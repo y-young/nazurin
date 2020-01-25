@@ -4,7 +4,8 @@ import os
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 # Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
+logging.basicConfig(filename='info.log', filemode='w',
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -22,10 +23,9 @@ def error(bot, update, error):
 
 
 def main():
-    TOKEN = "***REMOVED***"
-    NAME = "The name of your app on Heroku"
+    TOKEN = os.environ.get('TOKEN')
     # Port is given by Heroku
-    PORT = os.environ['PORT']
+    PORT = int(os.environ.get('PORT', '8443'))
 
     # Set up the Updater
     updater = Updater(TOKEN, use_context=True)
@@ -43,12 +43,10 @@ def main():
     dp.add_error_handler(error)
 
     # Webhook mode
-    updater.start_webhook(listen="0.0.0.0",
-                          port=int(PORT),
-                          url_path=TOKEN)
-    updater.bot.setWebhook("https://***REMOVED***.herokuapp.com/{}".format(NAME, TOKEN))
+    updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
+    updater.bot.setWebhook("https://***REMOVED***.herokuapp.com/" + TOKEN)
     # Polling mode
-    updater.start_polling()
+    # updater.start_polling()
     updater.idle()
 
 if __name__ == '__main__':
