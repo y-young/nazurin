@@ -4,8 +4,7 @@ import os
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 # Enable logging
-logging.basicConfig(filename='info.log', filemode='w',
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 
