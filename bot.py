@@ -3,9 +3,8 @@ import os
 from utils import *
 from pixiv import *
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from pixivpy3 import AppPixivAPI
 
-api = AppPixivAPI()
+papi = Pixiv()
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
                     level=logging.INFO)
@@ -22,6 +21,7 @@ def echo(update, context):
     #Echo the user message.
     update.message.reply_text(update.message.text)
 def pixiv(update, context):
+    global papi
     try:
         # args[0] should contain the queried artwork id
         id = int(context.args[0])
@@ -31,13 +31,14 @@ def pixiv(update, context):
         bot = context.bot
         chat_id = update.message.chat_id
         message_id = update.message.message_id
-        imgs = artworkDetail(id)
+        imgs = papi.artworkDetail(id)
         for img in imgs:
             bot.sendPhoto(chat_id, img['url'], reply_to_message_id=message_id)
     except (IndexError, ValueError):
         update.message.reply_text('Usage: /pixiv <artwork_id>')
-def error(bot, update, error):
-    logger.warning('Update "%s" caused error "%s"', update, error)
+def error(update, context):
+    print(error)
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
 def main():
@@ -58,7 +59,7 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('ping', ping))
-    dp.add_handler(CommandHandler('pixiv', pixiv, Filters.user(ADMIN_ID), pass_args=True))
+    dp.add_handler(CommandHandler('pixiv', pixiv, Filters.user(user_id=ADMIN_ID), pass_args=True))
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
@@ -74,7 +75,7 @@ def main():
         # Polling mode
         updater.start_polling()
 
-    api.login(PIXIV_USER, PIXIV_PASS)
+    papi.login(PIXIV_USER, PIXIV_PASS)
     updater.idle()
 
 if __name__ == '__main__':
