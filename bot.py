@@ -44,7 +44,6 @@ def main():
     global api
     ENV = os.environ.get('ENV')
     TOKEN = os.environ.get('TOKEN')
-    print os.environ
     # Port is given by Heroku
     PORT = int(os.environ.get('PORT', '8443'))
     ADMIN_ID = os.environ.get('ADMIN_ID')
