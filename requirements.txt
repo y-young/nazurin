@@ -1,1 +1,2 @@
 python-telegram-bot
+pixivpy3
