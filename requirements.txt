@@ -1,2 +1,3 @@
 python-telegram-bot
 pixivpy
+beautifulsoup4

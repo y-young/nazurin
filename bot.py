@@ -3,6 +3,7 @@ import os
 import traceback
 from utils import *
 from pixiv import *
+from twitter import *
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import InputMediaPhoto
 
@@ -18,10 +19,6 @@ def start(update, context):
 @typing
 def ping(update, context):
     update.message.reply_text('pong!')
-@typing
-def echo(update, context):
-    #Echo the user message.
-    update.message.reply_text(update.message.text)
 def pixiv(update, context):
     global papi
     try:
@@ -50,20 +47,51 @@ def pixiv_download(update, context):
         if id < 0:
             update.message.reply_text('Invalid artwork id!')
             return
-        bot = context.bot
-        chat_id = update.message.chat_id
-        message_id = update.message.message_id
-        imgs = papi.downloadArtwork(id=id)
-        for img in imgs:
-            bot.sendDocument(chat_id, open('./downloads/' + img['name'], 'rb'), filename=img['name'], reply_to_message_id=message_id)
+        sendPixivDocument(update, context, id)
     except (IndexError, ValueError):
         update.message.reply_text('Usage: /pixiv_download <artwork_id>')
-    except PixivError as error:
-        update.message.reply_text(error.reason)
+def gallery_update(update, context):
+    message = update.message
+    src = None
+    if message.entities:
+        entities = message.entities
+        text = message.text
+    elif message.caption_entities:
+        entities = message.caption_entities
+        text = message.caption
+    else:
+        return
+    for item in entities:
+        if item.type == 'text_link':
+            src = match_url(item.url)
+        elif item.type == 'url':
+            offset = item.offset
+            length = item.length
+            src = match_url(text[offset:offset + length])
+    if not src:
+        return
+    logger.info(src)
+    if src['type'] == 'pixiv':
+        sendPixivDocument(update, context, src['id'])
+    elif src['type'] == 'twitter':
+        imgs = twitter_download(src['url'])
+        for img in imgs:
+            bot.sendDocument(chat_id, open('./downloads/' + img['name'], 'rb'), filename=img['name'], reply_to_message_id=message_id)
+
 def error(update, context):
     logger.error('Update "%s" caused error "%s"', update, context.error)
     traceback.print_exc()
 
+def sendPixivDocument(update, context, id):
+    bot = context.bot
+    chat_id = update.message.chat_id
+    message_id = update.message.message_id
+    try:
+        imgs = papi.downloadArtwork(id=id)
+        for img in imgs:
+            bot.sendDocument(chat_id, open('./downloads/' + img['name'], 'rb'), filename=img['name'], reply_to_message_id=message_id)
+    except PixivError as error:
+        update.message.reply_text(error.reason)
 
 def main():
     global api
@@ -85,9 +113,7 @@ def main():
     dp.add_handler(CommandHandler('ping', ping))
     dp.add_handler(CommandHandler('pixiv', pixiv, Filters.user(user_id=ADMIN_ID), pass_args=True))
     dp.add_handler(CommandHandler('pixiv_download', pixiv_download, Filters.user(user_id=ADMIN_ID), pass_args=True))
-
-    # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler(Filters.text, echo))
+    dp.add_handler(MessageHandler(Filters.user(user_id=ADMIN_ID), gallery_update, pass_chat_data=True))
 
     # log all errors
     dp.add_error_handler(error)
