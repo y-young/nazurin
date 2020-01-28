@@ -1,5 +1,6 @@
 import logging
 import os
+import traceback
 from utils import *
 from pixiv import *
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
@@ -37,8 +38,8 @@ def pixiv(update, context):
     except (IndexError, ValueError):
         update.message.reply_text('Usage: /pixiv <artwork_id>')
 def error(update, context):
-    print(error)
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
+    logger.error('Update "%s" caused error "%s"', update, context.error)
+    traceback.print_exc()
 
 
 def main():
@@ -47,7 +48,7 @@ def main():
     TOKEN = os.environ.get('TOKEN')
     # Port is given by Heroku
     PORT = int(os.environ.get('PORT', '8443'))
-    ADMIN_ID = os.environ.get('ADMIN_ID')
+    ADMIN_ID = int(os.environ.get('ADMIN_ID'))
     PIXIV_USER = os.environ.get('PIXIV_USER')
     PIXIV_PASS = os.environ.get('PIXIV_PASS')
 
