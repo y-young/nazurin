@@ -75,6 +75,9 @@ def gallery_update(update, context):
         sendPixivDocument(update, context, src['id'])
     elif src['type'] == 'twitter':
         imgs = twitter_download(src['url'])
+        bot = context.bot
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
         for img in imgs:
             bot.sendDocument(chat_id, open('./downloads/' + img['name'], 'rb'), filename=img['name'], reply_to_message_id=message_id)
 
