@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 
 def twitter_download(url):
     directory = './downloads/'
-    source = requests.get(url).raw
+    source = requests.get(url).text
     soup = BeautifulSoup(source, 'html.parser')
     imgs = list()
     items = soup.findAll(property='og:image')
