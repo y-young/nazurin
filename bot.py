@@ -4,6 +4,7 @@ import traceback
 from utils import *
 from pixiv import *
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram import InputMediaPhoto
 
 papi = Pixiv()
 # Enable logging
@@ -33,8 +34,10 @@ def pixiv(update, context):
         chat_id = update.message.chat_id
         message_id = update.message.message_id
         imgs = papi.artworkDetail(id)
+        media = list()
         for img in imgs:
-            bot.sendPhoto(chat_id, img['url'], reply_to_message_id=message_id)
+            media.append(InputMediaPhoto(img['url']))
+        bot.send_media_group(chat_id, media, reply_to_message_id=message_id)
     except (IndexError, ValueError):
         update.message.reply_text('Usage: /pixiv <artwork_id>')
 def error(update, context):
