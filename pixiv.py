@@ -19,7 +19,7 @@ class Pixiv(object):
         try:
             illust = self.api.illust_detail(id).illust
         except AttributeError:
-            raise NotFoundError("Artwork not found")
+            raise PixivError("Artwork not found")
         imgs = list()
         if illust.meta_pages: # Contains more than one image
             pages = illust.meta_pages
@@ -33,11 +33,12 @@ class Pixiv(object):
             imgs.append({'url': url, 'name': name})
         return imgs
 
-    def downloadArtwork(self, id):
-        imgs = self.artworkDetail(id)
+    def downloadArtwork(self, id=None, imgs=None):
+        directory = './downloads/'
+        if not imgs:
+            imgs = self.artworkDetail(id)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
         for img in imgs:
-            self.api.download(img['url'], path='./', name=img['name'])
-
-class NotFoundError(Exception):
-    def __init__(self, message):
-        self.message = message
+            self.api.download(img['url'], path=directory, name=img['name'])
+        return imgs

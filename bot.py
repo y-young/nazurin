@@ -37,11 +37,29 @@ def pixiv(update, context):
         media = list()
         for img in imgs:
             media.append(InputMediaPhoto(img['url']))
-        bot.send_media_group(chat_id, media, reply_to_message_id=message_id)
+        bot.sendMediaGroup(chat_id, media, reply_to_message_id=message_id)
     except (IndexError, ValueError):
         update.message.reply_text('Usage: /pixiv <artwork_id>')
-    except NotFoundError as error:
-        update.message.reply_text(error.message)
+    except PixivError as error:
+        update.message.reply_text(error.reason)
+def pixiv_download(update, context):
+    global papi
+    try:
+        # args[0] should contain the queried artwork id
+        id = int(context.args[0])
+        if id < 0:
+            update.message.reply_text('Invalid artwork id!')
+            return
+        bot = context.bot
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        imgs = papi.downloadArtwork(id=id)
+        for img in imgs:
+            bot.sendDocument(chat_id, open('./downloads/' + img['name'], 'rb'), filename=img['name'], reply_to_message_id=message_id)
+    except (IndexError, ValueError):
+        update.message.reply_text('Usage: /pixiv_download <artwork_id>')
+    except PixivError as error:
+        update.message.reply_text(error.reason)
 def error(update, context):
     logger.error('Update "%s" caused error "%s"', update, context.error)
     traceback.print_exc()
@@ -66,6 +84,7 @@ def main():
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('ping', ping))
     dp.add_handler(CommandHandler('pixiv', pixiv, Filters.user(user_id=ADMIN_ID), pass_args=True))
+    dp.add_handler(CommandHandler('pixiv_download', pixiv_download, Filters.user(user_id=ADMIN_ID), pass_args=True))
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
@@ -82,6 +101,7 @@ def main():
         updater.start_polling()
 
     papi.login(PIXIV_USER, PIXIV_PASS)
+    logger.info('Pixiv logged in successfully')
     updater.idle()
 
 if __name__ == '__main__':
