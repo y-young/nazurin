@@ -40,6 +40,8 @@ def pixiv(update, context):
         bot.send_media_group(chat_id, media, reply_to_message_id=message_id)
     except (IndexError, ValueError):
         update.message.reply_text('Usage: /pixiv <artwork_id>')
+    except NotFoundError as error:
+        update.message.reply_text(error.message)
 def error(update, context):
     logger.error('Update "%s" caused error "%s"', update, context.error)
     traceback.print_exc()

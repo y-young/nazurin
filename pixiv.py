@@ -16,7 +16,10 @@ class Pixiv(object):
         return name
 
     def artworkDetail(self, id):
-        illust = self.api.illust_detail(id).illust
+        try:
+            illust = self.api.illust_detail(id).illust
+        except AttributeError:
+            raise NotFoundError("Artwork not found")
         imgs = list()
         if illust.meta_pages: # Contains more than one image
             pages = illust.meta_pages
@@ -34,3 +37,7 @@ class Pixiv(object):
         imgs = self.artworkDetail(id)
         for img in imgs:
             self.api.download(img['url'], path='./', name=img['name'])
+
+class NotFoundError(Exception):
+    def __init__(self, message):
+        self.message = message
