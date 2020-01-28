@@ -13,13 +13,13 @@ def twitter_download(url):
     for item in items:
         src = item.get('content')
         src = src[:-6]
-        filename = os.path.basename(src)
+        filename = 'twitter - ' + os.path.basename(src)
         imgs.append({'name': filename, 'url': src})
     if not os.path.exists(directory):
         os.makedirs(directory)
     headers = {'Referer': url, 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36'}
     for img in imgs:
         response = requests.get(img['url'], headers=headers, stream=True).raw
-        with open(directory + 'twitter - ' + img['name'], 'wb') as f:
+        with open(directory + img['name'], 'wb') as f:
             shutil.copyfileobj(response, f)
     return imgs
