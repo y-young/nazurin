@@ -21,6 +21,10 @@ class Pixiv(object):
         except AttributeError:
             raise PixivError("Artwork not found")
         imgs = list()
+        tags = str()
+        for tag in illust.tags:
+            tags += '#' + tag.name + ' '
+        details = {'Title': illust.title, 'Author': illust.user.name, 'Tags': tags, 'Total bookmarks': str(illust.total_bookmarks), 'Url': 'pixiv.net/i/' + str(id)}
         if illust.meta_pages: # Contains more than one image
             pages = illust.meta_pages
             for page in pages:
@@ -31,12 +35,12 @@ class Pixiv(object):
             url = illust.meta_single_page.original_image_url
             name = self.getFilename(url, illust)
             imgs.append({'url': url, 'name': name})
-        return imgs
+        return imgs, details
 
     def downloadArtwork(self, id=None, imgs=None):
         directory = './downloads/'
         if not imgs:
-            imgs = self.artworkDetail(id)
+            imgs, _ = self.artworkDetail(id)
         if not os.path.exists(directory):
             os.makedirs(directory)
         for img in imgs:

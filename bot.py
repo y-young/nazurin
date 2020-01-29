@@ -34,10 +34,13 @@ def pixiv(update, context):
         bot = context.bot
         chat_id = update.message.chat_id
         message_id = update.message.message_id
-        imgs = papi.artworkDetail(id)
+        imgs, details = papi.artworkDetail(id)
+        caption = str()
+        for key, value in details.items():
+            caption += key + ': ' + value + '\n'
         media = list()
         for img in imgs:
-            media.append(InputMediaPhoto(img['url']))
+            media.append(InputMediaPhoto(img['url'], caption, 'HTML'))
         bot.sendMediaGroup(chat_id, media, reply_to_message_id=message_id)
     except (IndexError, ValueError):
         update.message.reply_text('Usage: /pixiv <artwork_id>')
