@@ -15,7 +15,7 @@ class Pixiv(object):
         name = "%s - %s - %s(%d)%s" % (filename, illust.title, illust.user.name, illust.user.id, extension)
         return name
 
-    def artworkDetail(self, id):
+    def artworkDetail(self, id, is_admin=False):
         try:
             illust = self.api.illust_detail(id).illust
         except AttributeError:
@@ -25,6 +25,8 @@ class Pixiv(object):
         for tag in illust.tags:
             tags += '#' + tag.name + ' '
         details = {'Title': illust.title, 'Author': illust.user.name, 'Tags': tags, 'Total bookmarks': str(illust.total_bookmarks), 'Url': 'pixiv.net/i/' + str(id)}
+        if is_admin:
+            details.setdefault('Bookmarked', str(illust.is_bookmarked))
         if illust.meta_pages: # Contains more than one image
             pages = illust.meta_pages
             for page in pages:
@@ -46,3 +48,10 @@ class Pixiv(object):
         for img in imgs:
             self.api.download(img['url'], path=directory, name=img['name'])
         return imgs
+
+    def addBookmark(self, id):
+        response = self.api.illust_bookmark_add(id)
+        if 'error' in response.keys():
+            raise PixivError(response['error']['user_message'])
+        else:
+            return True

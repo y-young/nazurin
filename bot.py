@@ -22,6 +22,16 @@ def start(update, context):
 @typing
 def ping(update, context):
     update.message.reply_text('pong!')
+@typing
+def help(update, context):
+    update.message.reply_text('''
+    This is ***REMOVED*** 's personal bot, used for collecting Pixiv and Twitter images.
+    Commands:
+    /pixiv <id> - view pixiv artwork
+    /pixiv_download <id> - download pixiv artwork
+    /bookmark <id> - bookmark pixiv artwork(ADMIN ONLY)
+    PS: Send Pixiv/Twitter URL to download image(s)
+    ''')
 @uploading_photo
 def pixiv(update, context):
     global papi
@@ -34,7 +44,8 @@ def pixiv(update, context):
         bot = context.bot
         chat_id = update.message.chat_id
         message_id = update.message.message_id
-        imgs, details = papi.artworkDetail(id)
+        is_admin = update.message.from_user.id == ADMIN_ID
+        imgs, details = papi.artworkDetail(id, is_admin)
         caption = str()
         for key, value in details.items():
             caption += key + ': ' + value + '\n'
@@ -48,7 +59,6 @@ def pixiv(update, context):
         update.message.reply_text(error.reason)
 @uploading_document
 def pixiv_download(update, context):
-    global papi
     try:
         # args[0] should contain the queried artwork id
         id = int(context.args[0])
@@ -59,6 +69,7 @@ def pixiv_download(update, context):
     except (IndexError, ValueError):
         update.message.reply_text('Usage: /pixiv_download <artwork_id>')
 def gallery_update(update, context):
+    global papi
     message = update.message
     message_id = message.message_id
     chat_id = message.chat_id
@@ -90,21 +101,41 @@ def gallery_update(update, context):
         bot.forwardMessage(GALLERY, chat_id, message_id)
         chat_id = ALBUM
         message_id = None # No need to reply to message
+        is_admin = True
     else:
         # Reply directly to chat
         bot.send_chat_action(chat_id=chat_id, action=ChatAction.UPLOAD_DOCUMENT)
+        is_admin = False
     if src['type'] == 'pixiv':
+        if is_admin:
+            papi.addBookmark(src['id'])
+            logger.info('Bookmarked artwork ' + str(src['id']))
         sendPixivDocument(context, src['id'], chat_id=chat_id)
     elif src['type'] == 'twitter':
         imgs = twitter_download(src['url'])
         for img in imgs:
             bot.sendDocument(chat_id, open('./downloads/' + img['name'], 'rb'), filename=img['name'], reply_to_message_id=message_id)
+def pixiv_bookmark(update, context):
+    global papi
+    try:
+        # args[0] should contain the queried artwork id
+        id = int(context.args[0])
+        if id < 0:
+            update.message.reply_text('Invalid artwork id!')
+            return
+        papi.addBookmark(id)
+        update.message.reply_text('Done!')
+    except (IndexError, ValueError):
+        update.message.reply_text('Usage: /bookmark <artwork_id>')
+    except PixivError as error:
+        update.message.reply_text(error.reason)
 
 def error(update, context):
     logger.error('Update "%s" caused error "%s"', update, context.error)
     traceback.print_exc()
 
 def sendPixivDocument(context, id, update=None, chat_id=None):
+    global papi
     bot = context.bot
     if update:
         chat_id = update.message.chat_id
@@ -135,8 +166,10 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('ping', ping))
-    dp.add_handler(CommandHandler('pixiv', pixiv, Filters.user(user_id=ADMIN_ID), pass_args=True))
-    dp.add_handler(CommandHandler('pixiv_download', pixiv_download, Filters.user(user_id=ADMIN_ID), pass_args=True))
+    dp.add_handler(CommandHandler('help', help))
+    dp.add_handler(CommandHandler('pixiv', pixiv, pass_args=True))
+    dp.add_handler(CommandHandler('pixiv_download', pixiv_download, pass_args=True))
+    dp.add_handler(CommandHandler('bookmark', pixiv_bookmark, Filters.user(user_id=ADMIN_ID), pass_args=True))
     dp.add_handler(MessageHandler(urlFilter, gallery_update, pass_chat_data=True))
 
     # log all errors
