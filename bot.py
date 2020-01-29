@@ -175,6 +175,8 @@ def main():
     # log all errors
     dp.add_error_handler(error)
 
+    papi.login(PIXIV_USER, PIXIV_PASS)
+    logger.info('Pixiv logged in successfully')
     if ENV == 'production':
         # Webhook mode
         updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
@@ -183,8 +185,6 @@ def main():
         # Polling mode
         updater.start_polling()
 
-    papi.login(PIXIV_USER, PIXIV_PASS)
-    logger.info('Pixiv logged in successfully')
     updater.idle()
 
 if __name__ == '__main__':
