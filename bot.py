@@ -4,10 +4,12 @@ from config import *
 from utils import *
 from pixiv import *
 from twitter import *
+from meganz import *
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, run_async
 from telegram import InputMediaPhoto, ChatAction
 
 papi = Pixiv()
+mapi = Mega()
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
                     level=logging.INFO)
@@ -115,7 +117,9 @@ def gallery_update(update, context):
         elif src['type'] == 'twitter':
             imgs = twitter_download(src['url'])
             sendDocuments(update, context, imgs, chat_id=chat_id)
-        
+        if is_admin:
+            # Upload to MEGA
+            mapi.upload(imgs)
     except PixivError as error:
         update.message.reply_text(error.reason)
 def pixiv_bookmark(update, context):

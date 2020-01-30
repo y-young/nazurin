@@ -1,3 +1,4 @@
 python-telegram-bot
 pixivpy
 beautifulsoup4
+mega.py
