@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
+from config import *
 from pixivpy3 import *
 
 class Pixiv(object):
     api = AppPixivAPI()
 
-    def login(self, user, pwd):
-        self.api.login(user, pwd)
+    def login(self):
+        self.api.login(PIXIV_USER, PIXIV_PASS)
 
     def getFilename(self,url, illust):
         basename = os.path.basename(url)
@@ -40,13 +41,13 @@ class Pixiv(object):
         return imgs, details
 
     def downloadArtwork(self, id=None, imgs=None):
-        directory = './downloads/'
         if not imgs:
             imgs, _ = self.artworkDetail(id)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+        if not os.path.exists(DOWNLOAD_DIR):
+            os.makedirs(DOWNLOAD_DIR)
         for img in imgs:
-            self.api.download(img['url'], path=directory, name=img['name'])
+            if not os.path.exists(DOWNLOAD_DIR + img['name']):
+                self.api.download(img['url'], path=DOWNLOAD_DIR, name=img['name'])
         return imgs
 
     def addBookmark(self, id):

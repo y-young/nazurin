@@ -1,6 +1,6 @@
 import logging
-import os
 import traceback
+from config import *
 from utils import *
 from pixiv import *
 from twitter import *
@@ -8,9 +8,6 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, run_a
 from telegram import InputMediaPhoto, ChatAction
 
 papi = Pixiv()
-ALBUM = int(os.environ.get('ALBUM'))
-GALLERY = int(os.environ.get('GALLERY'))
-ADMIN_ID = int(os.environ.get('ADMIN_ID'))
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
                     level=logging.INFO)
@@ -37,7 +34,6 @@ def help(update, context):
     ''')
 @uploading_photo
 def pixiv(update, context):
-    global papi
     try:
         # args[0] should contain the queried artwork id
         id = int(context.args[0])
@@ -61,7 +57,6 @@ def pixiv(update, context):
     except PixivError as error:
         update.message.reply_text(error.reason)
 def pixiv_download(update, context):
-    global papi
     try:
         # args[0] should contain the queried artwork id
         id = int(context.args[0])
@@ -75,7 +70,6 @@ def pixiv_download(update, context):
     except PixivError as error:
         update.message.reply_text(error.reason)
 def gallery_update(update, context):
-    global papi
     message = update.message
     message_id = message.message_id
     chat_id = message.chat_id
@@ -121,10 +115,10 @@ def gallery_update(update, context):
         elif src['type'] == 'twitter':
             imgs = twitter_download(src['url'])
             sendDocuments(update, context, imgs, chat_id=chat_id)
+        
     except PixivError as error:
         update.message.reply_text(error.reason)
 def pixiv_bookmark(update, context):
-    global papi
     try:
         # args[0] should contain the queried artwork id
         id = int(context.args[0])
@@ -143,7 +137,6 @@ def error(update, context):
     traceback.print_exc()
 @uploading_document
 def sendDocuments(update, context, imgs, chat_id=None):
-    global papi
     bot = context.bot
     message_id = update.message.message_id
     if not chat_id:
@@ -151,15 +144,8 @@ def sendDocuments(update, context, imgs, chat_id=None):
     else:
         message_id = None # Sending to channel, no message to reply
     for img in imgs:
-        bot.sendDocument(chat_id, open('./downloads/' + img['name'], 'rb'), filename=img['name'], reply_to_message_id=message_id)
+        bot.sendDocument(chat_id, open(DOWNLOAD_DIR + img['name'], 'rb'), filename=img['name'], reply_to_message_id=message_id)
 def main():
-    global api
-    ENV = os.environ.get('ENV')
-    TOKEN = os.environ.get('TOKEN')
-    # Port is given by Heroku
-    PORT = int(os.environ.get('PORT', '8443'))
-    PIXIV_USER = os.environ.get('PIXIV_USER')
-    PIXIV_PASS = os.environ.get('PIXIV_PASS')
     urlFilter = Filters.entity('url') | Filters.entity('text_link') | Filters.caption_entity('url') | Filters.caption_entity('text_link')
 
     # Set up the Updater
@@ -179,7 +165,7 @@ def main():
     # log all errors
     dp.add_error_handler(error)
 
-    papi.login(PIXIV_USER, PIXIV_PASS)
+    papi.login()
     logger.info('Pixiv logged in successfully')
     if ENV == 'production':
         # Webhook mode
