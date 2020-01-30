@@ -4,7 +4,7 @@ import traceback
 from utils import *
 from pixiv import *
 from twitter import *
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, run_async
 from telegram import InputMediaPhoto, ChatAction
 
 papi = Pixiv()
@@ -16,12 +16,15 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+@run_async
 def start(update, context):
     #Send a message when the command /start is issued.
     update.message.reply_text('Hi!')
+@run_async
 @typing
 def ping(update, context):
     update.message.reply_text('pong!')
+@run_async
 @typing
 def help(update, context):
     update.message.reply_text('''
@@ -57,17 +60,20 @@ def pixiv(update, context):
         update.message.reply_text('Usage: /pixiv <artwork_id>')
     except PixivError as error:
         update.message.reply_text(error.reason)
-@uploading_document
 def pixiv_download(update, context):
+    global papi
     try:
         # args[0] should contain the queried artwork id
         id = int(context.args[0])
         if id < 0:
             update.message.reply_text('Invalid artwork id!')
             return
-        sendPixivDocument(context, id, update=update)
+        imgs = papi.downloadArtwork(id=id)
+        sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
         update.message.reply_text('Usage: /pixiv_download <artwork_id>')
+    except PixivError as error:
+        update.message.reply_text(error.reason)
 def gallery_update(update, context):
     global papi
     message = update.message
@@ -94,7 +100,7 @@ def gallery_update(update, context):
             src = match_url(text[offset:offset + length])
     if not src:
         return
-    logger.info('gallery update: "%s"', src)
+    logger.info('Gallery update: "%s"', src)
     # Perform action
     if user_id == ADMIN_ID:
         # Forward to gallery & Save to album
@@ -104,17 +110,19 @@ def gallery_update(update, context):
         is_admin = True
     else:
         # Reply directly to chat
-        bot.send_chat_action(chat_id=chat_id, action=ChatAction.UPLOAD_DOCUMENT)
         is_admin = False
-    if src['type'] == 'pixiv':
-        if is_admin:
-            papi.addBookmark(src['id'])
-            logger.info('Bookmarked artwork ' + str(src['id']))
-        sendPixivDocument(context, src['id'], chat_id=chat_id)
-    elif src['type'] == 'twitter':
-        imgs = twitter_download(src['url'])
-        for img in imgs:
-            bot.sendDocument(chat_id, open('./downloads/' + img['name'], 'rb'), filename=img['name'], reply_to_message_id=message_id)
+    try:
+        if src['type'] == 'pixiv':
+            if is_admin:
+                papi.addBookmark(src['id'])
+                logger.info('Bookmarked artwork ' + str(src['id']))
+            imgs = papi.downloadArtwork(id=src['id'])
+            sendDocuments(update, context, imgs, chat_id=chat_id)
+        elif src['type'] == 'twitter':
+            imgs = twitter_download(src['url'])
+            sendDocuments(update, context, imgs, chat_id=chat_id)
+    except PixivError as error:
+        update.message.reply_text(error.reason)
 def pixiv_bookmark(update, context):
     global papi
     try:
@@ -133,21 +141,17 @@ def pixiv_bookmark(update, context):
 def error(update, context):
     logger.error('Update "%s" caused error "%s"', update, context.error)
     traceback.print_exc()
-
-def sendPixivDocument(context, id, update=None, chat_id=None):
+@uploading_document
+def sendDocuments(update, context, imgs, chat_id=None):
     global papi
     bot = context.bot
-    if update:
+    message_id = update.message.message_id
+    if not chat_id:
         chat_id = update.message.chat_id
-        message_id = update.message.message_id
     else:
-        message_id = None
-    try:
-        imgs = papi.downloadArtwork(id=id)
-        for img in imgs:
-            bot.sendDocument(chat_id, open('./downloads/' + img['name'], 'rb'), filename=img['name'], reply_to_message_id=message_id)
-    except PixivError as error:
-        update.message.reply_text(error.reason)
+        message_id = None # Sending to channel, no message to reply
+    for img in imgs:
+        bot.sendDocument(chat_id, open('./downloads/' + img['name'], 'rb'), filename=img['name'], reply_to_message_id=message_id)
 def main():
     global api
     ENV = os.environ.get('ENV')
@@ -181,9 +185,11 @@ def main():
         # Webhook mode
         updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
         updater.bot.setWebhook("https://***REMOVED***.herokuapp.com/" + TOKEN)
+        logger.info('Set webhook')
     else:
         # Polling mode
         updater.start_polling()
+        print('Started polling')
 
     updater.idle()
 
