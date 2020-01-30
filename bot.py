@@ -157,14 +157,13 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    # on different commands - answer in Telegram
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('ping', ping))
     dp.add_handler(CommandHandler('help', help))
     dp.add_handler(CommandHandler('pixiv', pixiv, pass_args=True))
     dp.add_handler(CommandHandler('pixiv_download', pixiv_download, pass_args=True))
     dp.add_handler(CommandHandler('bookmark', pixiv_bookmark, Filters.user(user_id=ADMIN_ID), pass_args=True))
-    dp.add_handler(MessageHandler(urlFilter, gallery_update, pass_chat_data=True))
+    dp.add_handler(MessageHandler(urlFilter & (~ Filters.update.channel_posts), gallery_update, pass_chat_data=True))
 
     # log all errors
     dp.add_error_handler(error)
