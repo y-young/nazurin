@@ -47,6 +47,9 @@ def pixiv(update, context):
         for key, value in details.items():
             caption += key + ': ' + value + '\n'
         media = list()
+        if len(imgs) > 10:
+            imgs = imgs[:9]
+            update.message.reply_text('Notice: Too many pages, sending only 10 of them' )
         for img in imgs:
             media.append(InputMediaPhoto(img['url'], caption, 'HTML'))
         bot.sendMediaGroup(chat_id, media, reply_to_message_id=message_id)
