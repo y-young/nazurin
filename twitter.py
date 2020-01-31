@@ -19,6 +19,7 @@ class Twitter(object):
             src = item.get('content')
             filename, url = self.parseUrl(src)
             imgs.append({'name': 'twitter - '+ filename, 'url': url})
+        logger.info(imgs)
         if not os.path.exists(DOWNLOAD_DIR):
             os.makedirs(DOWNLOAD_DIR)
         headers = {'Referer': url, 'User-Agent': self.UA}

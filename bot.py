@@ -1,4 +1,3 @@
-import logging
 import traceback
 from config import *
 from utils import *
@@ -11,10 +10,6 @@ from telegram import InputMediaPhoto, ChatAction
 papi = Pixiv()
 mapi = Mega()
 tapi = Twitter()
-# Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
-                    level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 @run_async
 def start(update, context):
@@ -72,6 +67,7 @@ def pixiv_download(update, context):
         update.message.reply_text('Usage: /pixiv_download <artwork_id>')
     except PixivError as error:
         update.message.reply_text(error.reason)
+@run_async
 def gallery_update(update, context):
     message = update.message
     message_id = message.message_id
@@ -112,12 +108,10 @@ def gallery_update(update, context):
         if src['type'] == 'pixiv':
             if is_admin:
                 papi.addBookmark(src['id'])
-                logger.info('Bookmarked artwork ' + str(src['id']))
             imgs = papi.downloadArtwork(id=src['id'])
             sendDocuments(update, context, imgs, chat_id=chat_id)
         elif src['type'] == 'twitter':
             imgs = tapi.download(src['url'])
-            logger.info(imgs)
             sendDocuments(update, context, imgs, chat_id=chat_id)
         if is_admin:
             # Upload to MEGA
@@ -156,7 +150,7 @@ def main():
     urlFilter = Filters.entity('url') | Filters.entity('text_link') | Filters.caption_entity('url') | Filters.caption_entity('text_link')
 
     # Set up the Updater
-    updater = Updater(TOKEN, use_context=True)
+    updater = Updater(TOKEN, workers=16, use_context=True)
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
@@ -172,7 +166,6 @@ def main():
     dp.add_error_handler(error)
 
     papi.login()
-    logger.info('Pixiv logged in successfully')
     if ENV == 'production':
         # Webhook mode
         updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)

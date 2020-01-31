@@ -1,4 +1,5 @@
 import os
+import logging
 
 ENV = os.environ.get('ENV')
 TOKEN = os.environ.get('TOKEN')
@@ -17,3 +18,7 @@ PIXIV_PASS = os.environ.get('PIXIV_PASS')
 
 MEGA_USER = os.environ.get('MEGA_USER')
 MEGA_PASS = os.environ.get('MEGA_PASS')
+
+# Enable logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)

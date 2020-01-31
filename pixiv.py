@@ -2,12 +2,14 @@
 import os
 from config import *
 from pixivpy3 import *
+from telegram.ext import run_async
 
 class Pixiv(object):
     api = AppPixivAPI()
 
     def login(self):
         self.api.login(PIXIV_USER, PIXIV_PASS)
+        logger.info('Pixiv logged in successfully')
 
     def getFilename(self,url, illust):
         basename = os.path.basename(url)
@@ -50,9 +52,11 @@ class Pixiv(object):
                 self.api.download(img['url'], path=DOWNLOAD_DIR, name=img['name'])
         return imgs
 
+    @run_async
     def addBookmark(self, id):
         response = self.api.illust_bookmark_add(id)
         if 'error' in response.keys():
             raise PixivError(response['error']['user_message'])
         else:
+            logger.info('Bookmarked artwork ' + str(id))
             return True
