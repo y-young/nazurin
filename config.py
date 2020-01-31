@@ -21,4 +21,4 @@ MEGA_PASS = os.environ.get('MEGA_PASS')
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('bot')
