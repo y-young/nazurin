@@ -7,7 +7,7 @@ TOKEN = os.environ.get('TOKEN')
 PORT = int(os.environ.get('PORT', '8443'))
 
 DOWNLOAD_DIR = './downloads/' # Requires a slash on the end
-UPLOAD_DIR = 'pics'
+UPLOAD_DIR = 'Pictures'
 
 ALBUM = int(os.environ.get('ALBUM'))
 GALLERY = int(os.environ.get('GALLERY'))
