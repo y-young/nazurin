@@ -1,15 +1,17 @@
+import shutil
 import traceback
 from config import *
 from utils import *
 from pixiv import *
 from twitter import *
+from danbooru import *
 from meganz import *
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, run_async
-from telegram import InputMediaPhoto, ChatAction
 
 papi = Pixiv()
 mapi = Mega()
 tapi = Twitter()
+dapi = Danbooru()
 
 @run_async
 def start(update, context):
@@ -30,46 +32,62 @@ def help(update, context):
     /bookmark <id> - bookmark pixiv artwork(ADMIN ONLY)
     PS: Send Pixiv/Twitter URL to download image(s)
     ''')
-@uploading_photo
+@run_async
 def pixiv(update, context):
+    message = update.message
     try:
         # args[0] should contain the queried artwork id
         id = int(context.args[0])
         if id < 0:
-            update.message.reply_text('Invalid artwork id!')
+            message.reply_text('Invalid artwork id!')
             return
-        bot = context.bot
-        chat_id = update.message.chat_id
-        message_id = update.message.message_id
-        is_admin = update.message.from_user.id == ADMIN_ID
+        is_admin = message.from_user.id == ADMIN_ID
         imgs, details = papi.artworkDetail(id, is_admin)
-        caption = str()
-        for key, value in details.items():
-            caption += key + ': ' + value + '\n'
-        media = list()
-        if len(imgs) > 10:
-            imgs = imgs[:9]
-            update.message.reply_text('Notice: Too many pages, sending only 10 of them' )
-        for img in imgs:
-            media.append(InputMediaPhoto(img['url'], caption, 'HTML'))
-        bot.sendMediaGroup(chat_id, media, reply_to_message_id=message_id)
+        sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
-        update.message.reply_text('Usage: /pixiv <artwork_id>')
+        message.reply_text('Usage: /pixiv <artwork_id>')
     except PixivError as error:
-        update.message.reply_text(error.reason)
+        message.reply_text(error.reason)
+@run_async
 def pixiv_download(update, context):
+    message = update.message
     try:
         # args[0] should contain the queried artwork id
         id = int(context.args[0])
         if id < 0:
-            update.message.reply_text('Invalid artwork id!')
+            message.reply_text('Invalid artwork id!')
             return
         imgs = papi.downloadArtwork(id=id)
         sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
-        update.message.reply_text('Usage: /pixiv_download <artwork_id>')
+        message.reply_text('Usage: /pixiv_download <artwork_id>')
     except PixivError as error:
-        update.message.reply_text(error.reason)
+        message.reply_text(error.reason)
+@run_async
+def danbooru(update, context):
+    message = update.message
+    try:
+        id = int(context.args[0])
+        if id <= 0:
+            message.reply_text('Invalid post id!')
+            return
+        imgs, details = dapi.view(id)
+        sendPhotos(update, context, imgs, details)
+    except (IndexError, ValueError):
+        message.reply_text('Usage: /danbooru <post_id>')
+@run_async
+def danbooru_download(update, context):
+    message = update.message
+    try:
+        id = int(context.args[0])
+        if id <= 0:
+            message.reply_text('Invalid post id!')
+            return
+        imgs = dapi.download(id)
+        print('downloaded')
+        sendDocuments(update, context, imgs)
+    except (IndexError, ValueError):
+        message.reply_text('Usage: /danbooru_download <post_id>')
 @run_async
 def gallery_update(update, context):
     message = update.message
@@ -112,43 +130,47 @@ def gallery_update(update, context):
             if is_admin:
                 papi.addBookmark(src['id'])
             imgs = papi.downloadArtwork(id=src['id'])
-            sendDocuments(update, context, imgs, chat_id=chat_id)
         elif src['type'] == 'twitter':
             imgs = tapi.download(src['url'])
-            sendDocuments(update, context, imgs, chat_id=chat_id)
+        elif src['type'] == 'danbooru':
+            imgs = dapi.download(src['id'])
+
+        sendDocuments(update, context, imgs, chat_id=chat_id)
         if is_admin:
             # Upload to MEGA
             mapi.upload(imgs)
             logger.info('Uploaded to MEGA')
+        message.reply_text('Done!')
     except PixivError as error:
-        update.message.reply_text(error.reason)
+        message.reply_text(error.reason)
 def pixiv_bookmark(update, context):
+    message = update.message
     try:
         # args[0] should contain the queried artwork id
         id = int(context.args[0])
         if id < 0:
-            update.message.reply_text('Invalid artwork id!')
+            message.reply_text('Invalid artwork id!')
             return
         papi.addBookmark(id)
-        update.message.reply_text('Done!')
+        message.reply_text('Done!')
     except (IndexError, ValueError):
-        update.message.reply_text('Usage: /bookmark <artwork_id>')
+        message.reply_text('Usage: /bookmark <artwork_id>')
     except PixivError as error:
-        update.message.reply_text(error.reason)
+        message.reply_text(error.reason)
+def clear_downloads(update, context):
+    message = update.message
+    try:
+        shutil.rmtree('./downloads')
+        message.reply_text("downloads directory cleared successfully.")
+    except PermissionError:
+        message.reply_text("Permission denied.") 
+    except OSError as error:
+        message.reply_text(error.strerror)
 
 def error(update, context):
     logger.error('Update "%s" caused error "%s"', update, context.error)
     traceback.print_exc()
-@uploading_document
-def sendDocuments(update, context, imgs, chat_id=None):
-    bot = context.bot
-    message_id = update.message.message_id
-    if not chat_id:
-        chat_id = update.message.chat_id
-    else:
-        message_id = None # Sending to channel, no message to reply
-    for img in imgs:
-        bot.sendDocument(chat_id, open(DOWNLOAD_DIR + img['name'], 'rb'), filename=img['name'], reply_to_message_id=message_id)
+
 def main():
     urlFilter = Filters.entity('url') | Filters.entity('text_link') | Filters.caption_entity('url') | Filters.caption_entity('text_link')
 
@@ -163,6 +185,9 @@ def main():
     dp.add_handler(CommandHandler('pixiv', pixiv, pass_args=True))
     dp.add_handler(CommandHandler('pixiv_download', pixiv_download, pass_args=True))
     dp.add_handler(CommandHandler('bookmark', pixiv_bookmark, Filters.user(user_id=ADMIN_ID), pass_args=True))
+    dp.add_handler(CommandHandler('danbooru', danbooru, pass_args=True))
+    dp.add_handler(CommandHandler('danbooru_download', danbooru_download, pass_args=True))
+    dp.add_handler(CommandHandler('clear_downloads', clear_downloads, Filters.user(user_id=ADMIN_ID), pass_args=True))
     dp.add_handler(MessageHandler(urlFilter & (~ Filters.update.channel_posts), gallery_update, pass_chat_data=True))
 
     # log all errors
