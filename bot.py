@@ -2,9 +2,7 @@ import shutil
 import traceback
 from config import *
 from utils import *
-from pixiv import *
-from twitter import *
-from danbooru import *
+from sites import Danbooru, Pixiv, Twitter
 from meganz import *
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, run_async
 
