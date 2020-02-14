@@ -3,6 +3,8 @@ import logging
 
 ENV = os.environ.get('ENV')
 TOKEN = os.environ.get('TOKEN')
+# Webhook url, eg: https://xxx.herokuapp.com/, should end with '/'
+WEBHOOK_URL = os.environ.get('WEBHOOK_URL')
 # Port is given by Heroku
 PORT = int(os.environ.get('PORT', '8443'))
 

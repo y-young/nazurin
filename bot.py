@@ -197,7 +197,7 @@ def main():
     if ENV == 'production':
         # Webhook mode
         updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
-        updater.bot.setWebhook("https://***REMOVED***.herokuapp.com/" + TOKEN)
+        updater.bot.setWebhook(WEBHOOK_URL + TOKEN)
         logger.info('Set webhook')
     else:
         # Polling mode
