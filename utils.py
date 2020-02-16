@@ -65,3 +65,9 @@ def match_url(url):
         return {'type': 'konachan', 'id': match[0]}
     else:
         return None
+
+def handleBadRequest(update, context, error):
+    if 'Wrong file identifier/http url' in error.message:
+        update.message.reply_text('Failed to send image as photo, maybe the size is too big, please consider using download option instead.', quote=True)
+    else:
+        raise error

@@ -6,6 +6,7 @@ from sites import Danbooru, Moebooru, Twitter
 from sites.pixiv import Pixiv, PixivError
 from meganz import *
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, run_async
+from telegram.error import BadRequest
 
 danbooru = Danbooru()
 pixiv = Pixiv()
@@ -14,12 +15,11 @@ mega = Mega()
 
 @run_async
 def start(update, context):
-    #Send a message when the command /start is issued.
     update.message.reply_text('Hi!')
 @run_async
 @typing
 def ping(update, context):
-    update.message.reply_text('pong!')
+    update.message.reply_text('pong!', quote=True)
 @run_async
 @typing
 def help(update, context):
@@ -44,15 +44,17 @@ def pixiv_view(update, context):
         # args[0] should contain the queried artwork id
         id = int(context.args[0])
         if id < 0:
-            message.reply_text('Invalid artwork id!')
+            message.reply_text('Invalid artwork id!', quote=True)
             return
         is_admin = message.from_user.id == ADMIN_ID
         imgs, details = pixiv.view(id, is_admin)
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
-        message.reply_text('Usage: /pixiv <artwork_id>')
+        message.reply_text('Usage: /pixiv <artwork_id>', quote=True)
     except PixivError as error:
-        message.reply_text(error.reason)
+        message.reply_text(error.reason, quote=True)
+    except BadRequest as error:
+        handleBadRequest(update, context, error)
 @run_async
 def pixiv_download(update, context):
     message = update.message
@@ -60,90 +62,96 @@ def pixiv_download(update, context):
         # args[0] should contain the queried artwork id
         id = int(context.args[0])
         if id < 0:
-            message.reply_text('Invalid artwork id!')
+            message.reply_text('Invalid artwork id!', quote=True)
             return
         imgs = pixiv.download(id=id)
         sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
-        message.reply_text('Usage: /pixiv_download <artwork_id>')
+        message.reply_text('Usage: /pixiv_download <artwork_id>', quote=True)
     except PixivError as error:
-        message.reply_text(error.reason)
+        message.reply_text(error.reason, quote=True)
 @run_async
 def danbooru_view(update, context):
     message = update.message
     try:
         id = int(context.args[0])
         if id <= 0:
-            message.reply_text('Invalid post id!')
+            message.reply_text('Invalid post id!', quote=True)
             return
         imgs, details = danbooru.view(id)
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
-        message.reply_text('Usage: /danbooru <post_id>')
+        message.reply_text('Usage: /danbooru <post_id>', quote=True)
+    except BadRequest:
+        handleBadRequest(update, context, error)
 @run_async
 def danbooru_download(update, context):
     message = update.message
     try:
         id = int(context.args[0])
         if id <= 0:
-            message.reply_text('Invalid post id!')
+            message.reply_text('Invalid post id!', quote=True)
             return
         imgs = danbooru.download(id)
         sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
-        message.reply_text('Usage: /danbooru_download <post_id>')
+        message.reply_text('Usage: /danbooru_download <post_id>', quote=True)
 @run_async
 def yandere_view(update, context):
     message = update.message
     try:
         id = int(context.args[0])
         if id < 0:
-            message.reply_text('Invalid post id!')
+            message.reply_text('Invalid post id!', quote=True)
             return
         moebooru = Moebooru('yandere')
         imgs, details = moebooru.view(id)
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
-        message.reply_text('Usage: /yandere <post_id>')
+        message.reply_text('Usage: /yandere <post_id>', quote=True)
+    except BadRequest:
+        handleBadRequest(update, context, error)
 @run_async
 def yandere_download(update, context):
     message = update.message
     try:
         id = int(context.args[0])
         if id <= 0:
-            message.reply_text('Invalid post id!')
+            message.reply_text('Invalid post id!', quote=True)
             return
         moebooru = Moebooru('yandere')
         imgs = moebooru.download(id)
         sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
-        message.reply_text('Usage: /yandere_download <post_id>')
+        message.reply_text('Usage: /yandere_download <post_id>', quote=True)
 @run_async
 def konachan_view(update, context):
     message = update.message
     try:
         id = int(context.args[0])
         if id < 0:
-            message.reply_text('Invalid post id!')
+            message.reply_text('Invalid post id!', quote=True)
             return
         moebooru = Moebooru('konachan')
         imgs, details = moebooru.view(id)
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
-        message.reply_text('Usage: /konachan <post_id>')
+        message.reply_text('Usage: /konachan <post_id>', quote=True)
+    except BadRequest:
+        handleBadRequest(update, context, error)
 @run_async
 def konachan_download(update, context):
     message = update.message
     try:
         id = int(context.args[0])
         if id <= 0:
-            message.reply_text('Invalid post id!')
+            message.reply_text('Invalid post id!', quote=True)
             return
         moebooru = Moebooru('konachan')
         imgs = moebooru.download(id)
         sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
-        message.reply_text('Usage: /konachan_download <post_id>')
+        message.reply_text('Usage: /konachan_download <post_id>', quote=True)
 @run_async
 def gallery_update(update, context):
     message = update.message
@@ -199,32 +207,32 @@ def gallery_update(update, context):
             # Upload to MEGA
             mega.upload(imgs)
             logger.info('Uploaded to MEGA')
-        message.reply_text('Done!')
+            message.reply_text('Done!', quote=True)
     except PixivError as error:
-        message.reply_text(error.reason)
+        message.reply_text(error.reason, quote=True)
 def pixiv_bookmark(update, context):
     message = update.message
     try:
         # args[0] should contain the queried artwork id
         id = int(context.args[0])
         if id < 0:
-            message.reply_text('Invalid artwork id!')
+            message.reply_text('Invalid artwork id!', quote=True)
             return
         pixiv.bookmark(id)
-        message.reply_text('Done!')
+        message.reply_text('Done!', quote=True)
     except (IndexError, ValueError):
-        message.reply_text('Usage: /bookmark <artwork_id>')
+        message.reply_text('Usage: /bookmark <artwork_id>', quote=True)
     except PixivError as error:
         message.reply_text(error.reason)
 def clear_downloads(update, context):
     message = update.message
     try:
         shutil.rmtree('./downloads')
-        message.reply_text("downloads directory cleared successfully.")
+        message.reply_text("downloads directory cleared successfully.", quote=True)
     except PermissionError:
-        message.reply_text("Permission denied.") 
+        message.reply_text("Permission denied.", quote=True) 
     except OSError as error:
-        message.reply_text(error.strerror)
+        message.reply_text(error.strerror, quote=True)
 
 def error(update, context):
     logger.error('Update "%s" caused error "%s"', update, context.error)
@@ -234,7 +242,7 @@ def main():
     urlFilter = Filters.entity('url') | Filters.entity('text_link') | Filters.caption_entity('url') | Filters.caption_entity('text_link')
 
     # Set up the Updater
-    updater = Updater(TOKEN, workers=16, use_context=True)
+    updater = Updater(TOKEN, workers=32, use_context=True)
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
