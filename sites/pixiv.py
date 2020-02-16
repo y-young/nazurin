@@ -17,7 +17,7 @@ class Pixiv(object):
         name = "%s - %s - %s(%d)%s" % (filename, illust.title, illust.user.name, illust.user.id, extension)
         return name
 
-    def artworkDetail(self, id, is_admin=False):
+    def view(self, id, is_admin=False):
         try:
             illust = self.api.illust_detail(id).illust
         except AttributeError:
@@ -41,9 +41,9 @@ class Pixiv(object):
             imgs.append({'url': url, 'name': name})
         return imgs, details
 
-    def downloadArtwork(self, id=None, imgs=None):
+    def download(self, id=None, imgs=None):
         if not imgs:
-            imgs, _ = self.artworkDetail(id)
+            imgs, _ = self.view(id)
         if not os.path.exists(DOWNLOAD_DIR):
             os.makedirs(DOWNLOAD_DIR)
         for img in imgs:
@@ -52,7 +52,7 @@ class Pixiv(object):
         return imgs
 
     @run_async
-    def addBookmark(self, id):
+    def bookmark(self, id):
         response = self.api.illust_bookmark_add(id)
         if 'error' in response.keys():
             raise PixivError(response['error']['user_message'])

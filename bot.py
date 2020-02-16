@@ -47,7 +47,7 @@ def pixiv_view(update, context):
             message.reply_text('Invalid artwork id!')
             return
         is_admin = message.from_user.id == ADMIN_ID
-        imgs, details = pixiv.artworkDetail(id, is_admin)
+        imgs, details = pixiv.view(id, is_admin)
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
         message.reply_text('Usage: /pixiv <artwork_id>')
@@ -62,7 +62,7 @@ def pixiv_download(update, context):
         if id < 0:
             message.reply_text('Invalid artwork id!')
             return
-        imgs = pixiv.downloadArtwork(id=id)
+        imgs = pixiv.download(id=id)
         sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
         message.reply_text('Usage: /pixiv_download <artwork_id>')
@@ -104,7 +104,7 @@ def yandere_view(update, context):
         imgs, details = moebooru.view(id)
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
-        message.reply_text('Usage: /yandere <artwork_id>')
+        message.reply_text('Usage: /yandere <post_id>')
 @run_async
 def yandere_download(update, context):
     message = update.message
@@ -130,7 +130,7 @@ def konachan_view(update, context):
         imgs, details = moebooru.view(id)
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
-        message.reply_text('Usage: /konachan <artwork_id>')
+        message.reply_text('Usage: /konachan <post_id>')
 @run_async
 def konachan_download(update, context):
     message = update.message
@@ -184,8 +184,8 @@ def gallery_update(update, context):
     try:
         if src['type'] == 'pixiv':
             if is_admin:
-                pixiv.addBookmark(src['id'])
-            imgs = pixiv.downloadArtwork(id=src['id'])
+                pixiv.bookmark(src['id'])
+            imgs = pixiv.download(id=src['id'])
         elif src['type'] == 'twitter':
             imgs = twitter.download(src['url'])
         elif src['type'] == 'danbooru':
@@ -210,7 +210,7 @@ def pixiv_bookmark(update, context):
         if id < 0:
             message.reply_text('Invalid artwork id!')
             return
-        pixiv.addBookmark(id)
+        pixiv.bookmark(id)
         message.reply_text('Done!')
     except (IndexError, ValueError):
         message.reply_text('Usage: /bookmark <artwork_id>')
