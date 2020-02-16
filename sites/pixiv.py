@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 import os
 from config import *
 from pixivpy3 import *
@@ -15,7 +16,7 @@ class Pixiv(object):
         basename = os.path.basename(url)
         filename, extension = os.path.splitext(basename)
         name = "%s - %s - %s(%d)%s" % (filename, illust.title, illust.user.name, illust.user.id, extension)
-        return name
+        return self._normalize(name)
 
     def view(self, id, is_admin=False):
         try:
@@ -55,7 +56,12 @@ class Pixiv(object):
     def bookmark(self, id):
         response = self.api.illust_bookmark_add(id)
         if 'error' in response.keys():
+            logger.error(response)
             raise PixivError(response['error']['user_message'])
         else:
             logger.info('Bookmarked artwork ' + str(id))
             return True
+
+    def _normalize(self, name):
+        name = re.sub('[\\\/]', '_', name) # replace / and \
+        return name
