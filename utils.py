@@ -48,15 +48,20 @@ def sendDocuments(update, context, imgs, chat_id=None):
         bot.sendDocument(chat_id, open(DOWNLOAD_DIR + img['name'], 'rb'), filename=img['name'], reply_to_message_id=message_id)
 
 def match_url(url):
+    id_pattern = re.compile('[0-9]+')
     if 'pixiv' in url:
-        pattern = re.compile('[0-9]+')
-        match = re.findall(pattern, url)
+        match = re.findall(id_pattern, url)
         return {'type': 'pixiv', 'id': match[0]}
     elif 'twitter' in url:
         return {'type': 'twitter', 'url': url}
     elif 'danbooru.donmai.us' in url:
-        pattern = re.compile('[0-9]+')
-        match = re.findall(pattern, url)
+        match = re.findall(id_pattern, url)
         return {'type': 'danbooru', 'id': match[0]}
+    elif 'yande.re' in url:
+        match = re.findall(id_pattern, url)
+        return {'type': 'yandere', 'id': match[0]}
+    elif 'konachan.com' in url:
+        match = re.findall(id_pattern, url)
+        return {'type': 'konachan', 'id': match[0]}
     else:
         return None

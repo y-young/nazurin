@@ -13,8 +13,7 @@ class Pixiv(object):
 
     def getFilename(self,url, illust):
         basename = os.path.basename(url)
-        filename = os.path.splitext(basename)[0]
-        extension = os.path.splitext(basename)[1]
+        filename, extension = os.path.splitext(basename)
         name = "%s - %s - %s(%d)%s" % (filename, illust.title, illust.user.name, illust.user.id, extension)
         return name
 
