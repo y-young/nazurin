@@ -23,6 +23,8 @@ class Pixiv(object):
             illust = self.api.illust_detail(id).illust
         except AttributeError:
             raise PixivError("Artwork not found")
+        if illust.restrict == 2:
+            raise PixivError("Artwork not found or is private")
         imgs = list()
         tags = str()
         for tag in illust.tags:
