@@ -2,8 +2,9 @@ import shutil
 import traceback
 from config import *
 from utils import *
-from sites import Danbooru, Moebooru, Twitter
+from sites import Moebooru, Twitter
 from sites.pixiv import Pixiv, PixivError
+from sites.danbooru import Danbooru, DanbooruError
 from meganz import *
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, run_async
 from telegram.error import BadRequest
@@ -24,7 +25,7 @@ def ping(update, context):
 @typing
 def help(update, context):
     update.message.reply_text('''
-    This is ***REMOVED*** 's personal bot, used for collecting Pixiv and Twitter images.
+    小さな小さな賢将, can help you collect images from various sites.
     Commands:
     /pixiv <id> - view pixiv artwork
     /pixiv_download <id> - download pixiv artwork
@@ -35,7 +36,7 @@ def help(update, context):
     /konachan <id> - view konachan post
     /konachan_download <id> - download konachan post
     /bookmark <id> - bookmark pixiv artwork(ADMIN ONLY)
-    PS: Send Pixiv/Twitter URL to download image(s)
+    PS: Send Pixiv/Danbooru/Yandere/Konachan/Twitter URL to download image(s)
     ''')
 @run_async
 def pixiv_view(update, context):
@@ -82,6 +83,8 @@ def danbooru_view(update, context):
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
         message.reply_text('Usage: /danbooru <post_id>', quote=True)
+    except DanbooruError as error:
+        message.reply_text(error.msg, quote=True)
     except BadRequest:
         handleBadRequest(update, context, error)
 @run_async
@@ -96,6 +99,8 @@ def danbooru_download(update, context):
         sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
         message.reply_text('Usage: /danbooru_download <post_id>', quote=True)
+    except DanbooruError as error:
+        message.reply_text(error.msg, quote=True)
 @run_async
 def yandere_view(update, context):
     message = update.message

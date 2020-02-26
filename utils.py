@@ -32,7 +32,7 @@ def sendPhotos(update, context, imgs, details=dict()):
         message.reply_text('Notice: Too many pages, sending only 10 of them' )
     caption = str()
     for key, value in details.items():
-        caption += key + ': ' + value + '\n'
+        caption += str(key) + ': ' + str(value) + '\n'
     for img in imgs:
         media.append(InputMediaPhoto(img['url'], caption, 'HTML'))
     bot.sendMediaGroup(chat_id, media, reply_to_message_id=message_id)

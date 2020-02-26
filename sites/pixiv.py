@@ -29,9 +29,9 @@ class Pixiv(object):
         tags = str()
         for tag in illust.tags:
             tags += '#' + tag.name + ' '
-        details = {'Title': illust.title, 'Author': illust.user.name, 'Tags': tags, 'Total bookmarks': str(illust.total_bookmarks), 'Url': 'pixiv.net/i/' + str(id)}
+        details = {'title': illust.title, 'author': illust.user.name, 'tags': tags, 'total_bookmarks': illust.total_bookmarks, 'url': 'pixiv.net/i/' + str(id)}
         if is_admin:
-            details.setdefault('Bookmarked', str(illust.is_bookmarked))
+            details['bookmarked'] = illust.is_bookmarked
         if illust.meta_pages: # Contains more than one image
             pages = illust.meta_pages
             for page in pages:
