@@ -2,9 +2,10 @@ import shutil
 import traceback
 from config import *
 from utils import *
-from sites import Moebooru, Twitter
+from sites import Twitter
 from sites.pixiv import Pixiv, PixivError
 from sites.danbooru import Danbooru, DanbooruError
+from sites.moebooru import Moebooru, MoebooruError
 from meganz import *
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, run_async
 from telegram.error import BadRequest
@@ -116,6 +117,8 @@ def yandere_view(update, context):
         message.reply_text('Usage: /yandere <post_id>', quote=True)
     except BadRequest:
         handleBadRequest(update, context, error)
+    except MoebooruError as error:
+        message.reply_text(error.msg, quote=True)
 @run_async
 def yandere_download(update, context):
     message = update.message
@@ -129,6 +132,8 @@ def yandere_download(update, context):
         sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
         message.reply_text('Usage: /yandere_download <post_id>', quote=True)
+    except MoebooruError as error:
+        message.reply_text(error.msg, quote=True)
 @run_async
 def konachan_view(update, context):
     message = update.message
@@ -144,6 +149,8 @@ def konachan_view(update, context):
         message.reply_text('Usage: /konachan <post_id>', quote=True)
     except BadRequest:
         handleBadRequest(update, context, error)
+    except MoebooruError as error:
+        message.reply_text(error.msg, quote=True)
 @run_async
 def konachan_download(update, context):
     message = update.message
@@ -157,6 +164,8 @@ def konachan_download(update, context):
         sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
         message.reply_text('Usage: /konachan_download <post_id>', quote=True)
+    except MoebooruError as error:
+        message.reply_text(error.msg, quote=True)
 @run_async
 def gallery_update(update, context):
     message = update.message
@@ -215,6 +224,10 @@ def gallery_update(update, context):
             message.reply_text('Done!', quote=True)
     except PixivError as error:
         message.reply_text(error.reason, quote=True)
+    except DanbooruError as error:
+        message.reply_text(error.msg, quote=True)
+    except MoebooruError as error:
+        message.reply_text(error.msg, quote=True)
 def pixiv_bookmark(update, context):
     message = update.message
     try:

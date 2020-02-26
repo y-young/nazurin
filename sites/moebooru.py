@@ -1,5 +1,6 @@
 from urllib.parse import unquote
 import requests
+from requests.exceptions import HTTPError
 import shutil
 import json
 import re
@@ -15,12 +16,21 @@ class Moebooru(object):
     }
 
     def __init__(self, site):
+        if site not in self.sites_url.keys():
+            raise MoebooruError(f'Unknown site: {site}')
         self.site = site
+        self.url = self.sites_url[self.site]
 
     def view(self, id):
-        url = 'https://'+ self.sites_url[self.site] + '/post/show/' + str(id)
-        source = requests.get(url).text
-        soup = BeautifulSoup(source, 'html.parser')
+        url = 'https://'+ self.url + '/post/show/' + str(id)
+        response = requests.get(url)
+        try:
+            response.raise_for_status()
+        except HTTPError as err:
+            raise MoebooruError(err)
+
+        response = response.text
+        soup = BeautifulSoup(response, 'html.parser')
         content = soup.find(id="post-view").script.get_text()
         info = content[20:-3]
         try:
@@ -29,6 +39,7 @@ class Moebooru(object):
         except json.decoder.JSONDecodeError as err:
             logger.error(err)
             pass
+
         source = post['source']
         file_url = post['file_url']
         name = unquote(os.path.basename(file_url))
@@ -40,7 +51,20 @@ class Moebooru(object):
                 artists += tag + ' '
             else:
                 tag_string += '#' + tag + ' '
-        details = {'title': title, 'artists': artists, 'tags': tag_string, 'source': source, 'url': url}
+        details = dict()
+        if title:
+            details['title'] = title
+        if artists:
+            details['artists'] = artists
+        if tag_string:
+            details['tags'] = tag_string
+        details['url'] = url
+        if source:
+            details['source'] = source
+        if post['parent_id']:
+            details['parent_id'] = post['parent_id']
+        if post['has_children']:
+            details['has_children'] = True
         return imgs, details
 
     def download(self, id):
@@ -88,3 +112,12 @@ class Moebooru(object):
     def parse_url(self, url):
         name = os.path.basename(url)
         return os.path.splitext(name)
+
+class MoebooruError(Exception):
+
+    def __init__(self, msg):
+        self.msg = str(msg)
+        super(Exception, self).__init__(self, msg)
+
+    def __str__(self):
+        return self.msg
