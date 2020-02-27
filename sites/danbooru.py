@@ -15,7 +15,7 @@ class Danbooru(object):
             if 'Not Found' in err._msg:
                 raise DanbooruError('Post not found')
         if 'file_url' not in post.keys():
-            raise DanbooruError('Tou may need a gold account to view this post\nSource: ' + post['source'])
+            raise DanbooruError('You may need a gold account to view this post\nSource: ' + post['source'])
 
         url = post['file_url']
         artists = post['tag_string_artist']
