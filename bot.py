@@ -182,15 +182,19 @@ def gallery_update(update, context):
         entities = message.caption_entities
         text = message.caption
     else:
+        message.reply_text('Error: URL not found', quote=True)
         return
+    urls = list()
     for item in entities:
         if item.type == 'text_link':
-            src = match_url(item.url)
+            urls.append(item.url)
         elif item.type == 'url':
             offset = item.offset
             length = item.length
-            src = match_url(text[offset:offset + length])
+            urls.append(text[offset:offset + length])
+    src = match_url(urls)
     if not src:
+        message.reply_text('Error: No source matched', quote=True)
         return
     logger.info('Gallery update: "%s"', src)
     # Perform action
