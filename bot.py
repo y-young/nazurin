@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import shutil
 import traceback
 from config import *
@@ -184,19 +185,21 @@ def gallery_update(update, context):
     else:
         message.reply_text('Error: URL not found', quote=True)
         return
+    # Telegram counts entity offset and length in UTF-16 code units
+    text = text.encode('utf-16-le')
     urls = list()
     for item in entities:
         if item.type == 'text_link':
-            urls.append(item.url)
+            urls.append(item.url.decode('utf-16-le'))
         elif item.type == 'url':
             offset = item.offset
             length = item.length
-            urls.append(text[offset:offset + length])
+            urls.append(text[offset * 2:(offset + length) * 2].decode('utf-16-le'))
     src = match_url(urls)
     if not src:
         message.reply_text('Error: No source matched', quote=True)
         return
-    logger.info('Gallery update: "%s"', src)
+    logger.info('Collection update: "%s"', src)
     # Perform action
     if user_id == ADMIN_ID:
         # Forward to gallery & Save to album
