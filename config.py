@@ -10,6 +10,7 @@ PORT = int(os.environ.get('PORT', '8443'))
 
 DOWNLOAD_DIR = './downloads/' # Requires a slash on the end
 UPLOAD_DIR = 'Pictures'
+FIREBASE_COLLECION = 'nazurin'
 
 ALBUM = int(os.environ.get('ALBUM'))
 GALLERY = int(os.environ.get('GALLERY'))

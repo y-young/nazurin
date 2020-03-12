@@ -3,3 +3,4 @@ pixivpy
 beautifulsoup4
 mega.py
 Pybooru
+firebase-admin
