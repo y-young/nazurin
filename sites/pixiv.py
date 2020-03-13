@@ -8,8 +8,9 @@ from pixivpy3 import *
 from telegram.ext import run_async
 
 class Pixiv(object):
-    api = AppPixivAPI()
-    db = Firebase()
+    def __init__(self):
+        self.api = AppPixivAPI()
+        self.db = Firebase()
 
     def login(self, refresh=False):
         if not refresh:
