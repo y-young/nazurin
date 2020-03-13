@@ -190,7 +190,7 @@ def gallery_update(update, context):
     urls = list()
     for item in entities:
         if item.type == 'text_link':
-            urls.append(item.url.decode('utf-16-le'))
+            urls.append(item.url)
         elif item.type == 'url':
             offset = item.offset
             length = item.length
