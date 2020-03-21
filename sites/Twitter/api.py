@@ -2,12 +2,12 @@ import requests
 import shutil
 import re
 import os
-from config import *
+from config import DOWNLOAD_DIR
 from bs4 import BeautifulSoup
 
 class Twitter(object):
     UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36'
-
+    handlers = []
     def download(self, url):
         # Cannot get image meta from mobile Twitter
         url = url.replace('mobile.twitter.com', 'twitter.com')

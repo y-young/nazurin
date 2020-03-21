@@ -2,12 +2,12 @@ import os
 import re
 import shutil
 import requests
-from config import *
+from config import DOWNLOAD_DIR
 from pybooru import Danbooru as danbooru, PybooruHTTPError
 
 class Danbooru(object):
     api = danbooru('danbooru')
-
+    handlers = []
     def view(self, id):
         try:
             post = self.api.post_show(id)

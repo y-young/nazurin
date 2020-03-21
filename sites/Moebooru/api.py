@@ -5,7 +5,7 @@ import shutil
 import json
 import re
 import os
-from config import *
+from config import DOWNLOAD_DIR
 from pybooru import Moebooru as moebooru
 from bs4 import BeautifulSoup
 
@@ -14,8 +14,8 @@ class Moebooru(object):
         'yandere': 'yande.re',
         'konachan': 'konachan.com' 
     }
-
-    def __init__(self, site):
+    handlers = []
+    def __init__(self, site = 'yandere'):
         if site not in self.sites_url.keys():
             raise MoebooruError(f'Unknown site: {site}')
         self.site = site

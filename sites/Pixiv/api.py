@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 import re
 import os
+import sys
 import time
-from config import *
+from config import ADMIN_ID, FIREBASE_COLLECION, DOWNLOAD_DIR
+from sites.Pixiv.config import *
+from utils import sendPhotos, sendDocuments, handleBadRequest, logger
 from database import Firebase
-from pixivpy3 import *
-from telegram.ext import run_async
+from pixivpy3 import AppPixivAPI, PixivError
+from telegram.ext import run_async, CommandHandler, Filters
+from telegram.error import BadRequest
 
 class Pixiv(object):
     def __init__(self):

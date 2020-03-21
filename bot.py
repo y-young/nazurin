@@ -3,17 +3,15 @@ import shutil
 import traceback
 from config import *
 from utils import *
-from sites import Twitter
-from sites.pixiv import Pixiv, PixivError
-from sites.danbooru import Danbooru, DanbooruError
-from sites.moebooru import Moebooru, MoebooruError
+from sites import SiteManager
+from sites.Pixiv import PixivError
+from sites.Danbooru import DanbooruError
+from sites.Moebooru import MoebooruError
 from meganz import *
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, run_async
 from telegram.error import BadRequest
 
-danbooru = Danbooru()
-pixiv = Pixiv()
-twitter = Twitter()
+sites = SiteManager()
 mega = Mega()
 
 @run_async
@@ -40,133 +38,6 @@ def help(update, context):
     /bookmark <id> - bookmark pixiv artwork(ADMIN ONLY)
     PS: Send Pixiv/Danbooru/Yandere/Konachan/Twitter URL to download image(s)
     ''')
-@run_async
-def pixiv_view(update, context):
-    message = update.message
-    try:
-        # args[0] should contain the queried artwork id
-        id = int(context.args[0])
-        if id < 0:
-            message.reply_text('Invalid artwork id!', quote=True)
-            return
-        is_admin = message.from_user.id == ADMIN_ID
-        imgs, details = pixiv.view(id, is_admin)
-        sendPhotos(update, context, imgs, details)
-    except (IndexError, ValueError):
-        message.reply_text('Usage: /pixiv <artwork_id>', quote=True)
-    except PixivError as error:
-        message.reply_text(error.reason, quote=True)
-    except BadRequest as error:
-        handleBadRequest(update, context, error)
-@run_async
-def pixiv_download(update, context):
-    message = update.message
-    try:
-        # args[0] should contain the queried artwork id
-        id = int(context.args[0])
-        if id < 0:
-            message.reply_text('Invalid artwork id!', quote=True)
-            return
-        imgs = pixiv.download(id=id)
-        sendDocuments(update, context, imgs)
-    except (IndexError, ValueError):
-        message.reply_text('Usage: /pixiv_download <artwork_id>', quote=True)
-    except PixivError as error:
-        message.reply_text(error.reason, quote=True)
-@run_async
-def danbooru_view(update, context):
-    message = update.message
-    try:
-        id = int(context.args[0])
-        if id <= 0:
-            message.reply_text('Invalid post id!', quote=True)
-            return
-        imgs, details = danbooru.view(id)
-        sendPhotos(update, context, imgs, details)
-    except (IndexError, ValueError):
-        message.reply_text('Usage: /danbooru <post_id>', quote=True)
-    except DanbooruError as error:
-        message.reply_text(error.msg, quote=True)
-    except BadRequest:
-        handleBadRequest(update, context, error)
-@run_async
-def danbooru_download(update, context):
-    message = update.message
-    try:
-        id = int(context.args[0])
-        if id <= 0:
-            message.reply_text('Invalid post id!', quote=True)
-            return
-        imgs = danbooru.download(id)
-        sendDocuments(update, context, imgs)
-    except (IndexError, ValueError):
-        message.reply_text('Usage: /danbooru_download <post_id>', quote=True)
-    except DanbooruError as error:
-        message.reply_text(error.msg, quote=True)
-@run_async
-def yandere_view(update, context):
-    message = update.message
-    try:
-        id = int(context.args[0])
-        if id < 0:
-            message.reply_text('Invalid post id!', quote=True)
-            return
-        moebooru = Moebooru('yandere')
-        imgs, details = moebooru.view(id)
-        sendPhotos(update, context, imgs, details)
-    except (IndexError, ValueError):
-        message.reply_text('Usage: /yandere <post_id>', quote=True)
-    except BadRequest:
-        handleBadRequest(update, context, error)
-    except MoebooruError as error:
-        message.reply_text(error.msg, quote=True)
-@run_async
-def yandere_download(update, context):
-    message = update.message
-    try:
-        id = int(context.args[0])
-        if id <= 0:
-            message.reply_text('Invalid post id!', quote=True)
-            return
-        moebooru = Moebooru('yandere')
-        imgs = moebooru.download(id)
-        sendDocuments(update, context, imgs)
-    except (IndexError, ValueError):
-        message.reply_text('Usage: /yandere_download <post_id>', quote=True)
-    except MoebooruError as error:
-        message.reply_text(error.msg, quote=True)
-@run_async
-def konachan_view(update, context):
-    message = update.message
-    try:
-        id = int(context.args[0])
-        if id < 0:
-            message.reply_text('Invalid post id!', quote=True)
-            return
-        moebooru = Moebooru('konachan')
-        imgs, details = moebooru.view(id)
-        sendPhotos(update, context, imgs, details)
-    except (IndexError, ValueError):
-        message.reply_text('Usage: /konachan <post_id>', quote=True)
-    except BadRequest:
-        handleBadRequest(update, context, error)
-    except MoebooruError as error:
-        message.reply_text(error.msg, quote=True)
-@run_async
-def konachan_download(update, context):
-    message = update.message
-    try:
-        id = int(context.args[0])
-        if id <= 0:
-            message.reply_text('Invalid post id!', quote=True)
-            return
-        moebooru = Moebooru('konachan')
-        imgs = moebooru.download(id)
-        sendDocuments(update, context, imgs)
-    except (IndexError, ValueError):
-        message.reply_text('Usage: /konachan_download <post_id>', quote=True)
-    except MoebooruError as error:
-        message.reply_text(error.msg, quote=True)
 @run_async
 def gallery_update(update, context):
     message = update.message
@@ -212,15 +83,16 @@ def gallery_update(update, context):
         is_admin = False
     try:
         if src['type'] == 'pixiv':
+            pixiv = sites.api('pixiv')()
             if is_admin:
                 pixiv.bookmark(src['id'])
             imgs = pixiv.download(id=src['id'])
         elif src['type'] == 'twitter':
-            imgs = twitter.download(src['url'])
+            imgs = sites.api('twitter')().download(src['url'])
         elif src['type'] == 'danbooru':
-            imgs = danbooru.download(src['id'])
+            imgs = sites.api('danbooru')().download(src['id'])
         elif src['type'] in ['yandere', 'konachan']:
-            moebooru = Moebooru(src['type'])
+            moebooru = sites.api('moebooru')(src['type'])
             imgs = moebooru.download(src['id'])
 
         sendDocuments(update, context, imgs, chat_id=chat_id)
@@ -235,20 +107,6 @@ def gallery_update(update, context):
         message.reply_text(error.msg, quote=True)
     except MoebooruError as error:
         message.reply_text(error.msg, quote=True)
-def pixiv_bookmark(update, context):
-    message = update.message
-    try:
-        # args[0] should contain the queried artwork id
-        id = int(context.args[0])
-        if id < 0:
-            message.reply_text('Invalid artwork id!', quote=True)
-            return
-        pixiv.bookmark(id)
-        message.reply_text('Done!', quote=True)
-    except (IndexError, ValueError):
-        message.reply_text('Usage: /bookmark <artwork_id>', quote=True)
-    except PixivError as error:
-        message.reply_text(error.reason)
 def clear_downloads(update, context):
     message = update.message
     try:
@@ -274,15 +132,7 @@ def main():
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('ping', ping))
     dp.add_handler(CommandHandler('help', help))
-    dp.add_handler(CommandHandler('pixiv', pixiv_view, pass_args=True))
-    dp.add_handler(CommandHandler('pixiv_download', pixiv_download, pass_args=True))
-    dp.add_handler(CommandHandler('bookmark', pixiv_bookmark, Filters.user(user_id=ADMIN_ID), pass_args=True))
-    dp.add_handler(CommandHandler('danbooru', danbooru_view, pass_args=True))
-    dp.add_handler(CommandHandler('danbooru_download', danbooru_download, pass_args=True))
-    dp.add_handler(CommandHandler('yandere', yandere_view, pass_args=True))
-    dp.add_handler(CommandHandler('yandere_download', yandere_download, pass_args=True))
-    dp.add_handler(CommandHandler('konachan', konachan_view, pass_args=True))
-    dp.add_handler(CommandHandler('konachan_download', konachan_download, pass_args=True))
+    sites.register_commands(dp)
     dp.add_handler(CommandHandler('clear_downloads', clear_downloads, Filters.user(user_id=ADMIN_ID), pass_args=True))
     dp.add_handler(MessageHandler(urlFilter & (~ Filters.update.channel_posts), gallery_update, pass_chat_data=True))
 
