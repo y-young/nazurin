@@ -88,7 +88,7 @@ def gallery_update(update, context):
                 pixiv.bookmark(src['id'])
             imgs = pixiv.download(id=src['id'])
         elif src['type'] == 'twitter':
-            imgs = sites.api('twitter')().download(src['url'])
+            imgs = sites.api('twitter')().download(src['id'])
         elif src['type'] == 'danbooru':
             imgs = sites.api('danbooru')().download(src['id'])
         elif src['type'] in ['yandere', 'konachan']:

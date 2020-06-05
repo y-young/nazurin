@@ -49,13 +49,16 @@ def sendDocuments(update, context, imgs, chat_id=None):
 
 def match_url(urls):
     id_pattern = re.compile('[0-9]+')
+    # TODO: refactor patterns
+    twitter_pattern = re.compile('(?:mobile\.)?twitter\.com/[^.]+/status/(\d+)')
     src = None
     for url in urls:
         if 'pixiv' in url:
             match = re.findall(id_pattern, url)
             return {'type': 'pixiv', 'id': match[0]}
         elif 'twitter' in url:
-            src =  {'type': 'twitter', 'url': url} # Twitter has the lowest priority
+            match = re.findall(twitter_pattern, url)
+            src =  {'type': 'twitter', 'id': match[0]} # Twitter has the lowest priority
         elif 'danbooru.donmai.us' in url:
             match = re.findall(id_pattern, url)
             return {'type': 'danbooru', 'id': match[0]}

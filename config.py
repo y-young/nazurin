@@ -16,9 +16,6 @@ ALBUM = int(os.environ.get('ALBUM'))
 GALLERY = int(os.environ.get('GALLERY'))
 ADMIN_ID = int(os.environ.get('ADMIN_ID'))
 
-PIXIV_USER = os.environ.get('PIXIV_USER')
-PIXIV_PASS = os.environ.get('PIXIV_PASS')
-
 MEGA_USER = os.environ.get('MEGA_USER')
 MEGA_PASS = os.environ.get('MEGA_PASS')
 
