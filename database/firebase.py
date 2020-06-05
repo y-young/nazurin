@@ -9,7 +9,8 @@ class Firebase(object):
         if cert.startswith('{'):
             cert = json.loads(cert)
         cred = credentials.Certificate(cert)
-        firebase_admin.initialize_app(cred)
+        if len(firebase_admin._apps) == 0:
+            firebase_admin.initialize_app(cred)
         self.db = firestore.client()
 
     def get(self, collection, document):
