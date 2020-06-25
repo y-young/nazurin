@@ -23,4 +23,4 @@ class Firebase(object):
         return self.db.collection(collection).document(str(document)).set(data)
 
     def update(self, collection, document, data):
-        return self.db.collection(collection).document(str(document)).set(data)
+        return self.db.collection(collection).document(str(document)).update(data)
