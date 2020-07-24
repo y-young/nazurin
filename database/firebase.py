@@ -13,14 +13,25 @@ class Firebase(object):
             firebase_admin.initialize_app(cred)
         self.db = firestore.client()
 
-    def get(self, collection, document):
-        return self.db.collection(collection).document(str(document)).get().to_dict()
+    def collection(self, key):
+        self._collection = self.db.collection(str(key))
+        return self
 
-    def exists(self, collection, document):
-        return self.db.collection(collection).document(str(document)).get().exists
+    def document(self, key=None):
+        self._document = self._collection.document(str(key))
+        return self
 
-    def store(self, collection, document, data):
-        return self.db.collection(collection).document(str(document)).set(data)
+    def get(self):
+        return self._document.get().to_dict()
 
-    def update(self, collection, document, data):
-        return self.db.collection(collection).document(str(document)).update(data)
+    def exists(self):
+        return self._document.get().exists
+
+    def insert(self, key, data):
+        if key:
+            return self._collection.document(str(key)).set(data)
+        else:
+            return self._collection.add(data)
+
+    def update(self, data):
+        return self._document.update(data)

@@ -1,26 +1,32 @@
 # -*- coding: utf-8 -*-
 import os
 from config import *
-from database import Firebase
+from database import Database
 from mega import Mega as mega
 from mega.errors import RequestError
+
+MEGA_USER = os.environ.get('MEGA_USER')
+MEGA_PASS = os.environ.get('MEGA_PASS')
+MEGA_DOCUMENT = 'mega'
 
 class Mega(object):
     def __init__(self):
         self.api = mega()
-        self.db = Firebase()
+        self.db = Database().driver()
+        self.collection = self.db.collection(NAZURIN_DATA)
+        self.document = self.collection.document(MEGA_DOCUMENT)
         self.destination = None
 
     def login(self, initialize=False):
         self.api.login(MEGA_USER, MEGA_PASS)
         if initialize:
-            self.db.store(FIREBASE_COLLECION, 'mega', {
+            self.collection.insert(MEGA_DOCUMENT, {
                 'sid': self.api.sid,
                 'master_key': list(self.api.master_key),
                 'root_id': self.api.root_id
             })
         else:
-            self.db.update(FIREBASE_COLLECION, 'mega', {
+            self.document.update({
                 'sid': self.api.sid,
                 'master_key': list(self.api.master_key),
                 'root_id': self.api.root_id
@@ -29,7 +35,7 @@ class Mega(object):
 
     def requireAuth(self):
         if not self.api.sid:
-            tokens = self.db.get(FIREBASE_COLLECION, 'mega')
+            tokens = self.document.get()
             if 'sid' in tokens.keys():
                 self.api.sid = tokens['sid']
                 self.api.master_key = tuple(tokens['master_key'])
@@ -45,7 +51,7 @@ class Mega(object):
 
     def getDestination(self):
         self.destination = self.api.find(UPLOAD_DIR, exclude_deleted=True)[0]
-        self.db.update(FIREBASE_COLLECION, 'mega', {
+        self.document.update({
             'destination': self.destination
         })
         logger.info('MEGA destination cached')

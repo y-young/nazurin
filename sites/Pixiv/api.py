@@ -3,10 +3,10 @@ import re
 import os
 import sys
 import time
-from config import ADMIN_ID, FIREBASE_COLLECION, DOWNLOAD_DIR
+from config import ADMIN_ID, NAZURIN_DATA, DOWNLOAD_DIR
 from sites.Pixiv.config import *
 from utils import sendPhotos, sendDocuments, handleBadRequest, logger
-from database import Firebase
+from database import Database
 from pixivpy3 import AppPixivAPI, PixivError
 from telegram.ext import run_async, CommandHandler, Filters
 from telegram.error import BadRequest
@@ -14,11 +14,13 @@ from telegram.error import BadRequest
 class Pixiv(object):
     def __init__(self):
         self.api = AppPixivAPI()
-        self.db = Firebase()
+        self.db = Database().driver()
+        self.collection = self.db.collection(NAZURIN_DATA)
+        self.document = self.collection.document(PIXIV_DOCUMENT)
 
     def login(self, refresh=False):
         if not refresh:
-            tokens = self.db.get(FIREBASE_COLLECION, 'pixiv')
+            tokens = self.document.get()
             if tokens:
                 self.api.refresh_token = tokens['refresh_token']
                 self.updated_time = tokens['updated_time']
@@ -26,7 +28,7 @@ class Pixiv(object):
                 self._login()
         if refresh or time.time() - self.updated_time >= 3600: # Access token expired
             self._refreshToken()
-            self.db.store(FIREBASE_COLLECION, 'pixiv', {
+            self.collection.insert(PIXIV_DOCUMENT, {
                 'access_token': self.api.access_token,
                 'refresh_token': self.api.refresh_token,
                 'updated_time': self.updated_time
@@ -43,6 +45,7 @@ class Pixiv(object):
             raise PixivError("Artwork not found")
         if illust.restrict == 2:
             raise PixivError("Artwork not found or is private")
+
         imgs = list()
         tags = str()
         for tag in illust.tags:

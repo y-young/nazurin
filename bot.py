@@ -74,8 +74,8 @@ def gallery_update(update, context):
     # Perform action
     if user_id == ADMIN_ID:
         # Forward to gallery & Save to album
-        bot.forwardMessage(GALLERY, chat_id, message_id)
-        chat_id = ALBUM
+        bot.forwardMessage(GALLERY_ID, chat_id, message_id)
+        chat_id = ALBUM_ID
         message_id = None # No need to reply to message
         is_admin = True
     else:
