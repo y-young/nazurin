@@ -47,7 +47,7 @@ Update your collection: send the bot a message with a link of Pixiv/Danbooru/Yan
 
 ### ENV
 
-Set to `production` to use Webhook mode, otherwise polling mode will be used.
+The default option (`production`) uses Webhook mode, you can set to `development` to use polling mode.
 
 ### TOKEN
 
@@ -69,11 +69,11 @@ Local directory to store downloaded images, will be created if not exists.
 
 Remote directory on MEGA for files to be uploaded to, _must_ exists.
 
-### ALBUM
+### ALBUM_ID
 
 Telegram channel ID used for storing _files_.
 
-### GALLERY
+### GALLERY_ID
 
 Telegram channel ID used for storing _messages_, messages sent to bot and containing URL entities will be forwarded here for reviewing.
 
@@ -82,6 +82,12 @@ Telegram channel ID used for storing _messages_, messages sent to bot and contai
 Telegram user ID(_not_ username) of the admin, Pixiv bookmark and collection update features are restricted to admin user.
 
 > Tips: You can get your User ID & Channel ID via [@GetIDs Bot](https://t.me/getidsbot/)
+
+### DATABASE
+
+Default option of local database is still under development, set to `Firebase` to use Firebase.
+
+You can also implement your own database driver by creating a file under `database` folder, and set this option to the name of driver class.
 
 ### GOOGLE_APPLICATION_CREDENTIALS
 
