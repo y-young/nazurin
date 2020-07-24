@@ -39,11 +39,12 @@ class Pixiv(object):
             logger.info('Pixiv logged in through cached tokens')
 
     def view(self, id, is_admin=False):
-        try:
-            illust = self.call(self.api.illust_detail, id).illust
-        except AttributeError:
+        response = self.call(self.api.illust_detail, id)
+        if 'illust' in response.keys():
+            illust = response.illust
+        else:
             raise PixivError("Artwork not found")
-        if illust.restrict == 2:
+        if illust.restrict != 0:
             raise PixivError("Artwork not found or is private")
 
         imgs = list()
@@ -86,8 +87,13 @@ class Pixiv(object):
             return True
 
     def _login(self):
-        self.api.login()
+        self.api.login(PIXIV_USER, PIXIV_PASS)
         self.updated_time = time.time()
+        self.collection.insert(PIXIV_DOCUMENT, {
+            'access_token': self.api.access_token,
+            'refresh_token': self.api.refresh_token,
+            'updated_time': self.updated_time
+        })
         logger.info('Pixiv logged in with password')
 
     def _refreshToken(self):
