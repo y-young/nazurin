@@ -8,7 +8,7 @@ from sites.Pixiv import PixivError
 from sites.Danbooru import DanbooruError
 from sites.Moebooru import MoebooruError
 from meganz import *
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, run_async
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Defaults, run_async
 from telegram.error import BadRequest
 
 sites = SiteManager()
@@ -20,7 +20,7 @@ def start(update, context):
 @run_async
 @typing
 def ping(update, context):
-    update.message.reply_text('pong!', quote=True)
+    update.message.reply_text('pong!')
 @run_async
 @typing
 def help(update, context):
@@ -54,7 +54,7 @@ def gallery_update(update, context):
         entities = message.caption_entities
         text = message.caption
     else:
-        message.reply_text('Error: URL not found', quote=True)
+        message.reply_text('Error: URL not found')
         return
     # Telegram counts entity offset and length in UTF-16 code units
     text = text.encode('utf-16-le')
@@ -68,7 +68,7 @@ def gallery_update(update, context):
             urls.append(text[offset * 2:(offset + length) * 2].decode('utf-16-le'))
     src = match_url(urls)
     if not src:
-        message.reply_text('Error: No source matched', quote=True)
+        message.reply_text('Error: No source matched')
         return
     logger.info('Collection update: "%s"', src)
     # Perform action
@@ -100,32 +100,33 @@ def gallery_update(update, context):
             # Upload to MEGA
             mega.upload(imgs)
             logger.info('Uploaded to MEGA')
-            message.reply_text('Done!', quote=True)
+            message.reply_text('Done!')
     except PixivError as error:
-        message.reply_text(error.reason, quote=True)
+        message.reply_text(error.reason)
     except DanbooruError as error:
-        message.reply_text(error.msg, quote=True)
+        message.reply_text(error.msg)
     except MoebooruError as error:
-        message.reply_text(error.msg, quote=True)
+        message.reply_text(error.msg)
 def clear_downloads(update, context):
     message = update.message
     try:
         shutil.rmtree('./downloads')
-        message.reply_text("downloads directory cleared successfully.", quote=True)
+        message.reply_text("downloads directory cleared successfully.")
     except PermissionError:
-        message.reply_text("Permission denied.", quote=True) 
+        message.reply_text("Permission denied.") 
     except OSError as error:
-        message.reply_text(error.strerror, quote=True)
+        message.reply_text(error.strerror)
 
 def error(update, context):
     logger.error('Update "%s" caused error "%s"', update, context.error)
     traceback.print_exc()
 
 def main():
+    defaults = Defaults(quote=True)
     urlFilter = Filters.entity('url') | Filters.entity('text_link') | Filters.caption_entity('url') | Filters.caption_entity('text_link')
 
     # Set up the Updater
-    updater = Updater(TOKEN, workers=32, use_context=True)
+    updater = Updater(TOKEN, workers=32, use_context=True, defaults=defaults)
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
