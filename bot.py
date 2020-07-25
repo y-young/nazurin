@@ -143,7 +143,7 @@ def main():
     if ENV == 'production':
         # Webhook mode
         updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
-        updater.bot.setWebhook(WEBHOOK_URL + TOKEN)
+        updater.bot.setWebhook(url=WEBHOOK_URL + TOKEN, allowed_updates=["message"])
         logger.info('Set webhook')
     else:
         # Polling mode
