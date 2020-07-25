@@ -7,12 +7,12 @@ from sites import SiteManager
 from sites.Pixiv import PixivError
 from sites.Danbooru import DanbooruError
 from sites.Moebooru import MoebooruError
-from meganz import *
+from storage import Storage
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Defaults, run_async
 from telegram.error import BadRequest
 
 sites = SiteManager()
-mega = Mega()
+storage = Storage()
 
 @run_async
 def start(update, context):
@@ -97,9 +97,8 @@ def gallery_update(update, context):
 
         sendDocuments(update, context, imgs, chat_id=chat_id)
         if is_admin:
-            # Upload to MEGA
-            mega.upload(imgs)
-            logger.info('Uploaded to MEGA')
+            storage.store(imgs)
+            logger.info('Storage completed')
             message.reply_text('Done!')
     except PixivError as error:
         message.reply_text(error.reason)

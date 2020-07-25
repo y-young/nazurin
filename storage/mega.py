@@ -56,10 +56,10 @@ class Mega(object):
         })
         logger.info('MEGA destination cached')
 
-    def upload(self, imgs):
+    def store(self, files):
         self.requireAuth()
-        for img in imgs:
-            self.call(self.api.upload, DOWNLOAD_DIR + img['name'], self.destination)
+        for item in files:
+            self.call(self.api.upload, DOWNLOAD_DIR + item['name'], self.destination)
 
     def call(self, func, *args):
         try:

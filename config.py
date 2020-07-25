@@ -8,6 +8,7 @@ WEBHOOK_URL = os.environ.get('WEBHOOK_URL')
 # Port is given by Heroku
 PORT = int(os.environ.get('PORT', '8443'))
 
+STORAGE = eval(os.environ.get('STORAGE', '[]'))
 DOWNLOAD_DIR = './downloads/' # Requires a slash on the end
 UPLOAD_DIR = 'Pictures'
 
