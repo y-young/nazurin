@@ -61,6 +61,14 @@ Webhook URL to be set for Telegram server.
 
 Webhook port, automatically set if on Heroku.
 
+### STORAGE
+
+String, evaluated to list.
+
+Type of storage, default is `[]` which only uses `DOWNLOAD_DIR` as local storage. Set to `['Mega']` to use MEGA.
+
+Implement other storage by creating a file under `storage` with a `store` function.
+
 ### DOWNLOAD_DIR
 
 Local directory to store downloaded images, will be created if not exists.
