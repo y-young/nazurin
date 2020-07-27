@@ -11,9 +11,6 @@ from storage import Storage
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Defaults, run_async
 from telegram.error import BadRequest
 
-sites = SiteManager()
-storage = Storage()
-
 @run_async
 def start(update, context):
     update.message.reply_text('Hi!')
@@ -121,8 +118,10 @@ def error(update, context):
     traceback.print_exc()
 
 def main():
+    global sites, storage
     defaults = Defaults(quote=True)
     urlFilter = Filters.entity('url') | Filters.entity('text_link') | Filters.caption_entity('url') | Filters.caption_entity('text_link')
+    sites = SiteManager()
 
     # Set up the Updater
     updater = Updater(TOKEN, workers=32, use_context=True, defaults=defaults)
@@ -147,8 +146,9 @@ def main():
     else:
         # Polling mode
         updater.start_polling()
-        print('Started polling')
+        logger.info('Started polling')
 
+    storage = Storage()
     updater.idle()
 
 if __name__ == '__main__':

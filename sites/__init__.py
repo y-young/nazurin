@@ -2,6 +2,7 @@ import importlib
 import glob
 import sys
 import os
+from config import logger
 
 sys.path.append('../')
 
@@ -21,6 +22,7 @@ class SiteManager(object):
             self.sites[module_name.lower()] = getattr(module, module_name)
             if hasattr(module, 'commands'):
                 self.commands += getattr(module, 'commands')
+        logger.info("Sites loaded")
 
     def api(self, site):
         return self.sites[site]
