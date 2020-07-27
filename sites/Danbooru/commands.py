@@ -19,7 +19,7 @@ def danbooru_view(update, context):
         message.reply_text('Usage: /danbooru <post_id>', quote=True)
     except DanbooruError as error:
         message.reply_text(error.msg, quote=True)
-    except BadRequest:
+    except BadRequest as error:
         handleBadRequest(update, context, error)
 
 @run_async
