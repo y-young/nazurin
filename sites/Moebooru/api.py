@@ -32,14 +32,13 @@ class Moebooru(object):
 
         response = response.text
         soup = BeautifulSoup(response, 'html.parser')
-        content = soup.find(id="post-view").script.get_text()
+        content = soup.find(id="post-view").script.contents[0]
         info = content[20:-3]
         try:
             info = json.loads(info)
             post = info['posts'][0]
         except json.decoder.JSONDecodeError as err:
             logger.error(err)
-            pass
 
         source = post['source']
         file_url = post['file_url']
