@@ -80,16 +80,16 @@ def gallery_update(update, context):
         is_admin = False
     try:
         if src['type'] == 'pixiv':
-            pixiv = sites.api('pixiv')()
+            pixiv = sites.api('pixiv')
             if is_admin:
                 pixiv.bookmark(src['id'])
             imgs = pixiv.download(id=src['id'])
         elif src['type'] == 'twitter':
-            imgs = sites.api('twitter')().download(src['id'])
+            imgs = sites.api('twitter').download(src['id'])
         elif src['type'] == 'danbooru':
-            imgs = sites.api('danbooru')().download(src['id'])
+            imgs = sites.api('danbooru').download(src['id'])
         elif src['type'] in ['yandere', 'konachan']:
-            moebooru = sites.api('moebooru')(src['type'])
+            moebooru = sites.api('moebooru').site(src['type'])
             imgs = moebooru.download(src['id'])
 
         sendDocuments(update, context, imgs, chat_id=chat_id)

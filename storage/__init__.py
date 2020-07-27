@@ -10,9 +10,9 @@ class Storage(object):
     def load(self):
         for driver_name in STORAGE:
             driver = importlib.import_module('storage.' + driver_name.lower())
-            self.disks.append(getattr(driver, driver_name))
+            self.disks.append(getattr(driver, driver_name)())
         logger.info("Storage loaded")
 
     def store(self, files):
         for disk in self.disks:
-            disk().store(files)
+            disk.store(files)

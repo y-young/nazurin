@@ -5,7 +5,7 @@ import shutil
 import json
 import re
 import os
-from config import DOWNLOAD_DIR
+from config import DOWNLOAD_DIR, logger
 from pybooru import Moebooru as moebooru
 from bs4 import BeautifulSoup
 
@@ -15,11 +15,12 @@ class Moebooru(object):
         'konachan': 'konachan.com' 
     }
     handlers = []
-    def __init__(self, site = 'yandere'):
-        if site not in self.sites_url.keys():
-            raise MoebooruError(f'Unknown site: {site}')
-        self.site = site
-        self.url = self.sites_url[self.site]
+    def site(self, site_name = 'yandere'):
+        if site_name not in self.sites_url.keys():
+            raise MoebooruError(f'Unknown site: {site_name}')
+        self._site = site_name
+        self.url = self.sites_url[self._site]
+        return self
 
     def view(self, id):
         url = 'https://'+ self.url + '/post/show/' + str(id)

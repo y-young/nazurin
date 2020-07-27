@@ -19,7 +19,7 @@ class SiteManager(object):
             if module_name.startswith('__'):
                 continue
             module = importlib.import_module('sites.' + module_name)
-            self.sites[module_name.lower()] = getattr(module, module_name)
+            self.sites[module_name.lower()] = getattr(module, module_name)()
             if hasattr(module, 'commands'):
                 self.commands += getattr(module, 'commands')
         logger.info("Sites loaded")
