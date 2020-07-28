@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 
 class Twitter(object):
     UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36'
-    handlers = []
+
     def download(self, id):
         api = 'https://syndication.twitter.com/tweets.json?ids='+ id +'&lang=en'
         source = requests.get(api).text
