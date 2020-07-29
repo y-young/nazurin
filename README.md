@@ -7,6 +7,10 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 
 小さな小さな賢将, a Telegram bot which helps you collect ACG illustrations from various sites.
 
+## Architecture
+
+![architecture.png](https://i.loli.net/2020/07/29/sJB1HkgvwZ8mOez.png)
+
 ## Features
 
 - View artwork from Pixiv/Danbooru/Yandere/Konachan
