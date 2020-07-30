@@ -26,11 +26,11 @@ class Pixiv(object):
                 Pixiv.updated_time = tokens['updated_time']
             else: # Initialize database
                 self._login()
+                return
         if refresh or time.time() - Pixiv.updated_time >= 3600: # Access token expired
             self._refreshToken()
-            Pixiv.collection.insert(PIXIV_DOCUMENT, {
+            Pixiv.document.update({
                 'access_token': Pixiv.api.access_token,
-                'refresh_token': Pixiv.api.refresh_token,
                 'updated_time': Pixiv.updated_time
             })
             logger.info('Pixiv tokens cached')
@@ -103,6 +103,7 @@ class Pixiv(object):
             Pixiv.updated_time = time.time()
             logger.info('Pixiv access token updated')
         except PixivError: # Refresh token may be expired, try to login with password
+            Pixiv.document.delete()
             self._login()
 
     def call(self, func, *args):

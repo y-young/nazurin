@@ -35,3 +35,6 @@ class Firebase(object):
 
     def update(self, data):
         return self._document.update(data)
+
+    def delete(self):
+        return self._document.delete()

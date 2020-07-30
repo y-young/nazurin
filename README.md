@@ -120,7 +120,7 @@ MEGA login email and password.
 ## Roadmap
 
 - [ ] Introduce plugin system and extract some functions
-- [ ] Support local database
+- [x] Support local database
 - [ ] Thorough error handling
 - [ ] Support more sites
 - [ ] Support Pixiv ugoira
