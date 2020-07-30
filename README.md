@@ -97,7 +97,9 @@ Telegram user ID(_not_ username) of the admin, Pixiv bookmark and collection upd
 
 ### DATABASE
 
-Default option of local database is still under development, set to `Firebase` to use Firebase.
+Type of database.
+
+Default option (`Local`) uses `TinyDB` as local database, set to `Firebase` to use Firebase.
 
 You can also implement your own database driver by creating a file under `database` folder, and set this option to the name of driver class.
 
