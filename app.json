@@ -1,0 +1,68 @@
+{
+    "name": "nazurin",
+    "description": "Images collection done right.",
+    "keywords": [
+      "nazurin",
+      "Telegram Bot",
+      "Pixiv",
+      "Danbooru",
+      "Moebooru"
+    ],
+    "repository": "https://github.com/y-young/nazurin",
+    "env": {
+      "TOKEN": {
+        "description": "API token of Telegram bot."
+      },
+      "WEBHOOK_URL": {
+        "description": "Webhook URL. eg: https://xxx.herokuapp.com/"
+      },
+      "STORAGE": {
+        "description": "Type of storage.",
+        "value": "['Mega']",
+        "required": false
+      },
+      "STORAGE_DIR": {
+        "description": "Storage directory.",
+        "required": false
+      },
+      "DATABASE": {
+        "description": "Type of database.",
+        "value": "Firebase",
+        "required": false
+      },
+      "ALBUM_ID": {
+        "description": "ID of Telegram album channel."
+      },
+      "GALLERY_ID": {
+        "description": "ID of Telegram gallery channel."
+      },
+      "ADMIN_ID": {
+        "description": "ID of Telegram admin user."
+      },
+      "PIXIV_USER": {
+        "description": "Pixiv email or user id.",
+        "required": false
+      },
+      "PIXIV_PASS": {
+        "description": "Pixiv password.",
+        "required": false
+      },
+      "MEGA_USER": {
+        "description": "MEGA login email.",
+        "required": false
+      },
+      "MEGA_PASS": {
+        "description": "MEGA password.",
+        "required": false
+      },
+      "GOOGLE_APPLICATION_CREDENTIALS": {
+        "description": "Firebase SDK credentials.",
+        "required": false
+      }
+    },
+    "buildpacks": [
+      {
+        "url": "heroku/python"
+      }
+    ]
+}
