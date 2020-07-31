@@ -77,9 +77,9 @@ Implement other storage by creating a file under `storage` with a `store` functi
 
 Local directory to store downloaded images, will be created if not exists.
 
-### UPLOAD_DIR
+### STORAGE_DIR
 
-Remote directory on MEGA for files to be uploaded to, _must_ exists.
+Storage directory, can be local or remote, _must_ exists when using MEGA.
 
 ### ALBUM_ID
 

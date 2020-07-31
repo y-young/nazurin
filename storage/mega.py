@@ -49,7 +49,7 @@ class Mega(object):
             self.getDestination()
 
     def getDestination(self):
-        Mega.destination = Mega.api.find(UPLOAD_DIR, exclude_deleted=True)[0]
+        Mega.destination = Mega.api.find(STORAGE_DIR, exclude_deleted=True)[0]
         Mega.document.update({
             'destination': Mega.destination
         })

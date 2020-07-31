@@ -10,7 +10,7 @@ PORT = int(os.environ.get('PORT', '8443'))
 
 STORAGE = eval(os.environ.get('STORAGE', '[]'))
 DOWNLOAD_DIR = './downloads/' # Requires a slash on the end
-UPLOAD_DIR = 'Pictures'
+STORAGE_DIR = os.environ.get('STORAGE_DIR', 'Pictures')
 
 DATABASE = os.environ.get('DATABASE', 'Local')
 # nazurin data collection in database
