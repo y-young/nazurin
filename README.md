@@ -25,11 +25,11 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 
 1. 'Deploy to Heroku' Button:
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+    [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 2. Manual deploy:
 
-Set all required environment variables on Heroku according to `config.py`(root directory & `/sites`), clone this repository and push to Heroku, everything should be working properly.
+    Set all required environment variables on Heroku according to `config.py`(root directory & `/sites`), clone this repository and push to Heroku, everything should be working properly.
 
 ### Deploy on your own server
 
