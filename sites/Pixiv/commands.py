@@ -1,4 +1,4 @@
-from .api import Pixiv, PixivError
+from .api import Pixiv
 from utils import *
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, run_async
 from telegram.error import BadRequest
@@ -19,7 +19,7 @@ def pixiv_view(update, context):
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
         message.reply_text('Usage: /pixiv <artwork_id>', quote=True)
-    except PixivError as error:
+    except NazurinError as error:
         message.reply_text(error.reason, quote=True)
     except BadRequest as error:
         handleBadRequest(update, context, error)
@@ -37,7 +37,7 @@ def pixiv_download(update, context):
         sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
         message.reply_text('Usage: /pixiv_download <artwork_id>', quote=True)
-    except PixivError as error:
+    except NazurinError as error:
         message.reply_text(error.reason, quote=True)
 
 @run_async
@@ -53,7 +53,7 @@ def pixiv_bookmark(update, context):
         message.reply_text('Done!', quote=True)
     except (IndexError, ValueError):
         message.reply_text('Usage: /bookmark <artwork_id>', quote=True)
-    except PixivError as error:
+    except NazurinError as error:
         message.reply_text(error.reason)
 
 commands = [

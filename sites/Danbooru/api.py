@@ -3,6 +3,7 @@ import re
 import shutil
 import requests
 from config import DOWNLOAD_DIR
+from utils import NazurinError
 from pybooru import Danbooru as danbooru, PybooruHTTPError
 
 class Danbooru(object):
@@ -13,9 +14,9 @@ class Danbooru(object):
             post = self.api.post_show(id)
         except PybooruHTTPError as err:
             if 'Not Found' in err._msg:
-                raise DanbooruError('Post not found')
+                raise NazurinError('Post not found')
         if 'file_url' not in post.keys():
-            raise DanbooruError('You may need a gold account to view this post\nSource: ' + post['source'])
+            raise NazurinError('You may need a gold account to view this post\nSource: ' + post['source'])
 
         url = post['file_url']
         artists = post['tag_string_artist']
@@ -107,13 +108,3 @@ class Danbooru(object):
         name = name.replace('_', ' ')
         name = re.sub('[\\\/]', ' ', name) # replace / and \
         return name
-
-
-class DanbooruError(Exception):
-
-    def __init__(self, msg):
-        self.msg = str(msg)
-        super(Exception, self).__init__(self, msg)
-
-    def __str__(self):
-        return self.msg

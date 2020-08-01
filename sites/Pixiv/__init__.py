@@ -1,4 +1,5 @@
-from .api import Pixiv, PixivError
+from .api import Pixiv
 from .commands import commands
+from .interface import PRIORITY, patterns, handle
 
-__all__ = ['Pixiv', 'PixivError', 'commands']
+__all__ = ['Pixiv', 'commands', 'PRIORITY', 'patterns', 'handle']

@@ -1,4 +1,4 @@
-from .api import Danbooru, DanbooruError
+from .api import Danbooru
 from utils import *
 from telegram.ext import CommandHandler, MessageHandler, Filters, run_async
 from telegram.error import BadRequest
@@ -17,7 +17,7 @@ def danbooru_view(update, context):
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
         message.reply_text('Usage: /danbooru <post_id>', quote=True)
-    except DanbooruError as error:
+    except NazurinError as error:
         message.reply_text(error.msg, quote=True)
     except BadRequest as error:
         handleBadRequest(update, context, error)
@@ -34,7 +34,7 @@ def danbooru_download(update, context):
         sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
         message.reply_text('Usage: /danbooru_download <post_id>', quote=True)
-    except DanbooruError as error:
+    except NazurinError as error:
         message.reply_text(error.msg, quote=True)
 
 commands = [

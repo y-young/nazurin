@@ -4,12 +4,8 @@ import traceback
 from config import *
 from utils import *
 from sites import SiteManager
-from sites.Pixiv import PixivError
-from sites.Danbooru import DanbooruError
-from sites.Moebooru import MoebooruError
 from storage import Storage
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Defaults, run_async
-from telegram.error import BadRequest
 
 @run_async
 def start(update, context):
@@ -42,7 +38,7 @@ def gallery_update(update, context):
     chat_id = message.chat_id
     user_id = message.from_user.id
     bot = context.bot
-    src = None
+
     # Match URL
     if message.entities:
         entities = message.entities
@@ -63,11 +59,12 @@ def gallery_update(update, context):
             offset = item.offset
             length = item.length
             urls.append(text[offset * 2:(offset + length) * 2].decode('utf-16-le'))
-    src = match_url(urls)
-    if not src:
+
+    result = sites.match(urls)
+    if not result:
         message.reply_text('Error: No source matched')
         return
-    logger.info('Collection update: "%s"', src)
+    logger.info('Collection update: site=%s, match=%s', result['site'], result['match'].groups())
     # Perform action
     if user_id == ADMIN_ID:
         # Forward to gallery & Save to album
@@ -78,30 +75,15 @@ def gallery_update(update, context):
     else:
         # Reply directly to chat
         is_admin = False
-    try:
-        if src['type'] == 'pixiv':
-            pixiv = sites.api('pixiv')
-            if is_admin:
-                pixiv.bookmark(src['id'])
-            imgs = pixiv.download(id=src['id'])
-        elif src['type'] == 'twitter':
-            imgs = sites.api('twitter').download(src['id'])
-        elif src['type'] == 'danbooru':
-            imgs = sites.api('danbooru').download(src['id'])
-        elif src['type'] in ['yandere', 'konachan']:
-            moebooru = sites.api('moebooru').site(src['type'])
-            imgs = moebooru.download(src['id'])
+    result['is_admin'] = is_admin
 
+    try:
+        imgs = sites.handle_update(result)
         sendDocuments(update, context, imgs, chat_id=chat_id)
         if is_admin:
             storage.store(imgs)
-            logger.info('Storage completed')
             message.reply_text('Done!')
-    except PixivError as error:
-        message.reply_text(error.reason)
-    except DanbooruError as error:
-        message.reply_text(error.msg)
-    except MoebooruError as error:
+    except NazurinError as error:
         message.reply_text(error.msg)
 def clear_downloads(update, context):
     message = update.message

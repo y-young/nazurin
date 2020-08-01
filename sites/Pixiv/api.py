@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 import re
 import os
-import sys
 import time
 from config import ADMIN_ID, NAZURIN_DATA, DOWNLOAD_DIR
 from sites.Pixiv.config import *
-from utils import sendPhotos, sendDocuments, handleBadRequest, logger
+from utils import logger, NazurinError
 from database import Database
 from pixivpy3 import AppPixivAPI, PixivError
 from telegram.ext import run_async, CommandHandler, Filters
-from telegram.error import BadRequest
 
 class Pixiv(object):
     api = AppPixivAPI()
@@ -43,9 +41,9 @@ class Pixiv(object):
         if 'illust' in response.keys():
             illust = response.illust
         else:
-            raise PixivError("Artwork not found")
+            raise NazurinError("Artwork not found")
         if illust.restrict != 0:
-            raise PixivError("Artwork not found or is private")
+            raise NazurinError("Artwork not found or is private")
 
         imgs = list()
         tags = str()
@@ -82,7 +80,7 @@ class Pixiv(object):
         response = self.call(Pixiv.api.illust_bookmark_add, id)
         if 'error' in response.keys():
             logger.error(response)
-            raise PixivError(response['error']['user_message'])
+            raise NazurinError(response['error']['user_message'])
         else:
             logger.info('Bookmarked artwork ' + str(id))
             return True

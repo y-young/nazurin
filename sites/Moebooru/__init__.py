@@ -1,4 +1,5 @@
-from .api import Moebooru, MoebooruError
+from .api import Moebooru
 from .commands import commands
+from .interface import PRIORITY, patterns, handle
 
-__all__ = ['Moebooru', 'MoebooruError', 'commands']
+__all__ = ['Moebooru', 'commands', 'PRIORITY', 'patterns', 'handle']

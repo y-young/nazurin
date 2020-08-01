@@ -6,20 +6,13 @@ import json
 import re
 import os
 from config import DOWNLOAD_DIR, logger
+from utils import NazurinError
 from pybooru import Moebooru as moebooru
 from bs4 import BeautifulSoup
 
 class Moebooru(object):
-    sites_url = {
-        'yandere': 'yande.re',
-        'konachan': 'konachan.com' 
-    }
-    handlers = []
-    def site(self, site_name = 'yandere'):
-        if site_name not in self.sites_url.keys():
-            raise MoebooruError(f'Unknown site: {site_name}')
-        self._site = site_name
-        self.url = self.sites_url[self._site]
+    def site(self, site_url='yande.re'):
+        self.url = site_url
         return self
 
     def view(self, id):
@@ -28,7 +21,7 @@ class Moebooru(object):
         try:
             response.raise_for_status()
         except HTTPError as err:
-            raise MoebooruError(err)
+            raise NazurinError(err)
 
         response = response.text
         soup = BeautifulSoup(response, 'html.parser')
@@ -112,12 +105,3 @@ class Moebooru(object):
     def parse_url(self, url):
         name = os.path.basename(url)
         return os.path.splitext(name)
-
-class MoebooruError(Exception):
-
-    def __init__(self, msg):
-        self.msg = str(msg)
-        super(Exception, self).__init__(self, msg)
-
-    def __str__(self):
-        return self.msg

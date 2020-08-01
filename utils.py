@@ -47,31 +47,16 @@ def sendDocuments(update, context, imgs, chat_id=None):
     for img in imgs:
         bot.sendDocument(chat_id, open(DOWNLOAD_DIR + img['name'], 'rb'), filename=img['name'], reply_to_message_id=message_id)
 
-def match_url(urls):
-    id_pattern = re.compile('[0-9]+')
-    # TODO: refactor patterns
-    twitter_pattern = re.compile('(?:mobile\.)?twitter\.com/[^.]+/status/(\d+)')
-    src = None
-    for url in urls:
-        if 'pixiv' in url:
-            match = re.findall(id_pattern, url)
-            return {'type': 'pixiv', 'id': match[0]}
-        elif 'twitter' in url:
-            match = re.findall(twitter_pattern, url)
-            src =  {'type': 'twitter', 'id': match[0]} # Twitter has the lowest priority
-        elif 'danbooru.donmai.us' in url:
-            match = re.findall(id_pattern, url)
-            return {'type': 'danbooru', 'id': match[0]}
-        elif 'yande.re' in url:
-            match = re.findall(id_pattern, url)
-            return {'type': 'yandere', 'id': match[0]}
-        elif 'konachan.com' in url:
-            match = re.findall(id_pattern, url)
-            return {'type': 'konachan', 'id': match[0]}
-    return src
-
 def handleBadRequest(update, context, error):
     if 'Wrong file identifier/http url' in error.message:
         update.message.reply_text('Failed to send image as photo, maybe the size is too big, please consider using download option instead.', quote=True)
     else:
         raise error
+
+class NazurinError(Exception):
+    def __init__(self, msg):
+        self.msg = str(msg)
+        super(Exception, self).__init__(self, msg)
+
+    def __str__(self):
+        return self.msg

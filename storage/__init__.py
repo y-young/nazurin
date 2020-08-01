@@ -16,3 +16,4 @@ class Storage(object):
     def store(self, files):
         for disk in self.disks:
             disk.store(files)
+        logger.info('Storage completed')
