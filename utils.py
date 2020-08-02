@@ -1,3 +1,6 @@
+from shutil import copyfileobj
+from os import path, makedirs
+from requests import get
 import re
 from functools import wraps
 from config import *
@@ -52,6 +55,19 @@ def handleBadRequest(update, context, error):
         update.message.reply_text('Failed to send image as photo, maybe the size is too big, please consider using download option instead.', quote=True)
     else:
         raise error
+
+def downloadImages(imgs, headers={}):
+    headers['User-Agent'] = UA
+    if not path.exists(DOWNLOAD_DIR):
+        makedirs(DOWNLOAD_DIR)
+    for img in imgs:
+        downloadImage(img['url'], img['name'], headers)
+
+def downloadImage(url, path, headers={}):
+    if not os.path.exists(DOWNLOAD_DIR + path):
+        response = get(url, headers=headers, stream=True).raw
+        with open(DOWNLOAD_DIR + path, 'wb') as f:
+            copyfileobj(response, f)
 
 class NazurinError(Exception):
     def __init__(self, msg):

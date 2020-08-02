@@ -3,6 +3,7 @@ import shutil
 import json
 import os
 from config import DOWNLOAD_DIR
+from utils import downloadImages
 
 class Bilibili(object):
     def download(self, id):
@@ -18,11 +19,5 @@ class Bilibili(object):
             extension = os.path.splitext(basename)[1]
             imgs.append({'name': str(id) + '_' + str(index) + extension, 'url': url})
 
-        if not os.path.exists(DOWNLOAD_DIR):
-            os.makedirs(DOWNLOAD_DIR)
-        for img in imgs:
-            if not os.path.exists(DOWNLOAD_DIR + img['name']):
-                response = requests.get(img['url'], stream=True).raw
-                with open(DOWNLOAD_DIR + img['name'], 'wb') as f:
-                    shutil.copyfileobj(response, f)
+        downloadImages(imgs)
         return imgs

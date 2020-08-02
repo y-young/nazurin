@@ -6,7 +6,7 @@ import json
 import re
 import os
 from config import DOWNLOAD_DIR, logger
-from utils import NazurinError
+from utils import NazurinError, downloadImage, downloadImages
 from pybooru import Moebooru as moebooru
 from bs4 import BeautifulSoup
 
@@ -62,10 +62,7 @@ class Moebooru(object):
 
     def download(self, id):
         imgs, _ = self.view(id)
-        if not os.path.exists(DOWNLOAD_DIR):
-            os.makedirs(DOWNLOAD_DIR)
-        for img in imgs:
-            self._download(img['url'], img['name'])
+        downloadImages(imgs)
         return imgs
 
     def pool(self, id, jpeg=False):
@@ -93,14 +90,7 @@ class Moebooru(object):
             filename = '0' * (3 - len(filename)) + filename
             _, ext = self.parse_url(img['url'])
             filename += ext
-            self._download(img['url'], pool_name + '/' + filename)
-
-    def _download(self, url, filename):
-        if not os.path.exists(DOWNLOAD_DIR + filename):
-            response = requests.get(url, stream=True).raw
-            with open(DOWNLOAD_DIR + filename, 'wb') as f:
-                shutil.copyfileobj(response, f)
-        return True
+            downloadImage(img['url'], pool_name + '/' + filename)
 
     def parse_url(self, url):
         name = os.path.basename(url)

@@ -3,13 +3,11 @@ import shutil
 import json
 import re
 import os
-from utils import logger
+from utils import logger, downloadImages
 from config import DOWNLOAD_DIR
 from bs4 import BeautifulSoup
 
 class Twitter(object):
-    UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36'
-
     def download(self, id):
         api = 'https://syndication.twitter.com/tweets.json?ids='+ id +'&lang=en'
         source = requests.get(api).text
@@ -23,14 +21,7 @@ class Twitter(object):
             filename, url = self.parseUrl(src, ext)
             imgs.append({'name': 'twitter - '+ filename, 'url': url})
         logger.info(imgs)
-        if not os.path.exists(DOWNLOAD_DIR):
-            os.makedirs(DOWNLOAD_DIR)
-        headers = {'Referer': url, 'User-Agent': self.UA}
-        for img in imgs:
-            if not os.path.exists(DOWNLOAD_DIR + img['name']):
-                response = requests.get(img['url'], headers=headers, stream=True).raw
-                with open(DOWNLOAD_DIR + img['name'], 'wb') as f:
-                    shutil.copyfileobj(response, f)
+        downloadImages(imgs)
         return imgs
 
     def parseUrl(self, src, extension):

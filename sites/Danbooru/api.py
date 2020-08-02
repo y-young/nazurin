@@ -1,14 +1,10 @@
 import os
 import re
-import shutil
-import requests
-from config import DOWNLOAD_DIR
-from utils import NazurinError
+from utils import NazurinError, downloadImages
 from pybooru import Danbooru as danbooru, PybooruHTTPError
 
 class Danbooru(object):
     api = danbooru('danbooru')
-    handlers = []
     def view(self, id):
         try:
             post = self.api.post_show(id)
@@ -44,13 +40,7 @@ class Danbooru(object):
 
     def download(self, id):
         imgs, _ = self.view(id)
-        if not os.path.exists(DOWNLOAD_DIR):
-            os.makedirs(DOWNLOAD_DIR)
-        for img in imgs:
-            if not os.path.exists(DOWNLOAD_DIR + img['name']):
-                response = requests.get(img['url'], stream=True).raw
-                with open(DOWNLOAD_DIR + img['name'], 'wb') as f:
-                    shutil.copyfileobj(response, f)
+        downloadImages(imgs)
         return imgs
 
     def _getNames(self, post):
