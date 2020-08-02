@@ -71,8 +71,8 @@ def downloadImage(url, path, headers={}):
 
 class NazurinError(Exception):
     def __init__(self, msg):
+        super().__init__(msg)
         self.msg = str(msg)
-        super(Exception, self).__init__(self, msg)
 
     def __str__(self):
         return self.msg
