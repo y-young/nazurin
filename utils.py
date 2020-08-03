@@ -1,7 +1,7 @@
 from shutil import copyfileobj
-from os import path, makedirs
 from functools import wraps
 import requests
+import os
 from config import *
 from telegram import ChatAction, InputMediaPhoto
 
@@ -57,8 +57,8 @@ def handleBadRequest(update, context, error):
 
 def downloadImages(imgs, headers={}):
     headers['User-Agent'] = UA
-    if not path.exists(DOWNLOAD_DIR):
-        makedirs(DOWNLOAD_DIR)
+    if not os.path.exists(DOWNLOAD_DIR):
+        os.makedirs(DOWNLOAD_DIR)
     for img in imgs:
         downloadImage(img['url'], img['name'], headers)
 
