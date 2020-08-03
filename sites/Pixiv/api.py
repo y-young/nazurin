@@ -2,12 +2,12 @@
 import re
 import os
 import time
-from config import ADMIN_ID, NAZURIN_DATA, DOWNLOAD_DIR
+from config import NAZURIN_DATA, DOWNLOAD_DIR
 from sites.Pixiv.config import *
 from utils import logger, NazurinError
 from database import Database
 from pixivpy3 import AppPixivAPI, PixivError
-from telegram.ext import run_async, CommandHandler, Filters
+from telegram.ext import run_async
 
 class Pixiv(object):
     api = AppPixivAPI()

@@ -1,9 +1,7 @@
 from urllib.parse import unquote
 import requests
 from requests.exceptions import HTTPError
-import shutil
 import json
-import re
 import os
 from config import DOWNLOAD_DIR, logger
 from utils import NazurinError, downloadImage, downloadImages

@@ -1,6 +1,6 @@
 from .api import Moebooru
 from utils import *
-from telegram.ext import CommandHandler, MessageHandler, Filters, run_async
+from telegram.ext import CommandHandler, run_async
 from telegram.error import BadRequest
 
 moebooru = Moebooru()

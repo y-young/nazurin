@@ -1,6 +1,6 @@
 from .api import Pixiv
 from utils import *
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, run_async
+from telegram.ext import CommandHandler, Filters, run_async
 from telegram.error import BadRequest
 
 pixiv = Pixiv()

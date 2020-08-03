@@ -1,8 +1,6 @@
 import requests
-import shutil
 import json
 import os
-from config import DOWNLOAD_DIR
 from utils import downloadImages
 
 class Bilibili(object):

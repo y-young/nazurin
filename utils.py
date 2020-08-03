@@ -1,8 +1,7 @@
 from shutil import copyfileobj
 from os import path, makedirs
-from requests import get
-import re
 from functools import wraps
+import requests
 from config import *
 from telegram import ChatAction, InputMediaPhoto
 
@@ -65,7 +64,7 @@ def downloadImages(imgs, headers={}):
 
 def downloadImage(url, path, headers={}):
     if not os.path.exists(DOWNLOAD_DIR + path):
-        response = get(url, headers=headers, stream=True).raw
+        response = requests.get(url, headers=headers, stream=True).raw
         with open(DOWNLOAD_DIR + path, 'wb') as f:
             copyfileobj(response, f)
 
