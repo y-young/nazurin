@@ -39,7 +39,7 @@ class SiteManager(object):
     def match(self, urls):
         sources = self.sources
         urls = str.join(',', urls)
-        result = payload = None
+        result = None
         matched_priority = 0
 
         for interface in sources:

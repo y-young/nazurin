@@ -97,7 +97,7 @@ class Pixiv(object):
 
     def _refreshToken(self):
         try:
-            response = Pixiv.api.auth()
+            Pixiv.api.auth()
             Pixiv.updated_time = time.time()
             logger.info('Pixiv access token updated')
         except PixivError: # Refresh token may be expired, try to login with password
