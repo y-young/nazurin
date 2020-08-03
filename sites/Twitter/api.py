@@ -27,7 +27,7 @@ class Twitter(object):
     def parseUrl(self, src, extension):
         '''
         Get filename & the url of the original image
-        eg: 
+        eg:
             url: https://pbs.twimg.com/media/DOhM30VVwAEpIHq
             extension: jpg
             return: DOhM30VVwAEpIHq.jpg, https://pbs.twimg.com/media/DOhM30VVwAEpIHq?format=jpg&name=orig

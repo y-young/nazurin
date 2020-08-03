@@ -15,7 +15,7 @@ def send_action(action):
             context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=action)
             return func(update, context,  *args, **kwargs)
         return command_func
-    
+
     return decorator
 
 typing = send_action(ChatAction.TYPING)

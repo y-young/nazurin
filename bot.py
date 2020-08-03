@@ -91,7 +91,7 @@ def clear_downloads(update, context):
         shutil.rmtree('./downloads')
         message.reply_text("downloads directory cleared successfully.")
     except PermissionError:
-        message.reply_text("Permission denied.") 
+        message.reply_text("Permission denied.")
     except OSError as error:
         message.reply_text(error.strerror)
 
