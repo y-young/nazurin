@@ -35,7 +35,7 @@ class Mega(object):
     def requireAuth(self):
         if not Mega.api.sid:
             tokens = Mega.document.get()
-            if 'sid' in tokens.keys():
+            if tokens and 'sid' in tokens.keys():
                 Mega.api.sid = tokens['sid']
                 Mega.api.master_key = tuple(tokens['master_key'])
                 Mega.api.root_id = tokens['root_id']
