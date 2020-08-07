@@ -14,7 +14,7 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 ## Features
 
 -   View artwork from Pixiv/Danbooru/Yandere/Konachan
--   Download artwork from the 4 sites above + Twitter
+-   Download artwork from the 4 sites above + Twitter + Bilibili Dynamic
 -   Add images to collection via Telegram
 -   Store your collection in Telegram channels
 -   Upload images to [MEGA](https://mega.nz/)
@@ -99,7 +99,9 @@ Telegram channel ID used for storing _messages_, messages sent to bot and contai
 
 Telegram user ID(_not_ username) of the admin, Pixiv bookmark and collection update features are restricted to admin user.
 
-> Tips: You can get your User ID & Channel ID via [@GetIDs Bot](https://t.me/getidsbot/)
+> Tips: 
+> 1. You can get your User ID & Channel ID via [@GetIDs Bot](https://t.me/getidsbot/)
+> 2. You need to add your bot to channel administrators
 
 ### DATABASE
 
