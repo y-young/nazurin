@@ -99,9 +99,10 @@ Telegram channel ID used for storing _messages_, messages sent to bot and contai
 
 Telegram user ID(_not_ username) of the admin, Pixiv bookmark and collection update features are restricted to admin user.
 
-> Tips: 
-> 1. You can get your User ID & Channel ID via [@GetIDs Bot](https://t.me/getidsbot/)
-> 2. You need to add your bot to channel administrators
+> Tips:
+>
+> 1.  You can get your User ID & Channel ID via [@GetIDs Bot](https://t.me/getidsbot/)
+> 2.  You need to add your bot to channel administrators
 
 ### DATABASE
 
