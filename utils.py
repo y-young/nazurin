@@ -23,7 +23,9 @@ uploading_photo = send_action(ChatAction.UPLOAD_PHOTO)
 uploading_document = send_action(ChatAction.UPLOAD_DOCUMENT)
 
 @uploading_photo
-def sendPhotos(update, context, imgs, details=dict()):
+def sendPhotos(update, context, imgs, details=None):
+    if details is None:
+        details = dict()
     bot = context.bot
     message = update.message
     chat_id = message.chat_id
@@ -55,14 +57,18 @@ def handleBadRequest(update, context, error):
     else:
         raise error
 
-def downloadImages(imgs, headers={}):
+def downloadImages(imgs, headers=None):
+    if headers is None:
+        headers = dict()
     headers['User-Agent'] = UA
     if not os.path.exists(DOWNLOAD_DIR):
         os.makedirs(DOWNLOAD_DIR)
     for img in imgs:
         downloadImage(img['url'], img['name'], headers)
 
-def downloadImage(url, path, headers={}):
+def downloadImage(url, path, headers=None):
+    if headers is None:
+        headers = dict()
     if not os.path.exists(DOWNLOAD_DIR + path):
         response = requests.get(url, headers=headers, stream=True).raw
         with open(DOWNLOAD_DIR + path, 'wb') as f:
