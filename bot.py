@@ -32,7 +32,7 @@ def help(update, context):
     PS: Send Pixiv/Danbooru/Yandere/Konachan/Twitter URL to download image(s)
     ''')
 @run_async
-def gallery_update(update, context):
+def collection_update(update, context):
     message = update.message
     message_id = message.message_id
     chat_id = message.chat_id
@@ -115,7 +115,7 @@ def main():
     dp.add_handler(CommandHandler('help', help))
     sites.register_commands(dp)
     dp.add_handler(CommandHandler('clear_downloads', clear_downloads, Filters.user(user_id=ADMIN_ID), pass_args=True))
-    dp.add_handler(MessageHandler(urlFilter & (~ Filters.update.channel_posts), gallery_update, pass_chat_data=True))
+    dp.add_handler(MessageHandler(urlFilter & (~ Filters.update.channel_posts), collection_update, pass_chat_data=True))
 
     # log all errors
     dp.add_error_handler(error)
