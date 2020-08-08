@@ -13,8 +13,8 @@ class Moebooru(object):
         self.url = site_url
         return self
 
-    def view(self, id):
-        url = 'https://'+ self.url + '/post/show/' + str(id)
+    def view(self, post_id):
+        url = 'https://'+ self.url + '/post/show/' + str(post_id)
         response = requests.get(url)
         try:
             response.raise_for_status()
@@ -58,14 +58,14 @@ class Moebooru(object):
             details['has_children'] = True
         return imgs, details
 
-    def download(self, id):
-        imgs, _ = self.view(id)
+    def download(self, post_id):
+        imgs, _ = self.view(post_id)
         downloadImages(imgs)
         return imgs
 
-    def pool(self, id, jpeg=False):
+    def pool(self, pool_id, jpeg=False):
         client = moebooru(self.site)
-        info = client.pool_posts(id=id)
+        info = client.pool_posts(id=pool_id)
         posts = info['posts']
         imgs = list()
         for post in posts:
@@ -78,8 +78,8 @@ class Moebooru(object):
         details = {'name': info['name'], 'description': info['description']}
         return imgs, details
 
-    def download_pool(self, id, jpeg=False):
-        imgs, details = self.pool(id, jpeg)
+    def download_pool(self, pool_id, jpeg=False):
+        imgs, details = self.pool(pool_id, jpeg)
         pool_name = details['name']
         if not os.path.exists(DOWNLOAD_DIR + pool_name):
             os.makedirs(DOWNLOAD_DIR + pool_name)

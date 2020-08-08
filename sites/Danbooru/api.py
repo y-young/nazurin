@@ -5,9 +5,9 @@ from pybooru import Danbooru as danbooru, PybooruHTTPError
 
 class Danbooru(object):
     api = danbooru('danbooru')
-    def view(self, id):
+    def view(self, post_id):
         try:
-            post = self.api.post_show(id)
+            post = self.api.post_show(post_id)
         except PybooruHTTPError as err:
             if 'Not Found' in err._msg:
                 raise NazurinError('Post not found')
@@ -29,7 +29,7 @@ class Danbooru(object):
             details['title'] = title
         if artists:
             details['artists'] = artists
-        details.update({'tags': tag_string, 'url': 'https://danbooru.donmai.us/posts/' + str(id)})
+        details.update({'tags': tag_string, 'url': 'https://danbooru.donmai.us/posts/' + str(post_id)})
         if post['parent_id']:
             details['parent_id'] = post['parent_id']
         if post['pixiv_id']:
@@ -38,8 +38,8 @@ class Danbooru(object):
             details['has_children'] = True
         return imgs, details
 
-    def download(self, id):
-        imgs, _ = self.view(id)
+    def download(self, post_id):
+        imgs, _ = self.view(post_id)
         downloadImages(imgs)
         return imgs
 

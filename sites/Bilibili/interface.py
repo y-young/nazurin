@@ -10,6 +10,6 @@ patterns = [
 ]
 
 def handle(match, **kwargs):
-    id = match.group(1)
-    imgs = Bilibili().download(id)
+    dynamic_id = match.group(1)
+    imgs = Bilibili().download(dynamic_id)
     return imgs

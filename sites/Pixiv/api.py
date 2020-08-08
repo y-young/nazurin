@@ -36,8 +36,8 @@ class Pixiv(object):
             Pixiv.api.access_token = tokens['access_token']
             logger.info('Pixiv logged in through cached tokens')
 
-    def view(self, id, is_admin=False):
-        response = self.call(Pixiv.api.illust_detail, id)
+    def view(self, artwork_id, is_admin=False):
+        response = self.call(Pixiv.api.illust_detail, artwork_id)
         if 'illust' in response.keys():
             illust = response.illust
         else:
@@ -49,7 +49,7 @@ class Pixiv(object):
         tags = str()
         for tag in illust.tags:
             tags += '#' + tag.name + ' '
-        details = {'title': illust.title, 'author': illust.user.name, 'tags': tags, 'total_bookmarks': illust.total_bookmarks, 'url': 'pixiv.net/i/' + str(id)}
+        details = {'title': illust.title, 'author': illust.user.name, 'tags': tags, 'total_bookmarks': illust.total_bookmarks, 'url': 'pixiv.net/i/' + str(artwork_id)}
         if is_admin:
             details['bookmarked'] = illust.is_bookmarked
         if illust.meta_pages: # Contains more than one image
@@ -64,9 +64,8 @@ class Pixiv(object):
             imgs.append({'url': url, 'name': name})
         return imgs, details
 
-    def download(self, id=None, imgs=None):
-        if not imgs:
-            imgs, _ = self.view(id)
+    def download(self, artwork_id):
+        imgs, _ = self.view(artwork_id)
         if not os.path.exists(DOWNLOAD_DIR):
             os.makedirs(DOWNLOAD_DIR)
         for img in imgs:
@@ -76,13 +75,13 @@ class Pixiv(object):
         return imgs
 
     @run_async
-    def bookmark(self, id):
-        response = self.call(Pixiv.api.illust_bookmark_add, id)
+    def bookmark(self, artwork_id):
+        response = self.call(Pixiv.api.illust_bookmark_add, artwork_id)
         if 'error' in response.keys():
             logger.error(response)
             raise NazurinError(response['error']['user_message'])
         else:
-            logger.info('Bookmarked artwork ' + str(id))
+            logger.info('Bookmarked artwork ' + str(artwork_id))
             return True
 
     def _login(self):

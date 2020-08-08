@@ -5,10 +5,10 @@ from utils import logger, downloadImages
 from bs4 import BeautifulSoup
 
 class Twitter(object):
-    def download(self, id):
-        api = 'https://syndication.twitter.com/tweets.json?ids='+ id +'&lang=en'
+    def download(self, status_id):
+        api = 'https://syndication.twitter.com/tweets.json?ids='+ status_id +'&lang=en'
         source = requests.get(api).text
-        source = json.loads(source)[id]
+        source = json.loads(source)[status_id]
         soup = BeautifulSoup(source, 'html.parser')
         imgs = list()
         items = soup.findAll('img',attrs={'data-image': True})

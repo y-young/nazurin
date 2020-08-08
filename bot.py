@@ -16,7 +16,7 @@ def ping(update, context):
     update.message.reply_text('pong!')
 @run_async
 @typing
-def help(update, context):
+def get_help(update, context):
     update.message.reply_text('''
     小さな小さな賢将, can help you collect images from various sites.
     Commands:
@@ -112,7 +112,7 @@ def main():
 
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('ping', ping))
-    dp.add_handler(CommandHandler('help', help))
+    dp.add_handler(CommandHandler('help', get_help))
     sites.register_commands(dp)
     dp.add_handler(CommandHandler('clear_downloads', clear_downloads, Filters.user(user_id=ADMIN_ID), pass_args=True))
     dp.add_handler(MessageHandler(urlFilter & (~ Filters.update.channel_posts), collection_update, pass_chat_data=True))

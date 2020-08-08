@@ -10,12 +10,12 @@ def pixiv_view(update, context):
     message = update.message
     try:
         # args[0] should contain the queried artwork id
-        id = int(context.args[0])
-        if id < 0:
+        artwork_id = int(context.args[0])
+        if artwork_id < 0:
             message.reply_text('Invalid artwork id!', quote=True)
             return
         is_admin = message.from_user.id == ADMIN_ID
-        imgs, details = pixiv.view(id, is_admin)
+        imgs, details = pixiv.view(artwork_id, is_admin)
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
         message.reply_text('Usage: /pixiv <artwork_id>', quote=True)
@@ -29,11 +29,11 @@ def pixiv_download(update, context):
     message = update.message
     try:
         # args[0] should contain the queried artwork id
-        id = int(context.args[0])
-        if id < 0:
+        artwork_id = int(context.args[0])
+        if artwork_id < 0:
             message.reply_text('Invalid artwork id!', quote=True)
             return
-        imgs = pixiv.download(id=id)
+        imgs = pixiv.download(artwork_id)
         sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
         message.reply_text('Usage: /pixiv_download <artwork_id>', quote=True)
@@ -45,11 +45,11 @@ def pixiv_bookmark(update, context):
     message = update.message
     try:
         # args[0] should contain the queried artwork id
-        id = int(context.args[0])
-        if id < 0:
+        artwork_id = int(context.args[0])
+        if artwork_id < 0:
             message.reply_text('Invalid artwork id!', quote=True)
             return
-        pixiv.bookmark(id)
+        pixiv.bookmark(artwork_id)
         message.reply_text('Done!', quote=True)
     except (IndexError, ValueError):
         message.reply_text('Usage: /bookmark <artwork_id>', quote=True)

@@ -9,11 +9,11 @@ danbooru = Danbooru()
 def danbooru_view(update, context):
     message = update.message
     try:
-        id = int(context.args[0])
-        if id <= 0:
+        post_id = int(context.args[0])
+        if post_id <= 0:
             message.reply_text('Invalid post id!', quote=True)
             return
-        imgs, details = danbooru.view(id)
+        imgs, details = danbooru.view(post_id)
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
         message.reply_text('Usage: /danbooru <post_id>', quote=True)
@@ -26,11 +26,11 @@ def danbooru_view(update, context):
 def danbooru_download(update, context):
     message = update.message
     try:
-        id = int(context.args[0])
-        if id <= 0:
+        post_id = int(context.args[0])
+        if post_id <= 0:
             message.reply_text('Invalid post id!', quote=True)
             return
-        imgs = danbooru.download(id)
+        imgs = danbooru.download(post_id)
         sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
         message.reply_text('Usage: /danbooru_download <post_id>', quote=True)

@@ -15,9 +15,9 @@ patterns = [
 ]
 
 def handle(match, **kwargs):
-    id = match.group(1)
+    artwork_id = match.group(1)
     api = Pixiv()
     if kwargs['is_admin']:
-        api.bookmark(id)
-    imgs = api.download(id=id)
+        api.bookmark(artwork_id)
+    imgs = api.download(artwork_id)
     return imgs

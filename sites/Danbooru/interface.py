@@ -7,6 +7,6 @@ patterns = [
 ]
 
 def handle(match, **kwargs):
-    id = match.group(1)
-    imgs = Danbooru().download(id)
+    post_id = match.group(1)
+    imgs = Danbooru().download(post_id)
     return imgs

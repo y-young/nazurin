@@ -17,7 +17,7 @@ patterns = [
 
 def handle(match, **kwargs):
     site_url = match.group(1)
-    id = match.group(2)
+    post_id = match.group(2)
     api = Moebooru().site(site_url)
-    imgs = api.download(id)
+    imgs = api.download(post_id)
     return imgs

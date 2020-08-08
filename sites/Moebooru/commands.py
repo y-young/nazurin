@@ -9,11 +9,11 @@ moebooru = Moebooru()
 def yandere_view(update, context):
     message = update.message
     try:
-        id = int(context.args[0])
-        if id < 0:
+        post_id = int(context.args[0])
+        if post_id < 0:
             message.reply_text('Invalid post id!', quote=True)
             return
-        imgs, details = moebooru.site('yande.re').view(id)
+        imgs, details = moebooru.site('yande.re').view(post_id)
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
         message.reply_text('Usage: /yandere <post_id>', quote=True)
@@ -26,11 +26,11 @@ def yandere_view(update, context):
 def yandere_download(update, context):
     message = update.message
     try:
-        id = int(context.args[0])
-        if id <= 0:
+        post_id = int(context.args[0])
+        if post_id <= 0:
             message.reply_text('Invalid post id!', quote=True)
             return
-        imgs = moebooru.site('yande.re').download(id)
+        imgs = moebooru.site('yande.re').download(post_id)
         sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
         message.reply_text('Usage: /yandere_download <post_id>', quote=True)
@@ -41,11 +41,11 @@ def yandere_download(update, context):
 def konachan_view(update, context):
     message = update.message
     try:
-        id = int(context.args[0])
-        if id < 0:
+        post_id = int(context.args[0])
+        if post_id < 0:
             message.reply_text('Invalid post id!', quote=True)
             return
-        imgs, details = moebooru.site('konachan.com').view(id)
+        imgs, details = moebooru.site('konachan.com').view(post_id)
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
         message.reply_text('Usage: /konachan <post_id>', quote=True)
@@ -58,11 +58,11 @@ def konachan_view(update, context):
 def konachan_download(update, context):
     message = update.message
     try:
-        id = int(context.args[0])
-        if id <= 0:
+        post_id = int(context.args[0])
+        if post_id <= 0:
             message.reply_text('Invalid post id!', quote=True)
             return
-        imgs = moebooru.site('konachan.com').download(id)
+        imgs = moebooru.site('konachan.com').download(post_id)
         sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
         message.reply_text('Usage: /konachan_download <post_id>', quote=True)
