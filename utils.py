@@ -1,9 +1,14 @@
 from shutil import copyfileobj
 from functools import wraps
 import requests
+import logging
 import os
 from config import DOWNLOAD_DIR, UA
 from telegram import ChatAction, InputMediaPhoto
+
+# Logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logger = logging.getLogger('bot')
 
 def send_action(action):
     """Sends `action` while processing func command."""

@@ -1,5 +1,6 @@
 import importlib
-from config import STORAGE, logger
+from config import STORAGE
+from utils import logger
 
 class Storage(object):
     disks = list()

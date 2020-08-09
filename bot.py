@@ -2,7 +2,7 @@
 import shutil
 import traceback
 import config
-from utils import typing, sendDocuments, NazurinError
+from utils import typing, logger, sendDocuments, NazurinError
 from sites import SiteManager
 from storage import Storage
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Defaults, run_async
@@ -64,7 +64,7 @@ def collection_update(update, context):
     if not result:
         message.reply_text('Error: No source matched')
         return
-    config.logger.info('Collection update: site=%s, match=%s', result['site'], result['match'].groups())
+    logger.info('Collection update: site=%s, match=%s', result['site'], result['match'].groups())
     # Perform action
     if user_id == config.ADMIN_ID:
         # Forward to gallery & Save to album
@@ -96,7 +96,7 @@ def clear_downloads(update, context):
         message.reply_text(error.strerror)
 
 def error(update, context):
-    config.logger.error('Update "%s" caused error "%s"', update, context.error)
+    logger.error('Update "%s" caused error "%s"', update, context.error)
     traceback.print_exc()
 
 def main():
@@ -124,11 +124,11 @@ def main():
         # Webhook mode
         updater.start_webhook(listen="0.0.0.0", port=config.PORT, url_path=config.TOKEN)
         updater.bot.setWebhook(url=config.WEBHOOK_URL + config.TOKEN, allowed_updates=["message"])
-        config.logger.info('Set webhook')
+        logger.info('Set webhook')
     else:
         # Polling mode
         updater.start_polling()
-        config.logger.info('Started polling')
+        logger.info('Started polling')
 
     storage = Storage()
     updater.idle()

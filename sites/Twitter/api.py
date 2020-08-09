@@ -1,7 +1,7 @@
 import requests
 import json
 import os
-from config import logger
+from utils import logger
 from utils import downloadImages
 from bs4 import BeautifulSoup
 

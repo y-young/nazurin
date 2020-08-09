@@ -2,7 +2,7 @@ from importlib import import_module
 from re import search
 from glob import glob
 from os import path
-from config import logger
+from utils import logger
 
 class SiteManager(object):
     def __init__(self):

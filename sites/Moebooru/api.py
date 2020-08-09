@@ -3,8 +3,8 @@ import requests
 from requests.exceptions import HTTPError
 import json
 import os
-from config import DOWNLOAD_DIR, logger
-from utils import NazurinError, downloadImage, downloadImages
+from config import DOWNLOAD_DIR
+from utils import NazurinError, downloadImage, downloadImages, logger
 from pybooru import Moebooru as moebooru
 from bs4 import BeautifulSoup
 

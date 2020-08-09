@@ -2,9 +2,9 @@
 import re
 import os
 import time
-from config import NAZURIN_DATA, DOWNLOAD_DIR, logger
+from config import NAZURIN_DATA, DOWNLOAD_DIR
 from sites.Pixiv.config import PIXIV_DOCUMENT, PIXIV_USER, PIXIV_PASS
-from utils import NazurinError
+from utils import NazurinError, logger
 from database import Database
 from pixivpy3 import AppPixivAPI, PixivError
 from telegram.ext import run_async
