@@ -2,7 +2,7 @@ from shutil import copyfileobj
 from functools import wraps
 import requests
 import os
-from config import *
+from config import DOWNLOAD_DIR, UA
 from telegram import ChatAction, InputMediaPhoto
 
 def send_action(action):

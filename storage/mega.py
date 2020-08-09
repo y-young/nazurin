@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from config import *
+from config import logger, DOWNLOAD_DIR, STORAGE_DIR, NAZURIN_DATA
 from database import Database
 from mega import Mega as mega
 from mega.errors import RequestError

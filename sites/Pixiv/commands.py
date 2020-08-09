@@ -1,5 +1,6 @@
 from .api import Pixiv
-from utils import *
+from config import ADMIN_ID
+from utils import NazurinError, sendPhotos, sendDocuments, handleBadRequest
 from telegram.ext import CommandHandler, Filters, run_async
 from telegram.error import BadRequest
 

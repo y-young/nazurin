@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import shutil
 import traceback
-from config import *
-from utils import *
+import config
+from utils import typing, sendDocuments, NazurinError
 from sites import SiteManager
 from storage import Storage
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Defaults, run_async
@@ -64,12 +64,12 @@ def collection_update(update, context):
     if not result:
         message.reply_text('Error: No source matched')
         return
-    logger.info('Collection update: site=%s, match=%s', result['site'], result['match'].groups())
+    config.logger.info('Collection update: site=%s, match=%s', result['site'], result['match'].groups())
     # Perform action
-    if user_id == ADMIN_ID:
+    if user_id == config.ADMIN_ID:
         # Forward to gallery & Save to album
-        bot.forwardMessage(GALLERY_ID, chat_id, message_id)
-        chat_id = ALBUM_ID
+        bot.forwardMessage(config.GALLERY_ID, chat_id, message_id)
+        chat_id = config.ALBUM_ID
         message_id = None # No need to reply to message
         is_admin = True
     else:
@@ -96,7 +96,7 @@ def clear_downloads(update, context):
         message.reply_text(error.strerror)
 
 def error(update, context):
-    logger.error('Update "%s" caused error "%s"', update, context.error)
+    config.logger.error('Update "%s" caused error "%s"', update, context.error)
     traceback.print_exc()
 
 def main():
@@ -106,7 +106,7 @@ def main():
     sites = SiteManager()
 
     # Set up the Updater
-    updater = Updater(TOKEN, workers=32, use_context=True, defaults=defaults)
+    updater = Updater(config.TOKEN, workers=32, use_context=True, defaults=defaults)
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
@@ -114,21 +114,21 @@ def main():
     dp.add_handler(CommandHandler('ping', ping))
     dp.add_handler(CommandHandler('help', get_help))
     sites.register_commands(dp)
-    dp.add_handler(CommandHandler('clear_downloads', clear_downloads, Filters.user(user_id=ADMIN_ID), pass_args=True))
+    dp.add_handler(CommandHandler('clear_downloads', clear_downloads, Filters.user(user_id=config.ADMIN_ID), pass_args=True))
     dp.add_handler(MessageHandler(urlFilter & (~ Filters.update.channel_posts), collection_update, pass_chat_data=True))
 
     # log all errors
     dp.add_error_handler(error)
 
-    if ENV == 'production':
+    if config.ENV == 'production':
         # Webhook mode
-        updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
-        updater.bot.setWebhook(url=WEBHOOK_URL + TOKEN, allowed_updates=["message"])
-        logger.info('Set webhook')
+        updater.start_webhook(listen="0.0.0.0", port=config.PORT, url_path=config.TOKEN)
+        updater.bot.setWebhook(url=config.WEBHOOK_URL + config.TOKEN, allowed_updates=["message"])
+        config.logger.info('Set webhook')
     else:
         # Polling mode
         updater.start_polling()
-        logger.info('Started polling')
+        config.logger.info('Started polling')
 
     storage = Storage()
     updater.idle()
