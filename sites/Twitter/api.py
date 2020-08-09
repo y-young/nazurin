@@ -1,7 +1,8 @@
 import requests
 import json
 import os
-from utils import logger, downloadImages
+from config import logger
+from utils import downloadImages
 from bs4 import BeautifulSoup
 
 class Twitter(object):
