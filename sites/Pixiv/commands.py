@@ -21,7 +21,7 @@ def pixiv_view(update, context):
     except (IndexError, ValueError):
         message.reply_text('Usage: /pixiv <artwork_id>', quote=True)
     except NazurinError as error:
-        message.reply_text(error.reason, quote=True)
+        message.reply_text(error.msg, quote=True)
     except BadRequest as error:
         handleBadRequest(update, context, error)
 
@@ -39,7 +39,7 @@ def pixiv_download(update, context):
     except (IndexError, ValueError):
         message.reply_text('Usage: /pixiv_download <artwork_id>', quote=True)
     except NazurinError as error:
-        message.reply_text(error.reason, quote=True)
+        message.reply_text(error.msg, quote=True)
 
 @run_async
 def pixiv_bookmark(update, context):
@@ -55,7 +55,7 @@ def pixiv_bookmark(update, context):
     except (IndexError, ValueError):
         message.reply_text('Usage: /bookmark <artwork_id>', quote=True)
     except NazurinError as error:
-        message.reply_text(error.reason)
+        message.reply_text(error.msg)
 
 commands = [
     CommandHandler('pixiv', pixiv_view, pass_args=True),
