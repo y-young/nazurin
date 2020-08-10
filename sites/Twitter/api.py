@@ -23,14 +23,15 @@ class Twitter(object):
         return imgs
 
     def parseUrl(self, src, extension):
-        '''
-        Get filename & the url of the original image
+        """Get filename & the url of the original image
+
         eg:
             url: https://pbs.twimg.com/media/DOhM30VVwAEpIHq
             extension: jpg
             return: DOhM30VVwAEpIHq.jpg, https://pbs.twimg.com/media/DOhM30VVwAEpIHq?format=jpg&name=orig
+
         Doc: https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/entities-object
-        '''
+        """
         basename = os.path.basename(src)
         filename = basename + '.' + extension
         url = src + '?format=' + extension + '&name=orig'

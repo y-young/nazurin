@@ -1,3 +1,4 @@
+"""Nazurin site plugins & plugin manager."""
 from importlib import import_module
 from re import search
 from glob import glob
@@ -5,7 +6,10 @@ from os import path
 from utils import logger
 
 class SiteManager(object):
+    """Site plugin manager."""
+
     def __init__(self):
+        """Initialize and dynamically load all site plugins."""
         self.sites = dict()
         self.commands = list()
         self.sources = list()

@@ -4,7 +4,10 @@ import firebase_admin
 from firebase_admin import firestore, credentials
 
 class Firebase(object):
+    """Firestore driver of Firebase."""
+
     def __init__(self):
+        """Load credentials and initialize Firebase app."""
         cert = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
         if cert.startswith('{'):
             cert = json.loads(cert)

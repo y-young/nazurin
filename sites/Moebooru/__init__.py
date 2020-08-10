@@ -1,3 +1,4 @@
+"""Moebooru site plugin."""
 from .api import Moebooru
 from .commands import commands
 from .interface import PRIORITY, patterns, handle

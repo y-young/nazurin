@@ -1,3 +1,4 @@
+"""Bilibili dynamic site plugin."""
 from .api import Bilibili
 from .interface import PRIORITY, patterns, handle
 

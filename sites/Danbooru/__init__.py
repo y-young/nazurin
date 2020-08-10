@@ -1,3 +1,4 @@
+"""Danbooru site plugin."""
 from .api import Danbooru
 from .commands import commands
 from .interface import PRIORITY, patterns, handle

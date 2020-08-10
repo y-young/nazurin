@@ -1,11 +1,15 @@
+"""Nazurin storage drivers and storage manager."""
 import importlib
 from config import STORAGE
 from utils import logger
 
 class Storage(object):
+    """Storage manager."""
+
     disks = list()
 
     def __init__(self):
+        """Dynamically load all storage drivers."""
         self.load()
 
     def load(self):

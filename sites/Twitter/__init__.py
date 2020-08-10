@@ -1,3 +1,4 @@
+"""Twitter site plugin."""
 from .api import Twitter
 from .interface import PRIORITY, patterns, handle
 
