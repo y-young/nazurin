@@ -1,6 +1,6 @@
 import os
 import re
-from utils import NazurinError, downloadImages
+from utils import NazurinError, downloadImages, sanitizeFilename
 from pybooru import Danbooru as danbooru, PybooruHTTPError
 
 class Danbooru(object):
@@ -62,7 +62,7 @@ class Danbooru(object):
         if filename: # characters or copyrights present
             filename += ' - '
         filename += os.path.basename(post['file_url'])
-        return title, filename
+        return title, sanitizeFilename(filename)
 
     def _formatCharacters(self, characters):
         characters = characters.split(' ')

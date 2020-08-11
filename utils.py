@@ -1,7 +1,9 @@
 from shutil import copyfileobj
 from functools import wraps
+from pathlib import Path
 import requests
 import logging
+import re
 import os
 from config import DOWNLOAD_DIR, UA
 from telegram import ChatAction, InputMediaPhoto
@@ -78,6 +80,19 @@ def downloadImage(url, path, headers=None):
         response = requests.get(url, headers=headers, stream=True).raw
         with open(DOWNLOAD_DIR + path, 'wb') as f:
             copyfileobj(response, f)
+
+def sanitizeFilename(name):
+    # https://docs.microsoft.com/zh-cn/windows/win32/fileio/naming-a-file
+    name = re.sub(r"[\"*/:<>?\\|]+", '_', name) # reserved characters
+    name = re.sub(r"[\t\n\r\f\v]+", ' ', name)
+    name = re.sub(r"\u202E|\u200E|\u200F", '', name) # RTL marks
+    filename, ext = os.path.splitext(name)
+    if Path(filename).is_reserved():
+        filename = '_' + filename
+        name = filename + ext
+    if len(name) > 255:
+        name = filename[:255 - len(ext)] + ext
+    return name
 
 class NazurinError(Exception):
     def __init__(self, msg):

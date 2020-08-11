@@ -4,7 +4,7 @@ from requests.exceptions import HTTPError
 import json
 import os
 from config import DOWNLOAD_DIR
-from utils import NazurinError, downloadImage, downloadImages, logger
+from utils import NazurinError, downloadImage, downloadImages, logger, sanitizeFilename
 from pybooru import Moebooru as moebooru
 from bs4 import BeautifulSoup
 
@@ -33,7 +33,7 @@ class Moebooru(object):
 
         source = post['source']
         file_url = post['file_url']
-        name = unquote(os.path.basename(file_url))
+        name = sanitizeFilename(unquote(os.path.basename(file_url)))
         imgs = [{'url': file_url, 'name': name}]
         title = post['tags']
         tag_string = artists = str()

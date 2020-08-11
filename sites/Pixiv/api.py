@@ -4,7 +4,7 @@ import os
 import time
 from config import NAZURIN_DATA, DOWNLOAD_DIR
 from sites.Pixiv.config import PIXIV_DOCUMENT, PIXIV_USER, PIXIV_PASS
-from utils import NazurinError, logger
+from utils import NazurinError, logger, sanitizeFilename
 from database import Database
 from pixivpy3 import AppPixivAPI, PixivError
 from telegram.ext import run_async
@@ -116,8 +116,4 @@ class Pixiv(object):
         basename = os.path.basename(url)
         filename, extension = os.path.splitext(basename)
         name = "%s - %s - %s(%d)%s" % (filename, illust.title, illust.user.name, illust.user.id, extension)
-        return self._normalize(name)
-
-    def _normalize(self, name):
-        name = re.sub('[\\\/]', '_', name) # replace / and \
-        return name
+        return sanitizeFilename(name)
