@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import re
 import os
 import time
 from config import NAZURIN_DATA, DOWNLOAD_DIR
