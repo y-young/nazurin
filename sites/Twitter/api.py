@@ -1,38 +1,38 @@
 import requests
 import json
 import os
-from utils import logger
-from utils import downloadImages
-from bs4 import BeautifulSoup
+from utils import logger, downloadImages, NazurinError
 
 class Twitter(object):
     def download(self, status_id):
-        api = 'https://syndication.twitter.com/tweets.json?ids='+ status_id +'&lang=en'
-        source = requests.get(api).text
-        source = json.loads(source)[status_id]
-        soup = BeautifulSoup(source, 'html.parser')
+        # Old: 'https://syndication.twitter.com/tweets.json?ids='+ status_id +'&lang=en'
+        api = 'https://cdn.syndication.twimg.com/tweet?id='+ str(status_id) +'&lang=en'
+        response = requests.get(api)
+        if response.status_code == 404:
+            raise NazurinError('Tweet not found or unavailable.')
+        response = json.loads(response.text)
+        if 'photos' not in response.keys():
+            raise NazurinError('No photo found.')
+
+        photos = response['photos']
         imgs = list()
-        items = soup.findAll('img',attrs={'data-image': True})
-        for item in items:
-            src = item.get('data-image')
-            ext = item.get('data-image-format')
-            filename, url = self.parseUrl(src, ext)
+        for photo in photos:
+            filename, url = self.parseUrl(photo['url'])
             imgs.append({'name': 'twitter - '+ filename, 'url': url})
         logger.info(imgs)
         downloadImages(imgs)
         return imgs
 
-    def parseUrl(self, src, extension):
+    def parseUrl(self, src):
         """Get filename & the url of the original image
 
         eg:
-            url: https://pbs.twimg.com/media/DOhM30VVwAEpIHq
-            extension: jpg
+            src: https://pbs.twimg.com/media/DOhM30VVwAEpIHq.jpg
             return: DOhM30VVwAEpIHq.jpg, https://pbs.twimg.com/media/DOhM30VVwAEpIHq?format=jpg&name=orig
 
         Doc: https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/entities-object
         """
         basename = os.path.basename(src)
-        filename = basename + '.' + extension
-        url = src + '?format=' + extension + '&name=orig'
-        return filename, url
+        filename, extension = os.path.splitext(basename)
+        url = 'https://pbs.twimg.com/media/' + filename + '?format=' + extension[1:] + '&name=orig'
+        return basename, url
