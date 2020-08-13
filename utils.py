@@ -63,7 +63,7 @@ def sendDocuments(update, context, imgs, chat_id=None):
 
 def handleBadRequest(update, context, error):
     if 'Wrong file identifier/http url' in error.message:
-        update.message.reply_text('Failed to send image as photo, maybe the size is too big, please consider using download option instead.', quote=True)
+        update.message.reply_text('Failed to send image as photo, maybe the size is too big, please consider using download option instead.')
     else:
         raise error
 

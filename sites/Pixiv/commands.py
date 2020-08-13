@@ -13,15 +13,15 @@ def pixiv_view(update, context):
         # args[0] should contain the queried artwork id
         artwork_id = int(context.args[0])
         if artwork_id < 0:
-            message.reply_text('Invalid artwork id!', quote=True)
+            message.reply_text('Invalid artwork id!')
             return
         is_admin = message.from_user.id == ADMIN_ID
         imgs, details = pixiv.view(artwork_id, is_admin)
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
-        message.reply_text('Usage: /pixiv <artwork_id>', quote=True)
+        message.reply_text('Usage: /pixiv <artwork_id>')
     except NazurinError as error:
-        message.reply_text(error.msg, quote=True)
+        message.reply_text(error.msg)
     except BadRequest as error:
         handleBadRequest(update, context, error)
 
@@ -32,14 +32,14 @@ def pixiv_download(update, context):
         # args[0] should contain the queried artwork id
         artwork_id = int(context.args[0])
         if artwork_id < 0:
-            message.reply_text('Invalid artwork id!', quote=True)
+            message.reply_text('Invalid artwork id!')
             return
         imgs = pixiv.download(artwork_id)
         sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
-        message.reply_text('Usage: /pixiv_download <artwork_id>', quote=True)
+        message.reply_text('Usage: /pixiv_download <artwork_id>')
     except NazurinError as error:
-        message.reply_text(error.msg, quote=True)
+        message.reply_text(error.msg)
 
 @run_async
 def pixiv_bookmark(update, context):
@@ -48,12 +48,12 @@ def pixiv_bookmark(update, context):
         # args[0] should contain the queried artwork id
         artwork_id = int(context.args[0])
         if artwork_id < 0:
-            message.reply_text('Invalid artwork id!', quote=True)
+            message.reply_text('Invalid artwork id!')
             return
         pixiv.bookmark(artwork_id)
-        message.reply_text('Done!', quote=True)
+        message.reply_text('Done!')
     except (IndexError, ValueError):
-        message.reply_text('Usage: /bookmark <artwork_id>', quote=True)
+        message.reply_text('Usage: /bookmark <artwork_id>')
     except NazurinError as error:
         message.reply_text(error.msg)
 
