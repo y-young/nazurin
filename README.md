@@ -1,5 +1,6 @@
 # Nazurin
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/5cbfed1b51a644b187ed5d9521a4ea95)](https://www.codacy.com/manual/y-young/nazurin?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=y-young/nazurin&amp;utm_campaign=Badge_Grade)
 ![](https://img.shields.io/badge/python->%3D%203.5-blue)
 ![](https://img.shields.io/badge/-Telegram-blue.svg?logo=telegram)
 
