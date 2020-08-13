@@ -25,6 +25,7 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 
 1.  'Deploy to Heroku' Button:
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/28af0a2db4544c41823ab217cc057d01)](https://app.codacy.com/manual/y-young/nazurin?utm_source=github.com&utm_medium=referral&utm_content=y-young/nazurin&utm_campaign=Badge_Grade_Dashboard)
     [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 2.  Manual deploy:
