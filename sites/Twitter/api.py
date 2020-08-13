@@ -18,7 +18,7 @@ class Twitter(object):
         imgs = list()
         for photo in photos:
             filename, url = self.parseUrl(photo['url'])
-            imgs.append({'name': 'twitter - '+ filename, 'url': url})
+            imgs.append({'name': 'twitter - ' + str(status_id) + ' - ' + filename, 'url': url})
         logger.info(imgs)
         downloadImages(imgs)
         return imgs
