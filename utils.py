@@ -44,6 +44,9 @@ def sendPhotos(update, context, imgs, details=None):
     caption = str()
     for key, value in details.items():
         caption += str(key) + ': ' + str(value) + '\n'
+    if len(caption) > 1024:
+        caption = caption[:1024]
+        message.reply_text('Notice: Caption too long, trimmed')
     for img in imgs:
         media.append(InputMediaPhoto(img['url'], caption, 'HTML'))
     bot.sendMediaGroup(chat_id, media, reply_to_message_id=message_id)

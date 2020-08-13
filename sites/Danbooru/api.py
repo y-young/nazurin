@@ -29,7 +29,7 @@ class Danbooru(object):
             details['title'] = title
         if artists:
             details['artists'] = artists
-        details.update({'tags': tag_string, 'url': 'https://danbooru.donmai.us/posts/' + str(post_id)})
+        details.update({'url': 'https://danbooru.donmai.us/posts/' + str(post_id), 'tags': tag_string})
         if post['parent_id']:
             details['parent_id'] = post['parent_id']
         if post['pixiv_id']:
