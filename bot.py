@@ -7,6 +7,9 @@ from sites import SiteManager
 from storage import Storage
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Defaults, run_async
 
+sites = SiteManager()
+storage = Storage()
+
 @run_async
 def start(update, context):
     update.message.reply_text('Hi!')
@@ -103,7 +106,7 @@ def main():
     global sites, storage
     defaults = Defaults(quote=True)
     urlFilter = Filters.entity('url') | Filters.entity('text_link') | Filters.caption_entity('url') | Filters.caption_entity('text_link')
-    sites = SiteManager()
+    sites.load()
 
     # Set up the Updater
     updater = Updater(config.TOKEN, workers=32, use_context=True, defaults=defaults)
@@ -130,7 +133,7 @@ def main():
         updater.start_polling()
         logger.info('Started polling')
 
-    storage = Storage()
+    storage.load()
     updater.idle()
 
 if __name__ == '__main__':

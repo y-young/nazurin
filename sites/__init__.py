@@ -9,13 +9,13 @@ class SiteManager(object):
     """Site plugin manager."""
 
     def __init__(self):
-        """Initialize and dynamically load all site plugins."""
+        """Initialize."""
         self.sites = dict()
         self.commands = list()
         self.sources = list()
-        self.load()
 
     def load(self):
+        """Dynamically load all site plugins."""
         module_paths = glob('sites/*/')
         for module_path in module_paths:
             module_name = path.basename(path.normpath(module_path))

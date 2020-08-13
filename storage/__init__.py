@@ -7,12 +7,8 @@ class Storage(object):
     """Storage manager."""
 
     disks = list()
-
-    def __init__(self):
-        """Dynamically load all storage drivers."""
-        self.load()
-
     def load(self):
+        """Dynamically load all storage drivers."""
         for driver_name in STORAGE:
             driver = importlib.import_module('storage.' + driver_name.lower())
             self.disks.append(getattr(driver, driver_name)())
