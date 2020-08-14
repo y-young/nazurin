@@ -1,6 +1,7 @@
 from shutil import copyfileobj
 from functools import wraps
 from pathlib import Path
+from html import escape
 import requests
 import logging
 import re
@@ -47,6 +48,7 @@ def sendPhotos(update, context, imgs, details=None):
     if len(caption) > 1024:
         caption = caption[:1024]
         message.reply_text('Notice: Caption too long, trimmed')
+    caption = escape(caption, quote=False)
     for img in imgs:
         media.append(InputMediaPhoto(img['url'], caption, 'HTML'))
     bot.sendMediaGroup(chat_id, media, reply_to_message_id=message_id)
