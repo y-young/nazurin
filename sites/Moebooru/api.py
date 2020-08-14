@@ -23,8 +23,16 @@ class Moebooru(object):
 
         response = response.text
         soup = BeautifulSoup(response, 'html.parser')
-        content = soup.find(id="post-view").script.contents[0]
-        info = content[20:-3]
+        tag = soup.find(id="post-view").find(recursive=False)
+        if tag.name == 'script':
+            content = str.strip(tag.string)
+        elif tag.name == 'div' and ('status-notice' in tag['class']):
+            raise NazurinError(tag.get_text(strip=True))
+        else:
+            logger.error(tag)
+            raise NazurinError('Unknown error')
+
+        info = content[19:-2]
         try:
             info = json.loads(info)
             post = info['posts'][0]
