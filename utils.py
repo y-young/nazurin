@@ -2,12 +2,14 @@ from shutil import copyfileobj
 from functools import wraps
 from pathlib import Path
 from html import escape
+from time import sleep
 import requests
 import logging
 import re
 import os
 from config import DOWNLOAD_DIR, UA
 from telegram import ChatAction, InputMediaPhoto
+from telegram.error import RetryAfter
 
 # Logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -51,7 +53,13 @@ def sendPhotos(update, context, imgs, details=None):
     caption = escape(caption, quote=False)
     for img in imgs:
         media.append(InputMediaPhoto(img['url'], caption, 'HTML'))
-    bot.sendMediaGroup(chat_id, media, reply_to_message_id=message_id)
+    while True:
+        try:
+            bot.sendMediaGroup(chat_id, media, reply_to_message_id=message_id)
+        except RetryAfter as error:
+            sleep(error.retry_after)
+            continue
+        break
 @uploading_document
 def sendDocuments(update, context, imgs, chat_id=None):
     bot = context.bot
@@ -61,7 +69,13 @@ def sendDocuments(update, context, imgs, chat_id=None):
     else:
         message_id = None # Sending to channel, no message to reply
     for img in imgs:
-        bot.sendDocument(chat_id, open(DOWNLOAD_DIR + img['name'], 'rb'), filename=img['name'], reply_to_message_id=message_id)
+        while True:
+            try:
+                bot.sendDocument(chat_id, open(DOWNLOAD_DIR + img['name'], 'rb'), filename=img['name'], reply_to_message_id=message_id)
+            except RetryAfter as error:
+                sleep(error.retry_after)
+                continue
+            break
 
 def handleBadRequest(update, context, error):
     if 'Wrong file identifier/http url' in error.message:
