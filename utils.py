@@ -1,3 +1,4 @@
+from mimetypes import guess_type
 from shutil import copyfileobj
 from functools import wraps
 from pathlib import Path
@@ -52,7 +53,12 @@ def sendPhotos(update, context, imgs, details=None):
         message.reply_text('Notice: Caption too long, trimmed')
     caption = escape(caption, quote=False)
     for img in imgs:
-        media.append(InputMediaPhoto(img['url'], caption, 'HTML'))
+        filetype = str(guess_type(img['url'])[0])
+        if filetype.startswith('image'):
+            media.append(InputMediaPhoto(img['url'], caption, 'HTML'))
+        else:
+            message.reply_text('File is not image, try download option.')
+            return
     while True:
         try:
             bot.sendMediaGroup(chat_id, media, reply_to_message_id=message_id)
