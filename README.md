@@ -1,6 +1,6 @@
 # Nazurin
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/5cbfed1b51a644b187ed5d9521a4ea95)](https://www.codacy.com/manual/y-young/nazurin?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=y-young/nazurin&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/5cbfed1b51a644b187ed5d9521a4ea95)](https://www.codacy.com/manual/y-young/nazurin?utm_source=github.com&utm_medium=referral&utm_content=y-young/nazurin&utm_campaign=Badge_Grade)
 ![](https://img.shields.io/badge/python->%3D%203.5-blue)
 ![](https://img.shields.io/badge/-Telegram-blue.svg?logo=telegram)
 
@@ -128,6 +128,18 @@ Pixiv email or user id, and password.
 ### MEGA_USER & MEGA_PASS
 
 MEGA login email and password.
+
+## MEGA Encoding Issue
+
+Due to unknown reasons, there're encoding issues with special filenames (e.g.:special or full-width characters) on MEGA. These filenames may be wrongly displayed on MEGA Android & iOS clients, and cannot be synced through MEGASync. However, MEGA Web client can handle these files correctly, so to solve this problem, do the following:
+
+1.  Create a temporary directory and set `STORAGE_DIR` to it
+2.  Periodically log into MEGA **Web** client
+3.  **Copy** all files from temporary directory to archive directory (Do not use _move_)
+4.  Delete files in temporary directory
+5.  Problem solved
+
+> Of course you can modify filename format to avoid this problem
 
 ## Roadmap
 
