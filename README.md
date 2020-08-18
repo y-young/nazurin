@@ -14,11 +14,23 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 
 ## Features
 
--   View artwork from Pixiv/Danbooru/Yandere/Konachan
--   Download artwork from the 4 sites above + Twitter + Bilibili Dynamic
--   Add images to collection via Telegram
+-   View/Download artwork from [various sites](#supported-sites)
+-   Add images to your collection via Telegram
 -   Store your collection in Telegram channels
 -   Upload images to [MEGA](https://mega.nz/)
+
+### Supported Sites
+
+|        Name       |               URL              | Commands | Collection |
+| :---------------: | :----------------------------: | :------: | :--------: |
+|       Pixiv       |    <https://www.pixiv.net/>    |     ✔    |      ✔     |
+|      Danbooru     |  <https://danbooru.donmai.us/> |     ✔    |      ✔     |
+|     Safebooru     | <https://safebooru.donmai.us/> |          |      ✔     |
+|      yandere      |       <https://yande.re/>      |     ✔    |      ✔     |
+|      Konachan     |     <https://konachan.com/>    |     ✔    |      ✔     |
+|     Lolibooru     |    <https://lolibooru.moe/>    |          |      ✔     |
+|      Twitter      |     <https://twitter.com/>     |          |      ✔     |
+| Bilibili Dynamics |    <https://t.bilibili.com/>   |          |      ✔     |
 
 ## Deploy
 
