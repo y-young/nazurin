@@ -4,7 +4,11 @@ from utils import NazurinError, downloadImages, sanitizeFilename
 from pybooru import Danbooru as danbooru, PybooruHTTPError
 
 class Danbooru(object):
-    api = danbooru('danbooru')
+    def __init__(self, site='danbooru'):
+        """Set Danbooru site"""
+        self.site = site
+        self.api = danbooru(site)
+
     def view(self, post_id):
         try:
             post = self.api.post_show(post_id)
@@ -29,7 +33,7 @@ class Danbooru(object):
             details['title'] = title
         if artists:
             details['artists'] = artists
-        details.update({'url': 'https://danbooru.donmai.us/posts/' + str(post_id), 'tags': tag_string})
+        details.update({'url': 'https://' + self.site + '.donmai.us/posts/' + str(post_id), 'tags': tag_string})
         if post['parent_id']:
             details['parent_id'] = post['parent_id']
         if post['pixiv_id']:
