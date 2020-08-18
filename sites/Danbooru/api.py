@@ -5,7 +5,7 @@ from pybooru import Danbooru as danbooru, PybooruHTTPError
 
 class Danbooru(object):
     def __init__(self, site='danbooru'):
-        """Set Danbooru site"""
+        """Set Danbooru site."""
         self.site = site
         self.api = danbooru(site)
 
