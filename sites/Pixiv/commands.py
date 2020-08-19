@@ -15,8 +15,7 @@ def pixiv_view(update, context):
         if artwork_id < 0:
             message.reply_text('Invalid artwork id!')
             return
-        is_admin = message.from_user.id == ADMIN_ID
-        imgs, details = pixiv.view(artwork_id, is_admin)
+        imgs, details = pixiv.view(artwork_id)
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
         message.reply_text('Usage: /pixiv <artwork_id>')

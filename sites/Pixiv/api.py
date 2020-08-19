@@ -35,7 +35,7 @@ class Pixiv(object):
             Pixiv.api.access_token = tokens['access_token']
             logger.info('Pixiv logged in through cached tokens')
 
-    def view(self, artwork_id, is_admin=False):
+    def view(self, artwork_id):
         response = self.call(Pixiv.api.illust_detail, artwork_id)
         if 'illust' in response.keys():
             illust = response.illust
@@ -49,8 +49,7 @@ class Pixiv(object):
         for tag in illust.tags:
             tags += '#' + tag.name + ' '
         details = {'title': illust.title, 'author': illust.user.name, 'tags': tags, 'total_bookmarks': illust.total_bookmarks, 'url': 'pixiv.net/i/' + str(artwork_id)}
-        if is_admin:
-            details['bookmarked'] = illust.is_bookmarked
+        details['bookmarked'] = illust.is_bookmarked
         if illust.meta_pages: # Contains more than one image
             pages = illust.meta_pages
             for page in pages:
@@ -111,7 +110,7 @@ class Pixiv(object):
             response = func(*args)
         return response
 
-    def getFilename(self,url, illust):
+    def getFilename(self, url, illust):
         basename = os.path.basename(url)
         filename, extension = os.path.splitext(basename)
         name = "%s - %s - %s(%d)%s" % (filename, illust.title, illust.user.name, illust.user.id, extension)

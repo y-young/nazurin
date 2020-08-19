@@ -23,6 +23,7 @@ def get_help(update, context):
     update.message.reply_text('''
     小さな小さな賢将, can help you collect images from various sites.
     Commands:
+    /ping - pong
     /pixiv <id> - view pixiv artwork
     /pixiv_download <id> - download pixiv artwork
     /danbooru <id> - view danbooru post
@@ -31,7 +32,9 @@ def get_help(update, context):
     /yandere_download <id> - download yandere post
     /konachan <id> - view konachan post
     /konachan_download <id> - download konachan post
-    /bookmark <id> - bookmark pixiv artwork(ADMIN ONLY)
+    /bookmark <id> - bookmark pixiv artwork
+    /clear_downloads - clear download cache
+    /help - get this help text
     PS: Send Pixiv/Danbooru/Yandere/Konachan/Twitter URL to download image(s)
     ''')
 @run_async
@@ -68,24 +71,16 @@ def collection_update(update, context):
         message.reply_text('Error: No source matched')
         return
     logger.info('Collection update: site=%s, match=%s', result['site'], result['match'].groups())
-    # Perform action
-    if user_id == config.ADMIN_ID:
-        # Forward to gallery & Save to album
-        bot.forwardMessage(config.GALLERY_ID, chat_id, message_id)
-        chat_id = config.ALBUM_ID
-        message_id = None # No need to reply to message
-        is_admin = True
-    else:
-        # Reply directly to chat
-        is_admin = False
-    result['is_admin'] = is_admin
+    # Forward to gallery & Save to album
+    bot.forwardMessage(config.GALLERY_ID, chat_id, message_id)
+    chat_id = config.ALBUM_ID
+    message_id = None # No need to reply to message
 
     try:
         imgs = sites.handle_update(result)
         sendDocuments(update, context, imgs, chat_id=chat_id)
-        if is_admin:
-            storage.store(imgs)
-            message.reply_text('Done!')
+        storage.store(imgs)
+        message.reply_text('Done!')
     except NazurinError as error:
         message.reply_text(error.msg)
 def clear_downloads(update, context):
@@ -106,6 +101,7 @@ def main():
     global sites, storage
     defaults = Defaults(quote=True)
     urlFilter = Filters.entity('url') | Filters.entity('text_link') | Filters.caption_entity('url') | Filters.caption_entity('text_link')
+    adminFilter = Filters.user(user_id=config.ADMIN_ID)
     sites.load()
 
     # Set up the Updater
@@ -113,12 +109,12 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    dp.add_handler(CommandHandler('start', start))
-    dp.add_handler(CommandHandler('ping', ping))
-    dp.add_handler(CommandHandler('help', get_help))
+    dp.add_handler(CommandHandler('start', start, adminFilter))
+    dp.add_handler(CommandHandler('ping', ping, adminFilter))
+    dp.add_handler(CommandHandler('help', get_help, adminFilter))
     sites.register_commands(dp)
-    dp.add_handler(CommandHandler('clear_downloads', clear_downloads, Filters.user(user_id=config.ADMIN_ID), pass_args=True))
-    dp.add_handler(MessageHandler(urlFilter & (~ Filters.update.channel_posts), collection_update, pass_chat_data=True))
+    dp.add_handler(CommandHandler('clear_downloads', clear_downloads, adminFilter, pass_args=True))
+    dp.add_handler(MessageHandler(adminFilter & urlFilter & (~ Filters.update.channel_posts), collection_update, pass_chat_data=True))
 
     # log all errors
     dp.add_error_handler(handle_error)

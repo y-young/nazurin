@@ -4,6 +4,8 @@ from re import search
 from glob import glob
 from os import path
 from utils import logger
+from config import ADMIN_ID
+from telegram.ext import Filters
 
 class SiteManager(object):
     """Site plugin manager."""
@@ -37,7 +39,9 @@ class SiteManager(object):
         return self.sites[site]
 
     def register_commands(self, dispatcher):
+        adminFilter = Filters.user(user_id=ADMIN_ID)
         for command in self.commands:
+            command.filters = command.filters & adminFilter
             dispatcher.add_handler(command)
 
     def match(self, urls):
@@ -67,4 +71,4 @@ class SiteManager(object):
 
     def handle_update(self, result):
         handle = result['handler']
-        return handle(result['match'], is_admin=result['is_admin'])
+        return handle(result['match'])
