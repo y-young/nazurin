@@ -98,7 +98,7 @@ def clear_downloads(update, context):
     except OSError as error:
         message.reply_text(error.strerror)
 
-def error(update, context):
+def handle_error(update, context):
     logger.error('Update "%s" caused error "%s"', update, context.error)
     traceback.print_exc()
 
@@ -121,7 +121,7 @@ def main():
     dp.add_handler(MessageHandler(urlFilter & (~ Filters.update.channel_posts), collection_update, pass_chat_data=True))
 
     # log all errors
-    dp.add_error_handler(error)
+    dp.add_error_handler(handle_error)
 
     if config.ENV == 'production':
         # Webhook mode
