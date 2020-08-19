@@ -42,7 +42,6 @@ def collection_update(update, context):
     message = update.message
     message_id = message.message_id
     chat_id = message.chat_id
-    user_id = message.from_user.id
     bot = context.bot
 
     # Match URL
