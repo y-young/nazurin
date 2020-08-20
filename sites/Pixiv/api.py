@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-import os
+from shutil import copyfileobj
+import json
 import time
+import os
 from config import NAZURIN_DATA, DOWNLOAD_DIR
 from sites.Pixiv.config import PIXIV_DOCUMENT, PIXIV_USER, PIXIV_PASS
 from utils import NazurinError, logger, sanitizeFilename
@@ -35,7 +37,8 @@ class Pixiv(object):
             Pixiv.api.access_token = tokens['access_token']
             logger.info('Pixiv logged in through cached tokens')
 
-    def view(self, artwork_id):
+    def getArtwork(self, artwork_id):
+        """Fetch an artwork."""
         response = self.call(Pixiv.api.illust_detail, artwork_id)
         if 'illust' in response.keys():
             illust = response.illust
@@ -43,33 +46,46 @@ class Pixiv(object):
             raise NazurinError("Artwork not found")
         if illust.restrict != 0:
             raise NazurinError("Artwork not found or is private")
+        if illust.type != 'illust' and illust.type != 'ugoira':
+            raise NazurinError('Unknown artwork type.')
+        return illust
 
-        imgs = list()
-        tags = str()
-        for tag in illust.tags:
-            tags += '#' + tag.name + ' '
-        details = {'title': illust.title, 'author': illust.user.name, 'tags': tags, 'total_bookmarks': illust.total_bookmarks, 'url': 'pixiv.net/i/' + str(artwork_id)}
-        details['bookmarked'] = illust.is_bookmarked
-        if illust.meta_pages: # Contains more than one image
-            pages = illust.meta_pages
-            for page in pages:
-                url = page.image_urls.original
-                name = self.getFilename(url, illust)
-                imgs.append({'url': url, 'name': name})
-        else:
-            url = illust.meta_single_page.original_image_url
-            name = self.getFilename(url, illust)
-            imgs.append({'url': url, 'name': name})
+    def view_illust(self, artwork_id):
+        illust = self.getArtwork(artwork_id)
+        if illust.type == 'ugoira':
+            raise NazurinError('Ugoira view is not supported.')
+        details = self.buildCaption(illust)
+        imgs = self.getImgs(illust)
         return imgs, details
 
-    def download(self, artwork_id):
-        imgs, _ = self.view(artwork_id)
+    def download_illust(self, artwork_id=None, illust=None):
+        """Download and return images of an illustration."""
+        if not illust:
+            imgs, _ = self.view_illust(artwork_id)
+        else:
+            imgs = self.getImgs(illust)
         if not os.path.exists(DOWNLOAD_DIR):
             os.makedirs(DOWNLOAD_DIR)
         for img in imgs:
             filename = DOWNLOAD_DIR + img['name']
             if (not os.path.exists(filename)) or os.stat(filename).st_size == 0:
                 Pixiv.api.download(img['url'], path=DOWNLOAD_DIR, name=img['name'])
+        return imgs
+
+    def download_ugoira(self, illust):
+        """Download ugoira zip file and store animation data."""
+        metadata = json.dumps(Pixiv.api.ugoira_metadata(illust.id).ugoira_metadata)
+        url = illust.meta_single_page.original_image_url
+        zip_url = url.replace('/img-original/', '/img-zip-ugoira/')
+        zip_url = zip_url.split('_ugoira0')[0] + '_ugoira1920x1080.zip'
+        filename = str(illust.id) + '_ugoira1920x1080.zip'
+        metafile = str(illust.id) + '_ugoira.json'
+        imgs = [{'url': zip_url, 'name': filename}, {'name': metafile}]
+        if not os.path.exists(DOWNLOAD_DIR):
+            os.makedirs(DOWNLOAD_DIR)
+        with open(DOWNLOAD_DIR + metafile, 'w') as f:
+            f.write(metadata)
+        Pixiv.api.download(zip_url, path=DOWNLOAD_DIR, name=filename)
         return imgs
 
     @run_async
@@ -102,6 +118,7 @@ class Pixiv(object):
             self._login()
 
     def call(self, func, *args):
+        """Call API with login state check."""
         if not Pixiv.api.access_token or not Pixiv.api.refresh_token:
             self.login()
         response = func(*args)
@@ -109,6 +126,36 @@ class Pixiv(object):
             self.login(refresh=True)
             response = func(*args)
         return response
+
+    def getImgs(self, illust):
+        """Get images from an artwork."""
+        imgs = list()
+        if illust.meta_pages: # Contains more than one image
+            pages = illust.meta_pages
+            for page in pages:
+                url = page.image_urls.original
+                name = self.getFilename(url, illust)
+                imgs.append({'url': url, 'name': name})
+        else:
+            url = illust.meta_single_page.original_image_url
+            name = self.getFilename(url, illust)
+            imgs.append({'url': url, 'name': name})
+        return imgs
+
+    def buildCaption(self, illust):
+        """Build media caption from an artwork."""
+        tags = str()
+        for tag in illust.tags:
+            tags += '#' + tag.name + ' '
+        details = {
+            'title': illust.title,
+            'author': illust.user.name,
+            'tags': tags,
+            'total_bookmarks': illust.total_bookmarks,
+            'url': 'pixiv.net/i/' + str(illust.id)
+        }
+        details['bookmarked'] = illust.is_bookmarked
+        return details
 
     def getFilename(self, url, illust):
         basename = os.path.basename(url)

@@ -15,7 +15,7 @@ def pixiv_view(update, context):
         if artwork_id < 0:
             message.reply_text('Invalid artwork id!')
             return
-        imgs, details = pixiv.view(artwork_id)
+        imgs, details = pixiv.view_illust(artwork_id)
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
         message.reply_text('Usage: /pixiv <artwork_id>')
@@ -33,7 +33,7 @@ def pixiv_download(update, context):
         if artwork_id < 0:
             message.reply_text('Invalid artwork id!')
             return
-        imgs = pixiv.download(artwork_id)
+        imgs = pixiv.download_illust(artwork_id)
         sendDocuments(update, context, imgs)
     except (IndexError, ValueError):
         message.reply_text('Usage: /pixiv_download <artwork_id>')

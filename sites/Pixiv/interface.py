@@ -1,4 +1,7 @@
+from database import Database
+from time import time
 from .api import Pixiv
+from .config import PIXIV_COLLECTION
 
 PRIORITY = 10
 patterns = [
@@ -18,5 +21,15 @@ def handle(match, **kwargs):
     artwork_id = match.group(1)
     api = Pixiv()
     api.bookmark(artwork_id)
-    imgs = api.download(artwork_id)
+
+    db = Database().driver()
+    collection = db.collection(PIXIV_COLLECTION)
+    illust = api.getArtwork(artwork_id)
+    illust.collected_at = time()
+    collection.insert(artwork_id, illust)
+
+    if illust.type == 'illust':
+        imgs = api.download_illust(illust=illust)
+    else:
+        imgs = api.download_ugoira(illust)
     return imgs
