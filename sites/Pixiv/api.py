@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from shutil import copyfileobj
 import json
 import time
 import os
