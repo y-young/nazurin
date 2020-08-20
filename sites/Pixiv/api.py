@@ -54,7 +54,7 @@ class Pixiv(object):
         if illust.type == 'ugoira':
             raise NazurinError('Ugoira view is not supported.')
         details = self.buildCaption(illust)
-        imgs = self.getImgs(illust)
+        imgs = self.getImages(illust)
         return imgs, details
 
     def download_illust(self, artwork_id=None, illust=None):
@@ -62,7 +62,7 @@ class Pixiv(object):
         if not illust:
             imgs, _ = self.view_illust(artwork_id)
         else:
-            imgs = self.getImgs(illust)
+            imgs = self.getImages(illust)
         if not os.path.exists(DOWNLOAD_DIR):
             os.makedirs(DOWNLOAD_DIR)
         for img in imgs:
@@ -126,7 +126,7 @@ class Pixiv(object):
             response = func(*args)
         return response
 
-    def getImgs(self, illust):
+    def getImages(self, illust):
         """Get images from an artwork."""
         imgs = list()
         if illust.meta_pages: # Contains more than one image
