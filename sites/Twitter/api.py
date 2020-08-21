@@ -4,7 +4,8 @@ import os
 from utils import logger, downloadImages, NazurinError
 
 class Twitter(object):
-    def download(self, status_id):
+    def fetch(self, status_id):
+        """Fetch & return tweet images and information."""
         # Old: 'https://syndication.twitter.com/tweets.json?ids='+ status_id +'&lang=en'
         api = 'https://cdn.syndication.twimg.com/tweet?id='+ str(status_id) +'&lang=en'
         response = requests.get(api)
@@ -19,9 +20,8 @@ class Twitter(object):
         for photo in photos:
             filename, url = self.parseUrl(photo['url'])
             imgs.append({'name': 'twitter - ' + str(status_id) + ' - ' + filename, 'url': url})
-        logger.info(imgs)
         downloadImages(imgs)
-        return imgs
+        return imgs, response
 
     def parseUrl(self, src):
         """Get filename & the url of the original image

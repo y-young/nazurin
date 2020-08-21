@@ -1,4 +1,7 @@
+from database import Database
+from time import time
 from .api import Twitter
+from .config import TWITTER_COLLECTION
 
 PRIORITY = 5
 patterns = [
@@ -10,5 +13,9 @@ patterns = [
 
 def handle(match, **kwargs):
     status_id = match.group(1)
-    imgs = Twitter().download(status_id)
+    db = Database().driver()
+    collection = db.collection(TWITTER_COLLECTION)
+    imgs, tweet = Twitter().fetch(status_id)
+    tweet['collected_at'] = time()
+    collection.insert(status_id, tweet)
     return imgs
