@@ -1,7 +1,7 @@
 import requests
 import json
 import os
-from utils import logger, downloadImages, NazurinError
+from utils import downloadImages, NazurinError
 
 class Twitter(object):
     def fetch(self, status_id):
