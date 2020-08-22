@@ -1,4 +1,7 @@
+from database import Database
+from time import time
 from .api import Danbooru
+from .config import DANBOORU_COLLECTION
 
 PRIORITY = 30
 patterns = [
@@ -12,5 +15,12 @@ patterns = [
 def handle(match, **kwargs):
     site = match.group(1)
     post_id = match.group(2)
-    imgs = Danbooru(site).download(post_id)
+    db = Database().driver()
+    collection = db.collection(DANBOORU_COLLECTION)
+    api = Danbooru(site)
+
+    post = api.getPost(post_id)
+    imgs = api.download(post=post)
+    post['collected_at'] = time()
+    collection.insert(post_id, post)
     return imgs

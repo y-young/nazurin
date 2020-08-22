@@ -9,7 +9,8 @@ class Danbooru(object):
         self.site = site
         self.api = danbooru(site)
 
-    def view(self, post_id):
+    def getPost(self, post_id):
+        """Fetch an post."""
         try:
             post = self.api.post_show(post_id)
         except PybooruHTTPError as err:
@@ -17,14 +18,32 @@ class Danbooru(object):
                 raise NazurinError('Post not found')
         if 'file_url' not in post.keys():
             raise NazurinError('You may need a gold account to view this post\nSource: ' + post['source'])
+        return post
 
+    def view(self, post_id):
+        post = self.getPost(post_id)
+        imgs, caption = self.parsePost(post)
+        return imgs, caption
+
+    def download(self, post_id=None, post=None):
+        if post:
+            imgs, _ = self.parsePost(post)
+        else:
+            imgs, _ = self.view(post_id)
+        downloadImages(imgs)
+        return imgs
+
+    def parsePost(self, post):
+        """Get images and build caption."""
+        # Get images
         url = post['file_url']
         artists = post['tag_string_artist']
-        tags = post['tag_string'].split(' ')
         title, filename = self._getNames(post)
         imgs = list()
         imgs.append({'url': url, 'name': filename})
 
+        # Build media caption
+        tags = post['tag_string'].split(' ')
         tag_string = str()
         for character in tags:
             tag_string += '#' + character + ' '
@@ -33,7 +52,7 @@ class Danbooru(object):
             details['title'] = title
         if artists:
             details['artists'] = artists
-        details.update({'url': 'https://' + self.site + '.donmai.us/posts/' + str(post_id), 'tags': tag_string})
+        details.update({'url': 'https://' + self.site + '.donmai.us/posts/' + str(post['id']), 'tags': tag_string})
         if post['parent_id']:
             details['parent_id'] = post['parent_id']
         if post['pixiv_id']:
@@ -41,11 +60,6 @@ class Danbooru(object):
         if post['has_children']:
             details['has_children'] = True
         return imgs, details
-
-    def download(self, post_id):
-        imgs, _ = self.view(post_id)
-        downloadImages(imgs)
-        return imgs
 
     def _getNames(self, post):
         characters = post['tag_string_character']

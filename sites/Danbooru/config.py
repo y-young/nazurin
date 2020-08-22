@@ -1,0 +1,1 @@
+DANBOORU_COLLECTION = 'danbooru'
