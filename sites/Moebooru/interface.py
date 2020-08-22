@@ -1,4 +1,7 @@
+from database import Database
+from time import time
 from .api import Moebooru
+from .config import MOEBOORU_COLLECTIONS
 
 PRIORITY = 15
 patterns = [
@@ -24,6 +27,12 @@ patterns = [
 def handle(match, **kwargs):
     site_url = match.group(1)
     post_id = match.group(2)
+    db = Database().driver()
+    collection = db.collection(MOEBOORU_COLLECTIONS[site_url])
     api = Moebooru().site(site_url)
-    imgs = api.download(post_id)
+
+    post, _ = api.getPost(post_id)
+    imgs = api.download(post=post)
+    post['collected_at'] = time()
+    collection.insert(post_id, post)
     return imgs

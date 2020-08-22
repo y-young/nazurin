@@ -13,7 +13,7 @@ class Moebooru(object):
         self.url = site_url
         return self
 
-    def view(self, post_id):
+    def getPost(self, post_id):
         url = 'https://'+ self.url + '/post/show/' + str(post_id)
         response = requests.get(url)
         try:
@@ -36,38 +36,22 @@ class Moebooru(object):
         try:
             info = json.loads(info)
             post = info['posts'][0]
+            tags = info['tags']
         except json.decoder.JSONDecodeError as err:
             logger.error(err)
+        return post, tags
 
-        source = post['source']
-        file_url = post['file_url']
-        name = sanitizeFilename(unquote(os.path.basename(file_url)))
-        imgs = [{'url': file_url, 'name': name}]
-        title = post['tags']
-        tag_string = artists = str()
-        for tag, tag_type in info['tags'].items():
-            if tag_type == 'artist':
-                artists += tag + ' '
-            else:
-                tag_string += '#' + tag + ' '
-        details = dict()
-        if title:
-            details['title'] = title
-        if artists:
-            details['artists'] = artists
-        if tag_string:
-            details['tags'] = tag_string
-        details['url'] = url
-        if source:
-            details['source'] = source
-        if post['parent_id']:
-            details['parent_id'] = post['parent_id']
-        if post['has_children']:
-            details['has_children'] = True
-        return imgs, details
+    def view(self, post_id):
+        post, tags = self.getPost(post_id)
+        imgs = self.getImages(post)
+        caption = self.buildCaption(post, tags)
+        return imgs, caption
 
-    def download(self, post_id):
-        imgs, _ = self.view(post_id)
+    def download(self, post_id=None, post=None):
+        if post:
+            imgs = self.getImages(post)
+        else:
+            imgs, _ = self.view(post_id)
         downloadImages(imgs)
         return imgs
 
@@ -81,7 +65,7 @@ class Moebooru(object):
                 url = post['file_url']
             else:
                 url = post['jpeg_url']
-            name, _ = self.parse_url(url)
+            name, _ = self.parseUrl(url)
             imgs.append({'name': name, 'url': url})
         details = {'name': info['name'], 'description': info['description']}
         return imgs, details
@@ -94,10 +78,42 @@ class Moebooru(object):
         for key, img in enumerate(imgs):
             filename = str(key + 1)
             filename = '0' * (3 - len(filename)) + filename
-            _, ext = self.parse_url(img['url'])
+            _, ext = self.parseUrl(img['url'])
             filename += ext
             downloadImage(img['url'], pool_name + '/' + filename)
 
-    def parse_url(self, url):
+    def getImages(self, post):
+        file_url = post['file_url']
+        name = sanitizeFilename(unquote(os.path.basename(file_url)))
+        imgs = [{'url': file_url, 'name': name}]
+        return imgs
+
+    def buildCaption(self, post, tags):
+        """Build media caption from an post."""
+        title = post['tags']
+        source = post['source']
+        tag_string = artists = str()
+        for tag, tag_type in tags.items():
+            if tag_type == 'artist':
+                artists += tag + ' '
+            else:
+                tag_string += '#' + tag + ' '
+        details = dict()
+        if title:
+            details['title'] = title
+        if artists:
+            details['artists'] = artists
+        if tag_string:
+            details['tags'] = tag_string
+        details['url'] = 'https://'+ self.url + '/post/show/' + str(post['id'])
+        if source:
+            details['source'] = source
+        if post['parent_id']:
+            details['parent_id'] = post['parent_id']
+        if post['has_children']:
+            details['has_children'] = True
+        return details
+
+    def parseUrl(self, url):
         name = os.path.basename(url)
         return os.path.splitext(name)
