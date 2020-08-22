@@ -103,9 +103,9 @@ class Moebooru(object):
             details['title'] = title
         if artists:
             details['artists'] = artists
+        details['url'] = 'https://'+ self.url + '/post/show/' + str(post['id'])
         if tag_string:
             details['tags'] = tag_string
-        details['url'] = 'https://'+ self.url + '/post/show/' + str(post['id'])
         if source:
             details['source'] = source
         if post['parent_id']:
