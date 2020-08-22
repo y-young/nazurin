@@ -17,7 +17,8 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 -   View/Download artwork from [various sites](#supported-sites)
 -   Add images to your collection via Telegram
 -   Store your collection in Telegram channels
--   Upload images to [MEGA](https://mega.nz/)
+-   Store images on local disk or [MEGA](https://mega.nz/)
+-   Store image metadata in database
 
 ### Supported Sites
 
@@ -39,6 +40,8 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 1.  'Deploy to Heroku' Button:
 
     [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+> Tips: You can fork this repository, modify it to your needs, and use this button to deploy your own version.
 
 2.  Manual deploy:
 
