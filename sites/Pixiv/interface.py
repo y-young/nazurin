@@ -20,16 +20,15 @@ patterns = [
 def handle(match, **kwargs):
     artwork_id = match.group(1)
     api = Pixiv()
-    api.bookmark(artwork_id)
-
     db = Database().driver()
     collection = db.collection(PIXIV_COLLECTION)
-    illust = api.getArtwork(artwork_id)
-    illust.collected_at = time()
-    collection.insert(artwork_id, illust)
 
+    api.bookmark(artwork_id)
+    illust = api.getArtwork(artwork_id)
     if illust.type == 'illust':
         imgs = api.download_illust(illust=illust)
     else:
         imgs = api.download_ugoira(illust)
+    illust.collected_at = time()
+    collection.insert(artwork_id, illust)
     return imgs
