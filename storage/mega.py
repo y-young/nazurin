@@ -50,7 +50,12 @@ class Mega(object):
             self.getDestination()
 
     def getDestination(self):
-        Mega.destination = Mega.api.find(STORAGE_DIR, exclude_deleted=True)[0]
+        result = Mega.api.find(STORAGE_DIR, exclude_deleted=True)
+        if result:
+            Mega.destination = result[0]
+        else:
+            result = Mega.api.create_folder(STORAGE_DIR)
+            Mega.destination = result[STORAGE_DIR]
         Mega.document.update({
             'destination': Mega.destination
         })
