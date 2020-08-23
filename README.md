@@ -104,7 +104,7 @@ Local directory to store downloaded images, will be created if not exists.
 
 ### STORAGE_DIR
 
-Storage directory, can be local or remote, _must_ exists when using MEGA.
+Storage directory, can be local or remote, will be created if not exists.
 
 ### ALBUM_ID
 
