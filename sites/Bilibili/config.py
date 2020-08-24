@@ -1,0 +1,1 @@
+BILIBILI_COLLECTION = 'bilibili'

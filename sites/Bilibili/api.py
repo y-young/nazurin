@@ -4,7 +4,8 @@ import os
 from utils import downloadImages
 
 class Bilibili(object):
-    def download(self, dynamic_id):
+    def fetch(self, dynamic_id):
+        """Fetch images and detail."""
         api = 'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail?dynamic_id=' + str(dynamic_id)
         source = requests.get(api).text
         source = json.loads(source)
@@ -18,4 +19,4 @@ class Bilibili(object):
             imgs.append({'name': str(dynamic_id) + '_' + str(index) + extension, 'url': url})
 
         downloadImages(imgs)
-        return imgs
+        return imgs, card
