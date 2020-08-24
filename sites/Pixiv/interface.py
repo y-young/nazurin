@@ -25,10 +25,10 @@ def handle(match, **kwargs):
 
     api.bookmark(artwork_id)
     illust = api.getArtwork(artwork_id)
-    if illust.type == 'illust':
-        imgs = api.download_illust(illust=illust)
-    else:
+    if illust.type == 'ugoira':
         imgs = api.download_ugoira(illust)
+    else:
+        imgs = api.download_illust(illust=illust)
     illust.collected_at = time()
     collection.insert(artwork_id, illust)
     return imgs

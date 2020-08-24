@@ -45,8 +45,6 @@ class Pixiv(object):
             raise NazurinError("Artwork not found")
         if illust.restrict != 0:
             raise NazurinError("Artwork not found or is private")
-        if illust.type != 'illust' and illust.type != 'ugoira':
-            raise NazurinError('Unknown artwork type.')
         return illust
 
     def view_illust(self, artwork_id):
