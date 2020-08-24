@@ -1,3 +1,4 @@
+from requests.adapters import HTTPAdapter
 from mimetypes import guess_type
 from shutil import copyfileobj
 from functools import wraps
@@ -92,19 +93,15 @@ def handleBadRequest(update, context, error):
 def downloadImages(imgs, headers=None):
     if headers is None:
         headers = dict()
-    headers['User-Agent'] = UA
     if not os.path.exists(DOWNLOAD_DIR):
         os.makedirs(DOWNLOAD_DIR)
-    for img in imgs:
-        downloadImage(img['url'], img['name'], headers)
-
-def downloadImage(url, path, headers=None):
-    if headers is None:
-        headers = dict()
-    if not os.path.exists(DOWNLOAD_DIR + path):
-        response = requests.get(url, headers=headers, stream=True).raw
-        with open(DOWNLOAD_DIR + path, 'wb') as f:
-            copyfileobj(response, f)
+    with requests.Session() as session:
+        session.headers.update({'User-Agent': UA})
+        session.mount('https://', HTTPAdapter(max_retries=5))
+        for img in imgs:
+            response = session.get(img['url'], stream=True, timeout=5).raw
+            with open(DOWNLOAD_DIR + img['name'], 'wb') as f:
+                copyfileobj(response, f)
 
 def sanitizeFilename(name):
     # https://docs.microsoft.com/zh-cn/windows/win32/fileio/naming-a-file

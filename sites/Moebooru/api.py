@@ -4,7 +4,7 @@ from requests.exceptions import HTTPError
 import json
 import os
 from config import DOWNLOAD_DIR
-from utils import NazurinError, downloadImage, downloadImages, logger, sanitizeFilename
+from utils import NazurinError, downloadImages, logger, sanitizeFilename
 from pybooru import Moebooru as moebooru
 from bs4 import BeautifulSoup
 
@@ -80,7 +80,7 @@ class Moebooru(object):
             filename = '0' * (3 - len(filename)) + filename
             _, ext = self.parseUrl(img['url'])
             filename += ext
-            downloadImage(img['url'], pool_name + '/' + filename)
+            downloadImages([{'url': img['url'], 'name': pool_name + '/' + filename}]) #TODO
 
     def getImages(self, post):
         file_url = post['file_url']
