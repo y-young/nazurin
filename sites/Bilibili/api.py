@@ -7,8 +7,7 @@ class Bilibili(object):
     def fetch(self, dynamic_id):
         """Fetch images and detail."""
         api = 'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail?dynamic_id=' + str(dynamic_id)
-        source = requests.get(api).text
-        source = json.loads(source)
+        source = requests.get(api).json()
         card = json.loads(source['data']['card']['card'])
         pics = card['item']['pictures']
         imgs = list()

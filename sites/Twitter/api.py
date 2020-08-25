@@ -1,5 +1,4 @@
 import requests
-import json
 import os
 from utils import downloadImages, NazurinError
 
@@ -11,7 +10,7 @@ class Twitter(object):
         response = requests.get(api)
         if response.status_code == 404:
             raise NazurinError('Tweet not found or unavailable.')
-        response = json.loads(response.text)
+        response = response.json()
         if 'photos' not in response.keys():
             raise NazurinError('No photo found.')
 
