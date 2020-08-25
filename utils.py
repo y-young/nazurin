@@ -9,7 +9,7 @@ import requests
 import logging
 import re
 import os
-from config import DOWNLOAD_DIR, UA
+from config import DOWNLOAD_DIR, UA, RETRIES
 from telegram import ChatAction, InputMediaPhoto
 from telegram.error import RetryAfter
 
@@ -97,7 +97,7 @@ def downloadImages(imgs, headers=None):
         os.makedirs(DOWNLOAD_DIR)
     with requests.Session() as session:
         session.headers.update({'User-Agent': UA})
-        session.mount('https://', HTTPAdapter(max_retries=5))
+        session.mount('https://', HTTPAdapter(max_retries=RETRIES))
         for img in imgs:
             response = session.get(img['url'], stream=True, timeout=5).raw
             with open(DOWNLOAD_DIR + img['name'], 'wb') as f:
