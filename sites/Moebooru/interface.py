@@ -1,9 +1,8 @@
 from database import Database
 from time import time
 from .api import Moebooru
-from .config import MOEBOORU_COLLECTIONS
+from .config import COLLECTIONS
 
-PRIORITY = 15
 patterns = [
     # https://yande.re/post/show/123456
     r'(yande\.re)/post/show/(\d+)',
@@ -28,7 +27,7 @@ def handle(match, **kwargs):
     site_url = match.group(1)
     post_id = match.group(2)
     db = Database().driver()
-    collection = db.collection(MOEBOORU_COLLECTIONS[site_url])
+    collection = db.collection(COLLECTIONS[site_url])
     api = Moebooru().site(site_url)
 
     post, _ = api.getPost(post_id)

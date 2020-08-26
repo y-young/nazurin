@@ -1,1 +1,2 @@
-BILIBILI_COLLECTION = 'bilibili'
+PRIORITY = 4
+COLLECTION = 'bilibili'

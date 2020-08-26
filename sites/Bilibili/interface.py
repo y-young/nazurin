@@ -1,8 +1,7 @@
 from database import Database
 from time import time
 from .api import Bilibili
-from .config import BILIBILI_COLLECTION
-PRIORITY = 4
+from .config import COLLECTION
 
 patterns = [
     # https://t.bilibili.com/123456789012345678
@@ -15,7 +14,7 @@ patterns = [
 def handle(match, **kwargs):
     dynamic_id = match.group(1)
     db = Database().driver()
-    collection = db.collection(BILIBILI_COLLECTION)
+    collection = db.collection(COLLECTION)
 
     imgs, data = Bilibili().fetch(dynamic_id)
     data['collected_at'] = time()

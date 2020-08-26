@@ -1,9 +1,8 @@
 from database import Database
 from time import time
 from .api import Danbooru
-from .config import DANBOORU_COLLECTION
+from .config import COLLECTION
 
-PRIORITY = 30
 patterns = [
     # https://danbooru.donmai.us/posts/123456
     r'(danbooru)\.donmai\.us/posts/(\d+)',
@@ -16,7 +15,7 @@ def handle(match, **kwargs):
     site = match.group(1)
     post_id = match.group(2)
     db = Database().driver()
-    collection = db.collection(DANBOORU_COLLECTION)
+    collection = db.collection(COLLECTION)
     api = Danbooru(site)
 
     post = api.getPost(post_id)

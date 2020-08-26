@@ -1,1 +1,2 @@
-DANBOORU_COLLECTION = 'danbooru'
+PRIORITY = 30
+COLLECTION = 'danbooru'

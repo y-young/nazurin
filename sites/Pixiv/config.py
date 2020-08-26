@@ -1,7 +1,9 @@
-import os
+from os import environ
 
-PIXIV_USER = os.environ.get('PIXIV_USER')
-PIXIV_PASS = os.environ.get('PIXIV_PASS')
+PRIORITY = 10
 
-PIXIV_COLLECTION = 'pixiv'
-PIXIV_DOCUMENT = 'pixiv'
+USER = environ.get('PIXIV_USER')
+PASSWORD = environ.get('PIXIV_PASS')
+
+COLLECTION = 'pixiv'
+DOCUMENT = 'pixiv'

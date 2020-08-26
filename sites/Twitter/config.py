@@ -1,1 +1,2 @@
-TWITTER_COLLECTION = 'twitter'
+PRIORITY = 5
+COLLECTION = 'twitter'

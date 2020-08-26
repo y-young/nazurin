@@ -3,7 +3,7 @@ import json
 import time
 import os
 from config import NAZURIN_DATA, DOWNLOAD_DIR
-from sites.Pixiv.config import PIXIV_DOCUMENT, PIXIV_USER, PIXIV_PASS
+from sites.Pixiv.config import DOCUMENT, USER, PASSWORD
 from utils import NazurinError, logger, sanitizeFilename
 from database import Database
 from pixivpy3 import AppPixivAPI, PixivError
@@ -13,7 +13,7 @@ class Pixiv(object):
     api = AppPixivAPI()
     db = Database().driver()
     collection = db.collection(NAZURIN_DATA)
-    document = collection.document(PIXIV_DOCUMENT)
+    document = collection.document(DOCUMENT)
     updated_time = 0
 
     def login(self, refresh=False):
@@ -96,9 +96,9 @@ class Pixiv(object):
             return True
 
     def _login(self):
-        Pixiv.api.login(PIXIV_USER, PIXIV_PASS)
+        Pixiv.api.login(USER, PASSWORD)
         Pixiv.updated_time = time.time()
-        Pixiv.collection.insert(PIXIV_DOCUMENT, {
+        Pixiv.collection.insert(DOCUMENT, {
             'access_token': Pixiv.api.access_token,
             'refresh_token': Pixiv.api.refresh_token,
             'updated_time': Pixiv.updated_time

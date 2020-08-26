@@ -1,9 +1,8 @@
 from database import Database
 from time import time
 from .api import Pixiv
-from .config import PIXIV_COLLECTION
+from .config import COLLECTION
 
-PRIORITY = 10
 patterns = [
     # https://pixiv.net/i/123456
     # https://pixiv.net/artworks/123456
@@ -30,7 +29,7 @@ def handle(match, **kwargs):
     artwork_id = match.group(1)
     api = Pixiv()
     db = Database().driver()
-    collection = db.collection(PIXIV_COLLECTION)
+    collection = db.collection(COLLECTION)
 
     api.bookmark(artwork_id)
     illust = api.getArtwork(artwork_id)
