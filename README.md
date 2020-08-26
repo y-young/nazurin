@@ -30,6 +30,7 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 |      yandere      |       <https://yande.re/>      |     ✔    |      ✔     |
 |      Konachan     |     <https://konachan.com/>    |     ✔    |      ✔     |
 |     Lolibooru     |    <https://lolibooru.moe/>    |          |      ✔     |
+|      Gelbooru     |     <https://gelbooru.com/>    |          |      ✔     |
 |      Twitter      |     <https://twitter.com/>     |          |      ✔     |
 | Bilibili Dynamics |    <https://t.bilibili.com/>   |          |      ✔     |
 
@@ -70,7 +71,11 @@ Commands:
 -   `/clear_downloads` - clear download cache
 -   `/help` - get help text
 
-Update your collection: send the bot a message with a link of [supported sites](#supported-sites), this message will be forwarded to `GALLERY` channel, the bot will then download the original images from the site, send the files to `ALBUM` channel, and finally store to your custom destination.
+### How to update your collection
+
+Send the bot a message with a link of [supported sites](#supported-sites), this message will be forwarded to `GALLERY` channel, the bot will then download the original images from the site, send the files to `ALBUM` channel, and finally store to your custom destination.
+
+> Tips: On mobile you can use the _share_ button in apps, as long as the final message contains a link.
 
 ## Configuration
 
