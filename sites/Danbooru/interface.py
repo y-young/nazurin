@@ -5,21 +5,26 @@ from .config import COLLECTION
 
 patterns = [
     # https://danbooru.donmai.us/posts/123456
-    r'(danbooru)\.donmai\.us/posts/(\d+)',
-
     # https://safebooru.donmai.us/posts/123456
-    r'(safebooru)\.donmai\.us/posts/(\d+)'
+    r'(?:danbooru|safebooru)\.donmai\.us/posts/(?P<id>\d+)',
+
+    # https://cdn.donmai.us/original/12/ab/12ab34cd56ef7890ab12cd34ef567890.png
+    r'cdn\.donmai\.us/\w+/(?:[a-f0-9]{2}/){2}(?P<md5>[a-f0-9]{32})'
 ]
 
 def handle(match, **kwargs):
-    site = match.group(1)
-    post_id = match.group(2)
+    api = Danbooru()
     db = Database().driver()
     collection = db.collection(COLLECTION)
-    api = Danbooru(site)
 
-    post = api.getPost(post_id)
+    if match.lastgroup == 'id':
+        post_id = match.group(1)
+        post = api.getPost(post_id)
+    else:
+        md5 = match.group(1)
+        post = api.getPost(md5=md5)
+
     imgs = api.download(post=post)
     post['collected_at'] = time()
-    collection.insert(post_id, post)
+    collection.insert(post['id'], post)
     return imgs

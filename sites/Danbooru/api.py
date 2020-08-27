@@ -9,10 +9,13 @@ class Danbooru(object):
         self.site = site
         self.api = danbooru(site)
 
-    def getPost(self, post_id):
+    def getPost(self, post_id=None, md5=None):
         """Fetch an post."""
         try:
-            post = self.api.post_show(post_id)
+            if post_id:
+                post = self.api.post_show(post_id)
+            else:
+                post = self.api.post_list(md5=md5)
         except PybooruHTTPError as err:
             if 'Not Found' in err._msg:
                 raise NazurinError('Post not found')
