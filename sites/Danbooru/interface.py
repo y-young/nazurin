@@ -26,5 +26,5 @@ def handle(match, **kwargs):
 
     imgs = api.download(post=post)
     post['collected_at'] = time()
-    collection.insert(post['id'], post)
+    collection.insert(int(post['id']), post)
     return imgs

@@ -33,5 +33,5 @@ def handle(match, **kwargs):
     post, _ = api.getPost(post_id)
     imgs = api.download(post=post)
     post['collected_at'] = time()
-    collection.insert(post_id, post)
+    collection.insert(int(post_id), post)
     return imgs

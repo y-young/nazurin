@@ -38,5 +38,5 @@ def handle(match, **kwargs):
     else:
         imgs = api.download_illust(illust=illust)
     illust.collected_at = time()
-    collection.insert(artwork_id, illust)
+    collection.insert(int(artwork_id), illust)
     return imgs

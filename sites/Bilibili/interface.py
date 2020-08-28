@@ -18,5 +18,5 @@ def handle(match, **kwargs):
 
     imgs, data = Bilibili().fetch(dynamic_id)
     data['collected_at'] = time()
-    collection.insert(dynamic_id, data)
+    collection.insert(int(dynamic_id), data)
     return imgs

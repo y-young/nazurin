@@ -15,5 +15,5 @@ def handle(match, **kwargs):
 
     imgs, post = Gelbooru().fetch(post_id)
     post['collected_at'] = time()
-    collection.insert(post_id, post)
+    collection.insert(int(post_id), post)
     return imgs
