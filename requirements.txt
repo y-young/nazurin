@@ -1,7 +1,17 @@
 python-telegram-bot
 pixivpy
 beautifulsoup4
-mega.py
 Pybooru
-firebase-admin
+
+# DATABASE
+# Local:
 tinydb
+# Firebase:
+firebase-admin
+# Mongo:
+pymongo
+dnspython
+
+# STORAGE
+# Mega:
+mega.py
