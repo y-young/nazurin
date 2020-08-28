@@ -18,7 +18,7 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 -   Add images to your collection via Telegram
 -   Store your collection in Telegram channels
 -   Store images on local disk or [MEGA](https://mega.nz/)
--   Store image metadata in database
+-   Store image metadata in [multiple types](#database) of database
 
 ### Supported Sites
 
@@ -132,15 +132,27 @@ Telegram user ID(_not_ username) of the admin, bot functions are restricted to a
 
 Type of database.
 
-Default option (`Local`) uses `TinyDB` as local database, set to `Firebase` to use Firebase.
+Supported databases:
+
+|   Driver  |                          URL                         |   Config   |           Note          |
+| :-------: | :--------------------------------------------------: | :--------: | :---------------------: |
+|   TinyDB  | <https://tinydb.readthedocs.io/en/stable/index.html> |   `Local`  |         Default         |
+| Firestore |   <https://firebase.google.com/products/firestore>   | `Firebase` |                         |
+|  MongoDB  |              <https://www.mongodb.com/>              |   `Mongo`  | MongoDB Atlas supported |
 
 You can also implement your own database driver by creating a file under `database` folder, and set this option to the name of driver class.
 
-### GOOGLE_APPLICATION_CREDENTIALS
+#### GOOGLE_APPLICATION_CREDENTIALS
 
 Firebase SDK credentials, see [Firebase Documentation](https://firebase.google.com/docs/admin/setup#initialize_the_sdk).
 
 For Heroku, you can copy the content of `service-account-file.json`.
+
+#### MONGO_URI
+
+MongoDB [connection string](https://docs.mongodb.com/manual/reference/connection-string/), _must_ specify database.
+
+eg: `mongodb://username:password@localhost:27017/database`, default is `mongodb://localhost:27017/nazurin`.
 
 ### PIXIV_USER & PIXIV_PASS
 
