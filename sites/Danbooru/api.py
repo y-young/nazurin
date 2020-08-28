@@ -1,4 +1,4 @@
-import os
+from os import path
 import re
 from utils import NazurinError, downloadImages, sanitizeFilename
 from pybooru import Danbooru as danbooru, PybooruHTTPError
@@ -65,27 +65,28 @@ class Danbooru(object):
         return imgs, details
 
     def _getNames(self, post):
-        characters = post['tag_string_character']
-        copyrights = post['tag_string_copyright']
-        artists = post['tag_string_artist']
+        """Build title and filename."""
+        characters = self._formatCharacters(post['tag_string_character'])
+        copyrights = self._formatCopyrights(post['tag_string_copyright'])
+        artists = self._formatArtists(post['tag_string_artist'])
+        extension = path.splitext(post['file_url'])[1]
         filename = str()
+
         if characters:
-            filename += self._formatCharacters(characters) + ' '
+            filename += characters + ' '
         if copyrights:
-            copyrights = self._formatCopyrights(copyrights)
             if characters:
-                filename += '(' + copyrights + ')'
-            else:
-                filename += copyrights
+                copyrights = '(' + copyrights + ')'
+            filename += copyrights + ' '
         title = filename
         if artists:
-            filename += ' drawn by ' + self._normalize(self._sentence(artists.split(' ')))
-        if filename: # characters or copyrights present
-            filename += ' - '
-        filename += os.path.basename(post['file_url'])
+            filename += 'drawn by ' + artists
+        filename = 'danbooru ' + str(post['id']) + ' ' + filename + extension
         return title, sanitizeFilename(filename)
 
     def _formatCharacters(self, characters):
+        if not characters:
+            return ''
         characters = characters.split(' ')
         characters = list(map(self._normalize, characters))
         size = len(characters)
@@ -97,6 +98,8 @@ class Danbooru(object):
         return result
 
     def _formatCopyrights(self, copyrights):
+        if not copyrights:
+            return ''
         copyrights = copyrights.split(' ')
         copyrights = list(map(self._normalize, copyrights))
         size = len(copyrights)
@@ -105,6 +108,11 @@ class Danbooru(object):
         else:
             result = copyrights[0] + ' and ' + str(size - 1) + ' more'
         return result
+
+    def _formatArtists(self, artists):
+        if not artists:
+            return ''
+        return self._normalize(self._sentence(artists.split(' ')))
 
     def _sentence(self, names):
         if len(names) == 1:

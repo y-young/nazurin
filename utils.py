@@ -109,9 +109,10 @@ def sanitizeFilename(name):
     name = re.sub(r"[\t\n\r\f\v]+", ' ', name)
     name = re.sub(r"\u202E|\u200E|\u200F", '', name) # RTL marks
     filename, ext = os.path.splitext(name)
+    filename = filename.strip()
     if Path(filename).is_reserved():
         filename = '_' + filename
-        name = filename + ext
+    name = filename + ext
     if len(name) > 255:
         name = filename[:255 - len(ext)] + ext
     return name
