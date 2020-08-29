@@ -1,5 +1,7 @@
 from os import environ
+from utils import NazurinError
 from pymongo import MongoClient
+from pymongo.errors import DuplicateKeyError
 
 class Mongo(object):
     """MongoDB driver for MongoDB Atlas or local server."""
@@ -27,7 +29,10 @@ class Mongo(object):
     def insert(self, key, data):
         if key:
             data['_id'] = key
-        return self._collection.insert_one(data).acknowledged
+        try:
+            return self._collection.insert_one(data).acknowledged
+        except DuplicateKeyError:
+            raise NazurinError('Already exists in database.')
 
     def update(self, data):
         return self._collection.update_one({'_id': self._document}, {'$set': data}).modified_count == 1
