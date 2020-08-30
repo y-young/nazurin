@@ -42,9 +42,11 @@ class Pixiv(object):
         if 'illust' in response.keys():
             illust = response.illust
         else:
-            raise NazurinError("Artwork not found")
+            error = response.error
+            msg = error.user_message or error.message
+            raise NazurinError(msg)
         if illust.restrict != 0:
-            raise NazurinError("Artwork not found or is private")
+            raise NazurinError("Artwork is private")
         return illust
 
     def view_illust(self, artwork_id):
