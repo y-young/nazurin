@@ -11,6 +11,8 @@ firebase-admin
 # Mongo:
 pymongo
 dnspython
+# Cloudant:
+cloudant
 
 # STORAGE
 # Mega:
