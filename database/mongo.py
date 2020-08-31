@@ -24,7 +24,7 @@ class Mongo(object):
         return self._collection.find_one({'_id': self._document})
 
     def exists(self):
-        return self.get() != None
+        return self._collection.count_documents({'_id': self._document}, limit=1) > 0
 
     def insert(self, key, data):
         if key:
