@@ -1,7 +1,6 @@
 from requests.adapters import HTTPAdapter
 from os import environ
 from cloudant.client import Cloudant as cloudant
-from cloudant.error import CloudantException
 from config import RETRIES
 
 USERNAME = environ.get('CLOUDANT_USER')
