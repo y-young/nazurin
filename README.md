@@ -50,6 +50,8 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 
 ### Deploy on your own server
 
+> Tips: You may comment out unused dependencies in `requirements.txt` before installation.
+
 1.  Install dependencies: `pip install -r requirements.txt`
 2.  Set the required environment variables
 3.  Start the bot: `python bot.py`
@@ -139,6 +141,7 @@ Supported databases:
 |   TinyDB  | <https://tinydb.readthedocs.io/en/stable/index.html> |   `Local`  |         Default         |
 | Firestore |   <https://firebase.google.com/products/firestore>   | `Firebase` |                         |
 |  MongoDB  |              <https://www.mongodb.com/>              |   `Mongo`  | MongoDB Atlas supported |
+|  Cloudant |         <https://www.ibm.com/cloud/cloudant>         | `Cloudant` |                         |
 
 You can also implement your own database driver by creating a file under `database` folder, and set this option to the name of driver class.
 
@@ -153,6 +156,10 @@ For Heroku, you can copy the content of `service-account-file.json`.
 MongoDB [connection string](https://docs.mongodb.com/manual/reference/connection-string/), _must_ specify database.
 
 eg: `mongodb://username:password@localhost:27017/database`, default is `mongodb://localhost:27017/nazurin`.
+
+#### CLOUDANT_USER & CLOUDANT_APIKEY & CLOUDANT_DB
+
+Cloudant username, API key and database name, using IAM authentication, default database is `nazurin`.
 
 ### PIXIV_USER & PIXIV_PASS
 
