@@ -30,6 +30,7 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 |      yandere      |       <https://yande.re/>      |     ✔    |      ✔     |
 |      Konachan     |     <https://konachan.com/>    |     ✔    |      ✔     |
 |     Lolibooru     |    <https://lolibooru.moe/>    |          |      ✔     |
+|      Zerochan     |   <https://www.zerochan.net/>  |     ✔    |      ✔     |
 |      Gelbooru     |     <https://gelbooru.com/>    |          |      ✔     |
 |      Twitter      |     <https://twitter.com/>     |          |      ✔     |
 | Bilibili Dynamics |    <https://t.bilibili.com/>   |          |      ✔     |
@@ -69,6 +70,8 @@ Commands:
 -   `/yandere_download <id>` - download yandere post
 -   `/konachan <id>` - view konachan post
 -   `/konachan_download <id>` - download konachan post
+-   `/zerochan <id>` - view zerochan post
+-   `/zerochan_download <id>` - download zerochan post
 -   `/bookmark <id>` - bookmark pixiv artwork
 -   `/clear_downloads` - clear download cache
 -   `/help` - get help text
