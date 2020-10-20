@@ -1,11 +1,10 @@
 from .api import Moebooru
 from utils import sendPhotos, sendDocuments, handleBadRequest, NazurinError
-from telegram.ext import CommandHandler, run_async
+from telegram.ext import CommandHandler
 from telegram.error import BadRequest
 
 moebooru = Moebooru()
 
-@run_async
 def yandere_view(update, context):
     message = update.message
     try:
@@ -22,7 +21,6 @@ def yandere_view(update, context):
     except NazurinError as error:
         message.reply_text(error.msg)
 
-@run_async
 def yandere_download(update, context):
     message = update.message
     try:
@@ -37,7 +35,6 @@ def yandere_download(update, context):
     except NazurinError as error:
         message.reply_text(error.msg)
 
-@run_async
 def konachan_view(update, context):
     message = update.message
     try:
@@ -54,7 +51,6 @@ def konachan_view(update, context):
     except NazurinError as error:
         message.reply_text(error.msg)
 
-@run_async
 def konachan_download(update, context):
     message = update.message
     try:
@@ -70,8 +66,8 @@ def konachan_download(update, context):
         message.reply_text(error.msg)
 
 commands = [
-    CommandHandler('yandere', yandere_view, pass_args=True),
-    CommandHandler('yandere_download', yandere_download, pass_args=True),
-    CommandHandler('konachan', konachan_view, pass_args=True),
-    CommandHandler('konachan_download', konachan_download, pass_args=True)
+    CommandHandler('yandere', yandere_view, pass_args=True, run_async=True),
+    CommandHandler('yandere_download', yandere_download, pass_args=True, run_async=True),
+    CommandHandler('konachan', konachan_view, pass_args=True, run_async=True),
+    CommandHandler('konachan_download', konachan_download, pass_args=True, run_async=True)
 ]

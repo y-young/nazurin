@@ -5,19 +5,16 @@ import config
 from utils import typing, logger, sendDocuments, NazurinError
 from sites import SiteManager
 from storage import Storage
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Defaults, run_async
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Defaults
 
 sites = SiteManager()
 storage = Storage()
 
-@run_async
 def start(update, context):
     update.message.reply_text('Hi!')
-@run_async
 @typing
 def ping(update, context):
     update.message.reply_text('pong!')
-@run_async
 @typing
 def get_help(update, context):
     update.message.reply_text('''
@@ -37,7 +34,6 @@ def get_help(update, context):
     /help - get this help text
     PS: Send Pixiv/Danbooru/Yandere/Konachan/Twitter URL to download image(s)
     ''')
-@run_async
 def collection_update(update, context):
     message = update.message
     message_id = message.message_id
@@ -108,12 +104,12 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    dp.add_handler(CommandHandler('start', start, adminFilter))
-    dp.add_handler(CommandHandler('ping', ping, adminFilter))
-    dp.add_handler(CommandHandler('help', get_help, adminFilter))
+    dp.add_handler(CommandHandler('start', start, adminFilter, run_async=True))
+    dp.add_handler(CommandHandler('ping', ping, adminFilter, run_async=True))
+    dp.add_handler(CommandHandler('help', get_help, adminFilter, run_async=True))
     sites.register_commands(dp)
     dp.add_handler(CommandHandler('clear_downloads', clear_downloads, adminFilter, pass_args=True))
-    dp.add_handler(MessageHandler(adminFilter & urlFilter & (~ Filters.update.channel_posts), collection_update, pass_chat_data=True))
+    dp.add_handler(MessageHandler(adminFilter & urlFilter & (~ Filters.update.channel_posts), collection_update, pass_chat_data=True, run_async=True))
 
     # log all errors
     dp.add_error_handler(handle_error)

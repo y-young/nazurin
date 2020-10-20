@@ -1,11 +1,10 @@
 from .api import Zerochan
 from utils import sendPhotos, sendDocuments, handleBadRequest, NazurinError
-from telegram.ext import CommandHandler, run_async
+from telegram.ext import CommandHandler
 from telegram.error import BadRequest
 
 api = Zerochan()
 
-@run_async
 def zerochan_view(update, context):
     message = update.message
     try:
@@ -22,7 +21,6 @@ def zerochan_view(update, context):
     except NazurinError as error:
         message.reply_text(error.msg)
 
-@run_async
 def zerochan_download(update, context):
     message = update.message
     try:
@@ -38,6 +36,6 @@ def zerochan_download(update, context):
         message.reply_text(error.msg)
 
 commands = [
-    CommandHandler('zerochan', zerochan_view, pass_args=True),
-    CommandHandler('zerochan_download', zerochan_download, pass_args=True)
+    CommandHandler('zerochan', zerochan_view, pass_args=True, run_async=True),
+    CommandHandler('zerochan_download', zerochan_download, pass_args=True, run_async=True)
 ]

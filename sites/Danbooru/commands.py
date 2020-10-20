@@ -1,11 +1,10 @@
 from .api import Danbooru
 from utils import NazurinError, sendPhotos, sendDocuments, handleBadRequest
-from telegram.ext import CommandHandler, run_async
+from telegram.ext import CommandHandler
 from telegram.error import BadRequest
 
 danbooru = Danbooru()
 
-@run_async
 def danbooru_view(update, context):
     message = update.message
     try:
@@ -22,7 +21,6 @@ def danbooru_view(update, context):
     except BadRequest as error:
         handleBadRequest(update, context, error)
 
-@run_async
 def danbooru_download(update, context):
     message = update.message
     try:
@@ -38,6 +36,6 @@ def danbooru_download(update, context):
         message.reply_text(error.msg)
 
 commands = [
-    CommandHandler('danbooru', danbooru_view, pass_args=True),
-    CommandHandler('danbooru_download', danbooru_download, pass_args=True)
+    CommandHandler('danbooru', danbooru_view, pass_args=True, run_async=True),
+    CommandHandler('danbooru_download', danbooru_download, pass_args=True, run_async=True)
 ]

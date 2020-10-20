@@ -7,7 +7,6 @@ from sites.Pixiv.config import DOCUMENT, USER, PASSWORD
 from utils import NazurinError, logger, sanitizeFilename
 from database import Database
 from pixivpy3 import AppPixivAPI, PixivError
-from telegram.ext import run_async
 
 class Pixiv(object):
     api = AppPixivAPI()
@@ -87,7 +86,6 @@ class Pixiv(object):
         Pixiv.api.download(zip_url, path=DOWNLOAD_DIR, name=filename)
         return imgs
 
-    @run_async
     def bookmark(self, artwork_id):
         response = self.call(Pixiv.api.illust_bookmark_add, artwork_id)
         if 'error' in response.keys():
