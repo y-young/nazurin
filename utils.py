@@ -53,13 +53,15 @@ def sendPhotos(update, context, imgs, details=None):
         caption = caption[:1024]
         message.reply_text('Notice: Caption too long, trimmed')
     caption = escape(caption, quote=False)
+
     for img in imgs:
         filetype = str(guess_type(img['url'])[0])
         if filetype.startswith('image'):
-            media.append(InputMediaPhoto(img['url'], caption, 'HTML'))
+            media.append(InputMediaPhoto(img['url'], parse_mode='HTML'))
         else:
             message.reply_text('File is not image, try download option.')
             return
+    media[0].caption = caption
     while True:
         try:
             bot.sendMediaGroup(chat_id, media, reply_to_message_id=message_id)
