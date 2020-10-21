@@ -44,7 +44,7 @@ def sendPhotos(update, context, imgs, details=None):
     message_id = message.message_id
     media = list()
     if len(imgs) > 10:
-        imgs = imgs[:9]
+        imgs = imgs[:10]
         message.reply_text('Notice: Too many pages, sending only 10 of them' )
     caption = str()
     for key, value in details.items():
