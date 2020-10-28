@@ -17,7 +17,7 @@ def pixiv_view(update, context):
         imgs, details = pixiv.view_illust(artwork_id)
         # use reverse proxy to avoid strange problems
         for img in imgs:
-            img['url'] = img['url'].replace('pximg.net', 'pixiv.cat')
+            img['url'] = img['url'].replace('i.pximg.net', 'tiny-mountain-a5b2.test587876.workers.dev')
             img['url'] = img['url'].replace('img-original', 'img-master')
             img['url'] = img['url'].replace('.jpg', '_master1200.jpg')
             img['url'] = img['url'].replace('.png', '_master1200.jpg')
