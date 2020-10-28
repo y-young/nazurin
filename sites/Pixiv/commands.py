@@ -18,6 +18,9 @@ def pixiv_view(update, context):
         # use reverse proxy to avoid strange problems
         for img in imgs:
             img['url'] = img['url'].replace('pximg.net', 'pixiv.cat')
+            img['url'] = img['url'].replace('img-original', 'img-master')
+            img['url'] = img['url'].replace('.jpg', '_master1200.jpg')
+            img['url'] = img['url'].replace('.png', '_master1200.jpg')
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
         message.reply_text('Usage: /pixiv <artwork_id>')
