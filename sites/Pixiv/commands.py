@@ -15,6 +15,9 @@ def pixiv_view(update, context):
             message.reply_text('Invalid artwork id!')
             return
         imgs, details = pixiv.view_illust(artwork_id)
+        # use reverse proxy to avoid strange problems
+        for img in imgs:
+            img['url'] = img['url'].replace('pximg.net', 'pixiv.cat')
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
         message.reply_text('Usage: /pixiv <artwork_id>')
