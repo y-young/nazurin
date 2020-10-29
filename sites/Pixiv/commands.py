@@ -1,4 +1,5 @@
 from .api import Pixiv
+from .config import IMG_PROXY
 from config import ADMIN_ID
 from utils import NazurinError, sendPhotos, sendDocuments, handleBadRequest
 from telegram.ext import CommandHandler, Filters
@@ -17,7 +18,7 @@ def pixiv_view(update, context):
         imgs, details = pixiv.view_illust(artwork_id)
         # use reverse proxy to avoid strange problems
         for img in imgs:
-            img['url'] = img['url'].replace('pximg.net', 'pixiv.cat')
+            img['url'] = img['url'].replace('i.pximg.net', IMG_PROXY)
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
         message.reply_text('Usage: /pixiv <artwork_id>')
