@@ -55,7 +55,8 @@ def sendPhotos(update, context, imgs, details=None):
     caption = escape(caption, quote=False)
 
     for img in imgs:
-        filetype = str(guess_type(img['url'])[0])
+        url = img['url'].split('?')[0] # remove query string
+        filetype = str(guess_type(url)[0])
         if filetype.startswith('image'):
             media.append(InputMediaPhoto(img['url'], parse_mode='HTML'))
         else:
