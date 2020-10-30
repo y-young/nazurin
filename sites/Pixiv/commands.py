@@ -21,6 +21,8 @@ def pixiv_view(update, context):
         for img in imgs:
             img['url'] = img['url'].replace('i.pximg.net', IMG_PROXY)
             img['url'] += '?' + str(random.random())
+            img['thumbnail'] = img['thumbnail'].replace('i.pximg.net', IMG_PROXY)
+            img['thumbnail'] += '?' + str(random.random())
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
         message.reply_text('Usage: /pixiv <artwork_id>')

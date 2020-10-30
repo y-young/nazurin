@@ -132,11 +132,11 @@ class Pixiv(object):
             for page in pages:
                 url = page.image_urls.original
                 name = self.getFilename(url, illust)
-                imgs.append({'url': url, 'name': name})
+                imgs.append({'url': url, 'name': name, 'thumbnail': self.getThumbnail(url)})
         else:
             url = illust.meta_single_page.original_image_url
             name = self.getFilename(url, illust)
-            imgs.append({'url': url, 'name': name})
+            imgs.append({'url': url, 'name': name, 'thumbnail': self.getThumbnail(url)})
         return imgs
 
     def buildCaption(self, illust):
@@ -159,3 +159,9 @@ class Pixiv(object):
         filename, extension = os.path.splitext(basename)
         name = "%s - %s - %s(%d)%s" % (filename, illust.title, illust.user.name, illust.user.id, extension)
         return sanitizeFilename(name)
+
+    def getThumbnail(self, url):
+        pre, _ = os.path.splitext(url)
+        pre = pre.replace('img-original', 'img-master')
+        thumbnail = pre + '_master1200.jpg'
+        return thumbnail

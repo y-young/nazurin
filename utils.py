@@ -58,7 +58,8 @@ def sendPhotos(update, context, imgs, details=None):
         url = img['url'].split('?')[0] # remove query string
         filetype = str(guess_type(url)[0])
         if filetype.startswith('image'):
-            media.append(InputMediaPhoto(img['url'], parse_mode='HTML'))
+            url = chooseUrl(img)
+            media.append(InputMediaPhoto(url, parse_mode='HTML'))
         else:
             message.reply_text('File is not image, try download option.')
             return
@@ -86,6 +87,13 @@ def sendDocuments(update, context, imgs, chat_id=None):
                 sleep(error.retry_after)
                 continue
             break
+
+def chooseUrl(img):
+    url = img['url']
+    headers = requests.head(url).headers
+    if int(headers['Content-Length']) > 5*1024*1024 and 'thumbnail' in img.keys():
+        url = img['thumbnail']
+    return url
 
 def handleBadRequest(update, context, error):
     logger.info('BadRequest exception: ' + str(error))
