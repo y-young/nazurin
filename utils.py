@@ -90,8 +90,8 @@ def sendDocuments(update, context, imgs, chat_id=None):
 
 def chooseUrl(img):
     url = img['url']
-    headers = requests.head(url).headers
-    if int(headers['Content-Length']) > 5*1024*1024 and 'thumbnail' in img.keys():
+    headers = requests.head(url, headers={'Referer': 'https://www.pixiv.net/'}).headers
+    if 'Content-Length' in headers.keys() and int(headers['Content-Length']) > 5*1024*1024 and 'thumbnail' in img.keys():
         url = img['thumbnail']
     return url
 
