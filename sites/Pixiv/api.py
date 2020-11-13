@@ -3,7 +3,7 @@ import json
 import time
 import os
 from config import NAZURIN_DATA, DOWNLOAD_DIR
-from sites.Pixiv.config import DOCUMENT, USER, PASSWORD
+from sites.Pixiv.config import DOCUMENT, USER, PASSWORD, TRANSLATION
 from utils import NazurinError, logger, sanitizeFilename
 from database import Database
 from pixivpy3 import AppPixivAPI, PixivError
@@ -14,6 +14,10 @@ class Pixiv(object):
     collection = db.collection(NAZURIN_DATA)
     document = collection.document(DOCUMENT)
     updated_time = 0
+
+    def __init__(self):
+        if TRANSLATION:
+            Pixiv.api.set_accept_language(TRANSLATION)
 
     def login(self, refresh=False):
         if not refresh:
@@ -143,7 +147,11 @@ class Pixiv(object):
         """Build media caption from an artwork."""
         tags = str()
         for tag in illust.tags:
-            tags += '#' + tag.name + ' '
+            if TRANSLATION and tag.translated_name:
+                tag_name = tag.translated_name
+            else:
+                tag_name = tag.name
+            tags += '#' + tag_name.replace(' ', '_') + ' '
         details = {
             'title': illust.title,
             'author': illust.user.name,
