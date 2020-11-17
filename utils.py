@@ -90,9 +90,17 @@ def sendDocuments(update, context, imgs, chat_id=None):
 
 def chooseUrl(img):
     url = img['url']
-    headers = requests.head(url, headers={'Referer': 'https://www.pixiv.net/'}).headers
-    if 'Content-Length' in headers.keys() and int(headers['Content-Length']) > 5*1024*1024 and 'thumbnail' in img.keys():
+    if 'size' in img.keys():
+        size = img['size']
+    else:
+        headers = requests.head(url, headers={'Referer': 'https://www.pixiv.net/'}).headers
+        if 'Content-Length' in headers.keys():
+            size = int(headers['Content-Length'])
+        else:
+            size = 0
+    if size > 5*1024*1024 and 'thumbnail' in img.keys():
         url = img['thumbnail']
+        logger.info('Use thumbnail: ' + url)
     return url
 
 def handleBadRequest(update, context, error):
