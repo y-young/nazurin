@@ -1,7 +1,6 @@
 import random
 from .api import Pixiv
 from .config import IMG_PROXY
-from config import ADMIN_ID
 from utils import NazurinError, sendPhotos, sendDocuments, handleBadRequest
 from telegram.ext import CommandHandler, Filters
 from telegram.error import BadRequest
@@ -20,9 +19,9 @@ def pixiv_view(update, context):
         # use reverse proxy to avoid strange problems
         for img in imgs:
             img['url'] = img['url'].replace('i.pximg.net', IMG_PROXY)
-            img['url'] += '?' + str(random.random())
+            # img['url'] += '?' + str(random.random())
             img['thumbnail'] = img['thumbnail'].replace('i.pximg.net', IMG_PROXY)
-            img['thumbnail'] += '?' + str(random.random())
+            # img['thumbnail'] += '?' + str(random.random())
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
         message.reply_text('Usage: /pixiv <artwork_id>')
@@ -64,5 +63,5 @@ def pixiv_bookmark(update, context):
 commands = [
     CommandHandler('pixiv', pixiv_view, pass_args=True, run_async=True),
     CommandHandler('pixiv_download', pixiv_download, pass_args=True, run_async=True),
-    CommandHandler('bookmark', pixiv_bookmark, Filters.user(user_id=ADMIN_ID), pass_args=True, run_async=True)
+    CommandHandler('bookmark', pixiv_bookmark, pass_args=True, run_async=True)
 ]
