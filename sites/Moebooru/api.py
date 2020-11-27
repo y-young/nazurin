@@ -4,7 +4,8 @@ from requests.exceptions import HTTPError
 import json
 import os
 from config import DOWNLOAD_DIR
-from utils import NazurinError, downloadImages, logger, sanitizeFilename
+from models import Image
+from utils import NazurinError, downloadImages, logger
 from pybooru import Moebooru as moebooru
 from bs4 import BeautifulSoup
 
@@ -66,7 +67,7 @@ class Moebooru(object):
             else:
                 url = post['jpeg_url']
             name, _ = self.parseUrl(url)
-            imgs.append({'name': name, 'url': url})
+            imgs.append(Image(name, url))
         details = {'name': info['name'], 'description': info['description']}
         return imgs, details
 
@@ -78,19 +79,15 @@ class Moebooru(object):
         for key, img in enumerate(imgs):
             filename = str(key + 1)
             filename = '0' * (3 - len(filename)) + filename
-            _, ext = self.parseUrl(img['url'])
+            _, ext = self.parseUrl(img.url)
             filename += ext
-            downloadImages([{'url': img['url'], 'name': pool_name + '/' + filename}]) #TODO
+            img.name = pool_name + '/' + img.name
+            downloadImages([img]) #TODO
 
     def getImages(self, post):
         file_url = post['file_url']
-        name = sanitizeFilename(unquote(os.path.basename(file_url)))
-        imgs = [{
-            'url': file_url,
-            'name': name,
-            'thumbnail': post['sample_url'],
-            'size': post['file_size']
-        }]
+        name = unquote(os.path.basename(file_url))
+        imgs = [Image(name, file_url, post['sample_url'], post['file_size'])]
         return imgs
 
     def buildCaption(self, post, tags):

@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+from models import Image
 from utils import downloadImages
 
 class Bilibili(object):
@@ -26,5 +27,5 @@ class Bilibili(object):
             url = pic['img_src']
             basename = os.path.basename(url)
             extension = os.path.splitext(basename)[1]
-            imgs.append({'name': str(dynamic_id) + '_' + str(index) + extension, 'url': url})
+            imgs.append(Image(str(dynamic_id) + '_' + str(index) + extension, url))
         return imgs

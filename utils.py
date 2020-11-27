@@ -55,11 +55,9 @@ def sendPhotos(update, context, imgs, details=None):
     caption = escape(caption, quote=False)
 
     for img in imgs:
-        url = img['url'].split('?')[0] # remove query string
-        filetype = str(guess_type(url)[0])
+        filetype = str(guess_type(img.url)[0])
         if filetype.startswith('image'):
-            url = chooseUrl(img)
-            media.append(InputMediaPhoto(url, parse_mode='HTML'))
+            media.append(InputMediaPhoto(img.display_url, parse_mode='HTML'))
         else:
             message.reply_text('File is not image, try download option.')
             return
@@ -82,26 +80,11 @@ def sendDocuments(update, context, imgs, chat_id=None):
     for img in imgs:
         while True:
             try:
-                bot.sendDocument(chat_id, open(DOWNLOAD_DIR + img['name'], 'rb'), filename=img['name'], reply_to_message_id=message_id)
+                bot.sendDocument(chat_id, open(img.path, 'rb'), filename=img.name, reply_to_message_id=message_id)
             except RetryAfter as error:
                 sleep(error.retry_after)
                 continue
             break
-
-def chooseUrl(img):
-    url = img['url']
-    if 'size' in img.keys():
-        size = img['size']
-    else:
-        headers = requests.head(url, headers={'Referer': 'https://www.pixiv.net/'}).headers
-        if 'Content-Length' in headers.keys():
-            size = int(headers['Content-Length'])
-        else:
-            size = 0
-    if size > 5*1024*1024 and 'thumbnail' in img.keys():
-        url = img['thumbnail']
-        logger.info('Use thumbnail: ' + url)
-    return url
 
 def handleBadRequest(update, context, error):
     logger.info('BadRequest exception: ' + str(error))
@@ -129,8 +112,8 @@ def downloadImages(imgs, headers=None):
         session.headers.update({'User-Agent': UA})
         session.mount('https://', HTTPAdapter(max_retries=RETRIES))
         for img in imgs:
-            response = session.get(img['url'], stream=True, timeout=5).raw
-            with open(DOWNLOAD_DIR + img['name'], 'wb') as f:
+            response = session.get(img.url, stream=True, timeout=5).raw
+            with open(img.path, 'wb') as f:
                 copyfileobj(response, f)
 
 def sanitizeFilename(name):

@@ -36,11 +36,11 @@ class GoogleDrive(object):
     def store(self, files):
         for item in files:
             metadata = {
-                'title': item['name'],
+                'title': item.name,
                 'parents': [{'id': GD_FOLDER}]
             }
             f = GoogleDrive.drive.CreateFile(metadata)
-            f.SetContentFile(DOWNLOAD_DIR + item['name'])
+            f.SetContentFile(item.path)
             f.Upload()
 
     def findFolder(self, name):

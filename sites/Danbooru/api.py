@@ -1,6 +1,7 @@
 from os import path
 import re
-from utils import NazurinError, downloadImages, sanitizeFilename
+from models import Image
+from utils import NazurinError, downloadImages
 from pybooru import Danbooru as danbooru, PybooruHTTPError
 
 class Danbooru(object):
@@ -43,7 +44,7 @@ class Danbooru(object):
         artists = post['tag_string_artist']
         title, filename = self._getNames(post)
         imgs = list()
-        imgs.append({'url': url, 'name': filename})
+        imgs.append(Image(filename, url))
 
         # Build media caption
         tags = post['tag_string'].split(' ')
@@ -82,7 +83,7 @@ class Danbooru(object):
         if artists:
             filename += 'drawn by ' + artists
         filename = 'danbooru ' + str(post['id']) + ' ' + filename + extension
-        return title, sanitizeFilename(filename)
+        return title, filename
 
     def _formatCharacters(self, characters):
         if not characters:

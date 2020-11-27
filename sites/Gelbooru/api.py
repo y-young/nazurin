@@ -1,4 +1,5 @@
 import requests
+from models import Image
 from utils import NazurinError, downloadImages
 
 class Gelbooru(object):
@@ -22,5 +23,5 @@ class Gelbooru(object):
         url = post['file_url']
         filename = 'gelbooru - ' + post['image']
         imgs = list()
-        imgs.append({'url': url, 'name': filename})
+        imgs.append(Image(filename, url))
         return imgs

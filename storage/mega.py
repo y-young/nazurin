@@ -64,7 +64,7 @@ class Mega(object):
     def store(self, files):
         self.requireAuth()
         for item in files:
-            self.call(Mega.api.upload, DOWNLOAD_DIR + item['name'], Mega.destination)
+            self.call(Mega.api.upload, item.path, Mega.destination)
 
     def call(self, func, *args):
         try:
