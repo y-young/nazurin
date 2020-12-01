@@ -1,5 +1,4 @@
 from .api import Pixiv
-from .config import IMG_PROXY
 from config import ADMIN_ID
 from utils import NazurinError, sendPhotos, sendDocuments, handleBadRequest
 from telegram.ext import CommandHandler, Filters

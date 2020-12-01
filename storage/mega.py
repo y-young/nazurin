@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from config import DOWNLOAD_DIR, STORAGE_DIR, NAZURIN_DATA
+from config import STORAGE_DIR, NAZURIN_DATA
 from utils import logger
 from database import Database
 from mega import Mega as mega
