@@ -21,7 +21,8 @@ class Gelbooru(object):
     def getImages(self, post):
         """Get images from post."""
         url = post['file_url']
-        filename = 'gelbooru - ' + post['image']
+        ext = post['image'].split('.')[1]
+        filename = 'gelbooru - ' + str(post['id']) + '.' + ext
         imgs = list()
         imgs.append(Image(filename, url))
         return imgs
