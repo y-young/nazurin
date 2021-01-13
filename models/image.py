@@ -1,6 +1,7 @@
+import os
 import requests
 from dataclasses import dataclass
-from config import DOWNLOAD_DIR
+from config import TEMP_DIR
 from utils import logger, sanitizeFilename
 
 @dataclass
@@ -16,7 +17,7 @@ class Image:
 
     @property
     def path(self):
-        return DOWNLOAD_DIR + self.name
+        return os.path.join(TEMP_DIR, self.name)
 
     @property
     def display_url(self):

@@ -9,7 +9,7 @@ import requests
 import logging
 import re
 import os
-from config import DOWNLOAD_DIR, UA, RETRIES
+from config import TEMP_DIR, UA, RETRIES
 from telegram import ChatAction, InputMediaPhoto
 from telegram.error import RetryAfter
 
@@ -106,8 +106,8 @@ def handleBadRequest(update, context, error):
 def downloadImages(imgs, headers=None):
     if headers is None:
         headers = dict()
-    if not os.path.exists(DOWNLOAD_DIR):
-        os.makedirs(DOWNLOAD_DIR)
+    if not os.path.exists(TEMP_DIR):
+        os.makedirs(TEMP_DIR)
     with requests.Session() as session:
         session.headers.update({'User-Agent': UA})
         session.mount('https://', HTTPAdapter(max_retries=RETRIES))

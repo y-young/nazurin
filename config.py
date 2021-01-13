@@ -8,8 +8,8 @@ WEBHOOK_URL = environ.get('WEBHOOK_URL')
 # Port is given by Heroku
 PORT = int(environ.get('PORT', '8443'))
 
-STORAGE = literal_eval(environ.get('STORAGE', '[]'))
-DOWNLOAD_DIR = './downloads/' # Requires a slash on the end
+TEMP_DIR = './temp/'
+STORAGE = literal_eval(environ.get('STORAGE', "['Local']"))
 STORAGE_DIR = environ.get('STORAGE_DIR', 'Pictures')
 
 DATABASE = environ.get('DATABASE', 'Local')

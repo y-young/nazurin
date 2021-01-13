@@ -3,7 +3,7 @@ import requests
 from requests.exceptions import HTTPError
 import json
 import os
-from config import DOWNLOAD_DIR
+from config import TEMP_DIR
 from models import Image
 from utils import NazurinError, downloadImages, logger
 from pybooru import Moebooru as moebooru
@@ -74,8 +74,8 @@ class Moebooru(object):
     def download_pool(self, pool_id, jpeg=False):
         imgs, details = self.pool(pool_id, jpeg)
         pool_name = details['name']
-        if not os.path.exists(DOWNLOAD_DIR + pool_name):
-            os.makedirs(DOWNLOAD_DIR + pool_name)
+        if not os.path.exists(TEMP_DIR + pool_name):
+            os.makedirs(TEMP_DIR + pool_name)
         for key, img in enumerate(imgs):
             filename = str(key + 1)
             filename = '0' * (3 - len(filename)) + filename

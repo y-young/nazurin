@@ -2,7 +2,7 @@
 import json
 import time
 import os
-from config import NAZURIN_DATA, DOWNLOAD_DIR
+from config import NAZURIN_DATA, TEMP_DIR
 from utils import NazurinError, logger
 from database import Database
 from .config import DOCUMENT, USER, PASSWORD, TRANSLATION
@@ -67,11 +67,11 @@ class Pixiv(object):
             imgs, _ = self.view_illust(artwork_id)
         else:
             imgs = self.getImages(illust)
-        if not os.path.exists(DOWNLOAD_DIR):
-            os.makedirs(DOWNLOAD_DIR)
+        if not os.path.exists(TEMP_DIR):
+            os.makedirs(TEMP_DIR)
         for img in imgs:
             if (not os.path.exists(img.path)) or os.stat(img.path).st_size == 0:
-                Pixiv.api.download(img.url, path=DOWNLOAD_DIR, name=img.name)
+                Pixiv.api.download(img.url, path=TEMP_DIR, name=img.name)
         return imgs
 
     def download_ugoira(self, illust):
@@ -83,11 +83,11 @@ class Pixiv(object):
         filename = str(illust.id) + '_ugoira1920x1080.zip'
         metafile = str(illust.id) + '_ugoira.json'
         imgs = [PixivImage(filename, zip_url), PixivImage(metafile)]
-        if not os.path.exists(DOWNLOAD_DIR):
-            os.makedirs(DOWNLOAD_DIR)
-        with open(DOWNLOAD_DIR + metafile, 'w') as f:
+        if not os.path.exists(TEMP_DIR):
+            os.makedirs(TEMP_DIR)
+        with open(os.path.join(TEMP_DIR, metafile), 'w') as f:
             f.write(metadata)
-        Pixiv.api.download(zip_url, path=DOWNLOAD_DIR, name=filename)
+        Pixiv.api.download(zip_url, path=TEMP_DIR, name=filename)
         return imgs
 
     def bookmark(self, artwork_id):
