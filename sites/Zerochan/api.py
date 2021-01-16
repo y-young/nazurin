@@ -3,7 +3,8 @@ from datetime import datetime, timezone
 from urllib.parse import unquote
 import requests
 import json
-from utils import NazurinError, downloadImages, sanitizeFilename
+from models import Image
+from utils import NazurinError, downloadImages
 from bs4 import BeautifulSoup
 
 class Zerochan(object):
@@ -63,7 +64,7 @@ class Zerochan(object):
     def getImages(self, post):
         url = post['file_url']
         name = 'Zerochan ' + str(post['id']) + ' ' + post['name'] + '.' + post['file_ext']
-        return [{'name': sanitizeFilename(name), 'url': url}]
+        return [Image(name, url)]
 
     def buildCaption(self, post):
         """Build media caption from an post."""

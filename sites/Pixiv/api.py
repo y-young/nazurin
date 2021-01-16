@@ -2,10 +2,11 @@
 import json
 import time
 import os
-from config import NAZURIN_DATA, DOWNLOAD_DIR
-from sites.Pixiv.config import DOCUMENT, USER, PASSWORD, TRANSLATION
-from utils import NazurinError, logger, sanitizeFilename
+from config import NAZURIN_DATA, TEMP_DIR
+from utils import NazurinError, logger
 from database import Database
+from .config import DOCUMENT, USER, PASSWORD, TRANSLATION
+from .models import PixivImage
 from pixivpy3 import AppPixivAPI, PixivError
 
 class Pixiv(object):
@@ -66,12 +67,11 @@ class Pixiv(object):
             imgs, _ = self.view_illust(artwork_id)
         else:
             imgs = self.getImages(illust)
-        if not os.path.exists(DOWNLOAD_DIR):
-            os.makedirs(DOWNLOAD_DIR)
+        if not os.path.exists(TEMP_DIR):
+            os.makedirs(TEMP_DIR)
         for img in imgs:
-            filename = DOWNLOAD_DIR + img['name']
-            if (not os.path.exists(filename)) or os.stat(filename).st_size == 0:
-                Pixiv.api.download(img['url'], path=DOWNLOAD_DIR, name=img['name'])
+            if (not os.path.exists(img.path)) or os.stat(img.path).st_size == 0:
+                Pixiv.api.download(img.url, path=TEMP_DIR, name=img.name)
         return imgs
 
     def download_ugoira(self, illust):
@@ -82,12 +82,12 @@ class Pixiv(object):
         zip_url = zip_url.split('_ugoira0')[0] + '_ugoira1920x1080.zip'
         filename = str(illust.id) + '_ugoira1920x1080.zip'
         metafile = str(illust.id) + '_ugoira.json'
-        imgs = [{'url': zip_url, 'name': filename}, {'name': metafile}]
-        if not os.path.exists(DOWNLOAD_DIR):
-            os.makedirs(DOWNLOAD_DIR)
-        with open(DOWNLOAD_DIR + metafile, 'w') as f:
+        imgs = [PixivImage(filename, zip_url), PixivImage(metafile)]
+        if not os.path.exists(TEMP_DIR):
+            os.makedirs(TEMP_DIR)
+        with open(os.path.join(TEMP_DIR, metafile), 'w') as f:
             f.write(metadata)
-        Pixiv.api.download(zip_url, path=DOWNLOAD_DIR, name=filename)
+        Pixiv.api.download(zip_url, path=TEMP_DIR, name=filename)
         return imgs
 
     def bookmark(self, artwork_id):
@@ -136,11 +136,11 @@ class Pixiv(object):
             for page in pages:
                 url = page.image_urls.original
                 name = self.getFilename(url, illust)
-                imgs.append({'url': url, 'name': name, 'thumbnail': self.getThumbnail(url)})
+                imgs.append(PixivImage(name, url, self.getThumbnail(url)))
         else:
             url = illust.meta_single_page.original_image_url
             name = self.getFilename(url, illust)
-            imgs.append({'url': url, 'name': name, 'thumbnail': self.getThumbnail(url)})
+            imgs.append(PixivImage(name, url, self.getThumbnail(url)))
         return imgs
 
     def buildCaption(self, illust):
@@ -166,7 +166,7 @@ class Pixiv(object):
         basename = os.path.basename(url)
         filename, extension = os.path.splitext(basename)
         name = "%s - %s - %s(%d)%s" % (filename, illust.title, illust.user.name, illust.user.id, extension)
-        return sanitizeFilename(name)
+        return name
 
     def getThumbnail(self, url):
         pre, _ = os.path.splitext(url)

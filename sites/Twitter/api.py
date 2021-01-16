@@ -1,5 +1,6 @@
 import requests
 import os
+from models import Image
 from utils import downloadImages, NazurinError
 
 class Twitter(object):
@@ -28,7 +29,7 @@ class Twitter(object):
         imgs = list()
         for photo in photos:
             filename, url = self.parseUrl(photo['url'])
-            imgs.append({'name': 'twitter - ' + tweet['id_str'] + ' - ' + filename, 'url': url})
+            imgs.append(Image('twitter - ' + tweet['id_str'] + ' - ' + filename, url))
         return imgs
 
     def parseUrl(self, src):

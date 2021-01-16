@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from config import DOWNLOAD_DIR, STORAGE_DIR, NAZURIN_DATA
+from config import STORAGE_DIR, NAZURIN_DATA
 from utils import logger
 from database import Database
 from mega import Mega as mega
@@ -64,7 +64,7 @@ class Mega(object):
     def store(self, files):
         self.requireAuth()
         for item in files:
-            self.call(Mega.api.upload, DOWNLOAD_DIR + item['name'], Mega.destination)
+            self.call(Mega.api.upload, item.path, Mega.destination)
 
     def call(self, func, *args):
         try:

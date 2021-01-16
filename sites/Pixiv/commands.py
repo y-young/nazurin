@@ -1,6 +1,4 @@
-import random
 from .api import Pixiv
-from .config import IMG_PROXY
 from utils import NazurinError, sendPhotos, sendDocuments, handleBadRequest
 from telegram.ext import CommandHandler, Filters
 from telegram.error import BadRequest
@@ -16,12 +14,6 @@ def pixiv_view(update, context):
             message.reply_text('Invalid artwork id!')
             return
         imgs, details = pixiv.view_illust(artwork_id)
-        # use reverse proxy to avoid strange problems
-        for img in imgs:
-            img['url'] = img['url'].replace('i.pximg.net', IMG_PROXY)
-            # img['url'] += '?' + str(random.random())
-            img['thumbnail'] = img['thumbnail'].replace('i.pximg.net', IMG_PROXY)
-            # img['thumbnail'] += '?' + str(random.random())
         sendPhotos(update, context, imgs, details)
     except (IndexError, ValueError):
         message.reply_text('Usage: /pixiv <artwork_id>')
