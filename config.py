@@ -19,14 +19,16 @@ NAZURIN_DATA = 'nazurin'
 
 ALBUM_ID = int(environ.get('ALBUM_ID'))
 GALLERY_ID = int(environ.get('GALLERY_ID'))
-ADMIN_ID = literal_eval(environ.get('ADMIN_ID', 'None'))
-ADMIN_USERNAME = literal_eval(environ.get('ADMIN_USERNAME', 'None'))
+ADMIN_ID = environ.get('ADMIN_ID')
+ADMIN_USERNAME = environ.get('ADMIN_USERNAME')
 if ADMIN_ID:
+    ADMIN_ID = [int(ID) for ID in ADMIN_ID.split(',')]
     adminFilter = Filters.user(user_id=ADMIN_ID)
 elif ADMIN_USERNAME:
+    ADMIN_USERNAME = ADMIN_USERNAME.split(',')
     adminFilter = Filters.user(username=ADMIN_USERNAME)
 else:
-    adminFilter = None
+    adminFilter = Filters.all
 
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"
 RETRIES = 5
