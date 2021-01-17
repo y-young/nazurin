@@ -29,6 +29,10 @@ elif ADMIN_USERNAME:
     adminFilter = Filters.user(username=ADMIN_USERNAME)
 else:
     adminFilter = Filters.all
+GROUP_ID = environ.get('GROUP_ID')
+if GROUP_ID:
+    GROUP_ID = [int(ID) for ID in GROUP_ID.split(',')]
+    adminFilter = adminFilter | Filters.chat(chat_id=GROUP_ID)
 
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"
 RETRIES = 5
