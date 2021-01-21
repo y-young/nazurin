@@ -96,7 +96,6 @@ def main():
     global sites, storage
     defaults = Defaults(quote=True)
     urlFilter = Filters.entity('url') | Filters.entity('text_link') | Filters.caption_entity('url') | Filters.caption_entity('text_link')
-    adminFilter = Filters.user(user_id=config.ADMIN_ID)
     sites.load()
 
     # Set up the Updater
@@ -104,12 +103,12 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    dp.add_handler(CommandHandler('start', start, adminFilter, run_async=True))
-    dp.add_handler(CommandHandler('ping', ping, adminFilter, run_async=True))
-    dp.add_handler(CommandHandler('help', get_help, adminFilter, run_async=True))
+    dp.add_handler(CommandHandler('start', start, config.adminFilter, run_async=True))
+    dp.add_handler(CommandHandler('ping', ping, config.adminFilter, run_async=True))
+    dp.add_handler(CommandHandler('help', get_help, config.adminFilter, run_async=True))
     sites.register_commands(dp)
-    dp.add_handler(CommandHandler('clear_downloads', clear_downloads, adminFilter, pass_args=True))
-    dp.add_handler(MessageHandler(adminFilter & urlFilter & (~ Filters.update.channel_posts), collection_update, pass_chat_data=True, run_async=True))
+    dp.add_handler(CommandHandler('clear_downloads', clear_downloads, config.adminFilter, pass_args=True))
+    dp.add_handler(MessageHandler(config.adminFilter & urlFilter & (~ Filters.update.channel_posts), collection_update, pass_chat_data=True, run_async=True))
 
     # log all errors
     dp.add_error_handler(handle_error)

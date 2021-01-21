@@ -1,5 +1,4 @@
 from .api import Pixiv
-from config import ADMIN_ID
 from utils import NazurinError, sendPhotos, sendDocuments, handleBadRequest
 from telegram.ext import CommandHandler, Filters
 from telegram.error import BadRequest
@@ -56,5 +55,5 @@ def pixiv_bookmark(update, context):
 commands = [
     CommandHandler('pixiv', pixiv_view, pass_args=True, run_async=True),
     CommandHandler('pixiv_download', pixiv_download, pass_args=True, run_async=True),
-    CommandHandler('bookmark', pixiv_bookmark, Filters.user(user_id=ADMIN_ID), pass_args=True, run_async=True)
+    CommandHandler('bookmark', pixiv_bookmark, pass_args=True, run_async=True)
 ]

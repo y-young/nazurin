@@ -4,7 +4,7 @@ from re import search
 from glob import glob
 from os import path
 from utils import logger
-from config import ADMIN_ID
+from config import adminFilter
 from telegram.ext import Filters
 
 class SiteManager(object):
@@ -39,7 +39,6 @@ class SiteManager(object):
         return self.sites[site]
 
     def register_commands(self, dispatcher):
-        adminFilter = Filters.user(user_id=ADMIN_ID)
         for command in self.commands:
             command.filters = command.filters & adminFilter
             dispatcher.add_handler(command)
