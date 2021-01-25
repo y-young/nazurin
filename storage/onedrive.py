@@ -1,6 +1,7 @@
 from os import environ
 from config import NAZURIN_DATA
 from database import Database
+from utils import logger
 from microsoftgraph.client import Client
 import msal
 
@@ -26,21 +27,19 @@ class OneDrive(object):
     def __init__(self): 
         self.auth()
         # To find the folder and its id
-        if not self.folder_id:
-            # seek
-            folders = dict(self.api.drive_root_children_items())
-            folders = folders.get('value')
-            for folder in folders:
-                if folder['name'] == OD_FOLDER:
-                    self.folder_id = folder['id']
-                    break
-            else:
-                # create a folder
-                url = 'https://graph.microsoft.com/v1.0/me/drive/root/children'
-                body = {"name": "Pictures","folder": {}}
-                result = self.api._post(url,json=body)
-                if result.get('id'):
-                    self.folder_id = result['id']
+        folders = dict(self.api.drive_root_children_items())
+        folders = folders.get('value')
+        for folder in folders:
+            if folder['name'] == OD_FOLDER:
+                self.folder_id = folder['id']
+                break
+        else:
+            # create a folder
+            url = 'https://graph.microsoft.com/v1.0/me/drive/root/children'
+            body = {"name": "Pictures","folder": {}}
+            result = self.api._post(url,json=body)
+            if result.get('id'):
+                self.folder_id = result['id']
 
     def auth(self):
         refresh_token = self.document.get()
@@ -51,12 +50,13 @@ class OneDrive(object):
                 return
         token = self.api.refresh_token(OD_RD_URL,refresh_token)
         token = self.api.set_token(token)
+        logger.info('OneDrive logged in')
 
         # Update refresh token
         auth_api = msal.ClientApplication(OD_CLIENT,OD_SECRET)
         refresh_token = auth_api.acquire_token_by_refresh_token(refresh_token,["https://graph.microsoft.com/.default"])
         self.document.update(refresh_token)
-
+        logger.info('OneDrive refresh token cached')
         
     def store(self, files):
         self.auth()
