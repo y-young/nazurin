@@ -72,7 +72,7 @@ class OneDrive(object):
             url = 'https://graph.microsoft.com/v1.0/me/drive/items/{parent_id}:/{filename}:/content'.format(parent_id=self.folder_id,filename=item.name)
             # for _put() method create a dict
             file = dict()
-            file[item.name] = open(item.path)
+            file[item.name] = open(item.path,mode='rb')
             self.api._put(url,files=file)
 
 
