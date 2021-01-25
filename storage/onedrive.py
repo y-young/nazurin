@@ -56,9 +56,9 @@ class OneDrive(object):
         auth_api = msal.ClientApplication(OD_CLIENT,OD_SECRET)
         refresh_token = auth_api.acquire_token_by_refresh_token(refresh_token,["https://graph.microsoft.com/.default"])
         if self.initialize:
-            self.collection.insert(OD_DOCUMENT,refresh_token)
-        else:
             self.document.update(refresh_token)
+        else:
+            self.collection.insert(OD_DOCUMENT,refresh_token)
         logger.info('OneDrive refresh token cached')
         
     def store(self, files):
