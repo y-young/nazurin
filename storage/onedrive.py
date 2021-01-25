@@ -55,6 +55,7 @@ class OneDrive(object):
         # Update refresh token
         auth_api = msal.ClientApplication(OD_CLIENT,OD_SECRET)
         refresh_token = auth_api.acquire_token_by_refresh_token(refresh_token,["https://graph.microsoft.com/.default"])
+        refresh_token = refresh_token["refresh_token"]
         if self.initialize:
             self.document.update(refresh_token)
         else:
