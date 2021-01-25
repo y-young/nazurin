@@ -42,10 +42,13 @@ class OneDrive(object):
                 self.folder_id = result['id']
 
     def auth(self):
-        refresh_token = self.document.get()
-        if not refresh_token:
+        token_dict = self.document.get()
+        refresh_token = ''
+        if token_dict:
+            refresh_token = token_dict['refresh_token']
+        else:
             if OD_RF_TOKEN:
-                refresh_token=OD_RF_TOKEN
+                refresh_token = OD_RF_TOKEN
             else:
                 return
         token = self.api.refresh_token(OD_RD_URL,refresh_token)
@@ -55,11 +58,11 @@ class OneDrive(object):
         # Update refresh token
         auth_api = msal.ClientApplication(OD_CLIENT,OD_SECRET)
         refresh_token = auth_api.acquire_token_by_refresh_token(refresh_token,["https://graph.microsoft.com/.default"])
-        refresh_token = refresh_token["refresh_token"]
         if self.initialize:
             self.document.update(refresh_token)
         else:
             self.collection.insert(OD_DOCUMENT,refresh_token)
+            self.initialize = True
         logger.info('OneDrive refresh token cached')
         
     def store(self, files):
