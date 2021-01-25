@@ -8,7 +8,7 @@ import msal
 OD_FOLDER = environ.get('OD_FOLDER','Pictures')
 OD_CLIENT = environ.get('OD_CLIENT')
 OD_SECRET = environ.get('OD_SECRET')
-OD_RD_URL = environ.get('OD_RD_URL',r'http://localhost')
+OD_RD_URL = environ.get('OD_RD_URL',r'http://localhost/get_token')
 OD_RF_TOKEN = environ.get('OD_RF_TOKEN',None)
 
 OD_DOCUMENT = 'onedrive'
