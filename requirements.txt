@@ -19,3 +19,6 @@ cloudant
 mega.py
 # Google Drive:
 PyDrive2
+# Microsoft Authentication Library and Graph Api
+msal
+microsoftgraph-python
