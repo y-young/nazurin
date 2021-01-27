@@ -1,15 +1,13 @@
 """Nazurin site plugins & plugin manager."""
-from importlib import import_module
-from re import search
 from glob import glob
+from importlib import import_module
 from os import path
+from re import search
+
 from utils import logger
-from config import adminFilter
-from telegram.ext import Filters
 
 class SiteManager(object):
     """Site plugin manager."""
-
     def __init__(self):
         """Initialize."""
         self.sites = dict()
@@ -38,10 +36,9 @@ class SiteManager(object):
     def api(self, site):
         return self.sites[site]
 
-    def register_commands(self, dispatcher):
+    def register_commands(self, bot):
         for command in self.commands:
-            command.filters = command.filters & adminFilter
-            dispatcher.add_handler(command)
+            bot.add_event_handler(command)
 
     def match(self, urls):
         sources = self.sources

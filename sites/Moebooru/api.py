@@ -1,13 +1,15 @@
-from urllib.parse import unquote
-import requests
-from requests.exceptions import HTTPError
 import json
 import os
-from config import TEMP_DIR
-from models import Image
-from utils import NazurinError, downloadImages, logger
-from pybooru import Moebooru as moebooru
+from urllib.parse import unquote
+
+import requests
 from bs4 import BeautifulSoup
+from models import Image
+from pybooru import Moebooru as moebooru
+from requests.exceptions import HTTPError
+from utils import NazurinError, downloadImages, logger
+
+from config import TEMP_DIR
 
 class Moebooru(object):
     def site(self, site_url='yande.re'):
@@ -15,7 +17,7 @@ class Moebooru(object):
         return self
 
     def getPost(self, post_id):
-        url = 'https://'+ self.url + '/post/show/' + str(post_id)
+        url = 'https://' + self.url + '/post/show/' + str(post_id)
         response = requests.get(url)
         try:
             response.raise_for_status()
@@ -82,7 +84,7 @@ class Moebooru(object):
             _, ext = self.parseUrl(img.url)
             filename += ext
             img.name = pool_name + '/' + img.name
-            downloadImages([img]) #TODO
+            downloadImages([img])  #TODO
 
     def getImages(self, post):
         file_url = post['file_url']
@@ -105,7 +107,8 @@ class Moebooru(object):
             details['title'] = title
         if artists:
             details['artists'] = artists
-        details['url'] = 'https://'+ self.url + '/post/show/' + str(post['id'])
+        details['url'] = 'https://' + self.url + '/post/show/' + str(
+            post['id'])
         if tag_string:
             details['tags'] = tag_string
         if source:

@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 import json
-import time
 import os
-from config import NAZURIN_DATA, TEMP_DIR
-from utils import NazurinError, logger
+import time
+
 from database import Database
-from .config import DOCUMENT, USER, PASSWORD, TRANSLATION
-from .models import PixivImage
 from pixivpy3 import AppPixivAPI, PixivError
+from utils import NazurinError, logger
+
+from config import NAZURIN_DATA, TEMP_DIR
+
+from .config import DOCUMENT, PASSWORD, TRANSLATION, USER
+from .models import PixivImage
 
 class Pixiv(object):
     api = AppPixivAPI()
@@ -26,10 +29,11 @@ class Pixiv(object):
             if tokens:
                 Pixiv.api.refresh_token = tokens['refresh_token']
                 Pixiv.updated_time = tokens['updated_time']
-            else: # Initialize database
+            else:  # Initialize database
                 self._login()
                 return
-        if refresh or time.time() - Pixiv.updated_time >= 3600: # Access token expired
+        if refresh or time.time(
+        ) - Pixiv.updated_time >= 3600:  # Access token expired
             self._refreshToken()
             Pixiv.document.update({
                 'access_token': Pixiv.api.access_token,
@@ -70,13 +74,15 @@ class Pixiv(object):
         if not os.path.exists(TEMP_DIR):
             os.makedirs(TEMP_DIR)
         for img in imgs:
-            if (not os.path.exists(img.path)) or os.stat(img.path).st_size == 0:
+            if (not os.path.exists(img.path)) or os.stat(
+                    img.path).st_size == 0:
                 Pixiv.api.download(img.url, path=TEMP_DIR, name=img.name)
         return imgs
 
     def download_ugoira(self, illust):
         """Download ugoira zip file and store animation data."""
-        metadata = json.dumps(Pixiv.api.ugoira_metadata(illust.id).ugoira_metadata)
+        metadata = json.dumps(
+            Pixiv.api.ugoira_metadata(illust.id).ugoira_metadata)
         url = illust.meta_single_page.original_image_url
         zip_url = url.replace('/img-original/', '/img-zip-ugoira/')
         zip_url = zip_url.split('_ugoira0')[0] + '_ugoira1920x1080.zip'
@@ -102,11 +108,12 @@ class Pixiv(object):
     def _login(self):
         Pixiv.api.login(USER, PASSWORD)
         Pixiv.updated_time = time.time()
-        Pixiv.collection.insert(DOCUMENT, {
-            'access_token': Pixiv.api.access_token,
-            'refresh_token': Pixiv.api.refresh_token,
-            'updated_time': Pixiv.updated_time
-        })
+        Pixiv.collection.insert(
+            DOCUMENT, {
+                'access_token': Pixiv.api.access_token,
+                'refresh_token': Pixiv.api.refresh_token,
+                'updated_time': Pixiv.updated_time
+            })
         logger.info('Pixiv logged in with password')
 
     def _refreshToken(self):
@@ -114,7 +121,7 @@ class Pixiv(object):
             Pixiv.api.auth()
             Pixiv.updated_time = time.time()
             logger.info('Pixiv access token updated')
-        except PixivError: # Refresh token may be expired, try to login with password
+        except PixivError:  # Refresh token may be expired, try to login with password
             Pixiv.document.delete()
             self._login()
 
@@ -123,7 +130,8 @@ class Pixiv(object):
         if not Pixiv.api.access_token or not Pixiv.api.refresh_token:
             self.login()
         response = func(*args)
-        if 'error' in response.keys() and 'invalid_grant' in response.error.message: # Access token expired
+        if 'error' in response.keys(
+        ) and 'invalid_grant' in response.error.message:  # Access token expired
             self.login(refresh=True)
             response = func(*args)
         return response
@@ -131,7 +139,7 @@ class Pixiv(object):
     def getImages(self, illust):
         """Get images from an artwork."""
         imgs = list()
-        if illust.meta_pages: # Contains more than one image
+        if illust.meta_pages:  # Contains more than one image
             pages = illust.meta_pages
             for page in pages:
                 url = page.image_urls.original
@@ -165,7 +173,9 @@ class Pixiv(object):
     def getFilename(self, url, illust):
         basename = os.path.basename(url)
         filename, extension = os.path.splitext(basename)
-        name = "%s - %s - %s(%d)%s" % (filename, illust.title, illust.user.name, illust.user.id, extension)
+        name = "%s - %s - %s(%d)%s" % (filename, illust.title,
+                                       illust.user.name, illust.user.id,
+                                       extension)
         return name
 
     def getThumbnail(self, url):

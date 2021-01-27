@@ -1,13 +1,15 @@
-import requests
 import os
+
+import requests
 from models import Image
-from utils import downloadImages, NazurinError
+from utils import NazurinError, downloadImages
 
 class Twitter(object):
     def getTweet(self, status_id):
         """Get a tweet from API."""
         # Old: 'https://syndication.twitter.com/tweets.json?ids='+ status_id +'&lang=en'
-        api = 'https://cdn.syndication.twimg.com/tweet?id='+ str(status_id) +'&lang=en'
+        api = 'https://cdn.syndication.twimg.com/tweet?id=' + str(
+            status_id) + '&lang=en'
         response = requests.get(api)
         if response.status_code == 404:
             raise NazurinError('Tweet not found or unavailable.')
@@ -29,7 +31,8 @@ class Twitter(object):
         imgs = list()
         for photo in photos:
             filename, url = self.parseUrl(photo['url'])
-            imgs.append(Image('twitter - ' + tweet['id_str'] + ' - ' + filename, url))
+            imgs.append(
+                Image('twitter - ' + tweet['id_str'] + ' - ' + filename, url))
         return imgs
 
     def parseUrl(self, src):
@@ -43,5 +46,6 @@ class Twitter(object):
         """
         basename = os.path.basename(src)
         filename, extension = os.path.splitext(basename)
-        url = 'https://pbs.twimg.com/media/' + filename + '?format=' + extension[1:] + '&name=orig'
+        url = 'https://pbs.twimg.com/media/' + filename + '?format=' + extension[
+            1:] + '&name=orig'
         return basename, url

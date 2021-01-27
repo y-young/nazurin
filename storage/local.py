@@ -1,5 +1,6 @@
 import os
 import shutil
+
 from config import STORAGE_DIR
 
 class Local(object):

@@ -1,59 +1,55 @@
+from telethon import events
+from utils import NazurinError, handleBadRequest, sendDocuments, sendPhotos
+
 from .api import Pixiv
-from utils import NazurinError, sendPhotos, sendDocuments, handleBadRequest
-from telegram.ext import CommandHandler, Filters
-from telegram.error import BadRequest
 
 pixiv = Pixiv()
 
-def pixiv_view(update, context):
-    message = update.message
+@events.register(events.NewMessage(pattern=r'/pixiv (\S+)'))
+async def pixiv_view(event):
     try:
         # args[0] should contain the queried artwork id
-        artwork_id = int(context.args[0])
+        artwork_id = int(event.pattern_match.group(1))
         if artwork_id < 0:
-            message.reply_text('Invalid artwork id!')
+            await event.reply('Invalid artwork id!')
             return
         imgs, details = pixiv.view_illust(artwork_id)
-        sendPhotos(update, context, imgs, details)
+        await sendPhotos(event, imgs, details)
     except (IndexError, ValueError):
-        message.reply_text('Usage: /pixiv <artwork_id>')
+        await event.reply('Usage: /pixiv <artwork_id>')
     except NazurinError as error:
-        message.reply_text(error.msg)
-    except BadRequest as error:
-        handleBadRequest(update, context, error)
+        await event.reply(error.msg)
+    # except BadRequest as error:
+    #     handleBadRequest(update, context, error)
 
-def pixiv_download(update, context):
-    message = update.message
+@events.register(events.NewMessage(pattern=r'/pixiv_download (\S+)'))
+async def pixiv_download(event):
     try:
         # args[0] should contain the queried artwork id
-        artwork_id = int(context.args[0])
+        artwork_id = int(event.pattern_match.group(1))
         if artwork_id < 0:
-            message.reply_text('Invalid artwork id!')
+            await event.reply('Invalid artwork id!')
             return
         imgs = pixiv.download_illust(artwork_id)
-        sendDocuments(update, context, imgs)
+        await sendDocuments(event, imgs)
     except (IndexError, ValueError):
-        message.reply_text('Usage: /pixiv_download <artwork_id>')
+        await event.reply('Usage: /pixiv_download <artwork_id>')
     except NazurinError as error:
-        message.reply_text(error.msg)
+        await event.reply(error.msg)
 
-def pixiv_bookmark(update, context):
-    message = update.message
+@events.register(events.NewMessage(pattern=r'/pixiv_bookmark (\S+)'))
+async def pixiv_bookmark(event):
     try:
         # args[0] should contain the queried artwork id
-        artwork_id = int(context.args[0])
+        artwork_id = int(event.pattern_match.group(1))
         if artwork_id < 0:
-            message.reply_text('Invalid artwork id!')
+            await event.reply('Invalid artwork id!')
             return
-        context.dispatcher.run_async(pixiv.bookmark, artwork_id)
-        message.reply_text('Done!')
+        pixiv.bookmark(artwork_id)
+        await event.reply('Done!')
     except (IndexError, ValueError):
-        message.reply_text('Usage: /bookmark <artwork_id>')
+        await event.reply('Usage: /bookmark <artwork_id>')
     except NazurinError as error:
-        message.reply_text(error.msg)
+        await event.reply(error.msg)
 
-commands = [
-    CommandHandler('pixiv', pixiv_view, pass_args=True, run_async=True),
-    CommandHandler('pixiv_download', pixiv_download, pass_args=True, run_async=True),
-    CommandHandler('bookmark', pixiv_bookmark, pass_args=True, run_async=True)
-]
+commands = [pixiv_view, pixiv_download, pixiv_bookmark]

@@ -1,7 +1,9 @@
-from requests.adapters import HTTPAdapter
 from os import environ
-from cloudant.client import Cloudant as cloudant
+
 from config import RETRIES
+from requests.adapters import HTTPAdapter
+
+from cloudant.client import Cloudant as cloudant
 
 USERNAME = environ.get('CLOUDANT_USER')
 APIKEY = environ.get('CLOUDANT_APIKEY')

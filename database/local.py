@@ -1,8 +1,7 @@
-from tinydb import TinyDB, Query
+from tinydb import Query, TinyDB
 
 class Local(object):
     """Local database driver using TinyDB."""
-
     def collection(self, key):
         self.db = TinyDB(key + '.json')
         return self

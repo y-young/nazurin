@@ -1,5 +1,7 @@
-from database import Database
 from time import time
+
+from database import Database
+
 from .api import Danbooru
 from .config import COLLECTION
 

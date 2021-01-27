@@ -1,11 +1,12 @@
-from requests.exceptions import HTTPError
+import json
 from datetime import datetime, timezone
 from urllib.parse import unquote
+
 import requests
-import json
-from models import Image
-from utils import NazurinError, downloadImages
 from bs4 import BeautifulSoup
+from models import Image
+from requests.exceptions import HTTPError
+from utils import NazurinError, downloadImages
 
 class Zerochan(object):
     def getPost(self, post_id):
@@ -20,11 +21,13 @@ class Zerochan(object):
             post_id = response.url.split('/')[3]
         response = response.text
         soup = BeautifulSoup(response, 'html.parser')
-        info = soup.find("script", {"type":"application/ld+json"}).contents
+        info = soup.find("script", {"type": "application/ld+json"}).contents
         info = json.loads(''.join(info).replace('\\\'', '\''))
 
         name = info['name'].split(' #')[0]
-        created_at = int(datetime.strptime(info['datePublished'], '%c').replace(tzinfo=timezone.utc).timestamp())
+        created_at = int(
+            datetime.strptime(info['datePublished'],
+                              '%c').replace(tzinfo=timezone.utc).timestamp())
         size = int(info['contentSize'][:-2]) * 1024
         tags = dict()
         for tag in soup.find('ul', id='tags').find_all('li'):
@@ -63,7 +66,8 @@ class Zerochan(object):
 
     def getImages(self, post):
         url = post['file_url']
-        name = 'Zerochan ' + str(post['id']) + ' ' + post['name'] + '.' + post['file_ext']
+        name = 'Zerochan ' + str(
+            post['id']) + ' ' + post['name'] + '.' + post['file_ext']
         return [Image(name, url)]
 
     def buildCaption(self, post):

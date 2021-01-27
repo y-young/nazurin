@@ -1,8 +1,10 @@
-from os import path
 import re
+from os import path
+
 from models import Image
+from pybooru import Danbooru as danbooru
+from pybooru import PybooruHTTPError
 from utils import NazurinError, downloadImages
-from pybooru import Danbooru as danbooru, PybooruHTTPError
 
 class Danbooru(object):
     def __init__(self, site='danbooru'):
@@ -21,7 +23,9 @@ class Danbooru(object):
             if 'Not Found' in err._msg:
                 raise NazurinError('Post not found')
         if 'file_url' not in post.keys():
-            raise NazurinError('You may need a gold account to view this post\nSource: ' + post['source'])
+            raise NazurinError(
+                'You may need a gold account to view this post\nSource: ' +
+                post['source'])
         return post
 
     def view(self, post_id):
@@ -56,7 +60,12 @@ class Danbooru(object):
             details['title'] = title
         if artists:
             details['artists'] = artists
-        details.update({'url': 'https://' + self.site + '.donmai.us/posts/' + str(post['id']), 'tags': tag_string})
+        details.update({
+            'url':
+            'https://' + self.site + '.donmai.us/posts/' + str(post['id']),
+            'tags':
+            tag_string
+        })
         if post['parent_id']:
             details['parent_id'] = post['parent_id']
         if post['pixiv_id']:
@@ -95,7 +104,8 @@ class Danbooru(object):
             result = self._sentence(characters)
         else:
             characters = characters[:5]
-            result = self._sentence(characters) + ' and ' + str(size - 1) + ' more'
+            result = self._sentence(characters) + ' and ' + str(size -
+                                                                1) + ' more'
         return result
 
     def _formatCopyrights(self, copyrights):
@@ -124,7 +134,7 @@ class Danbooru(object):
             return sentence
 
     def _normalize(self, name):
-        name = re.sub('_\(.*\)', '', name) # replace _(...)
+        name = re.sub('_\(.*\)', '', name)  # replace _(...)
         name = name.replace('_', ' ')
-        name = re.sub('[\\\/]', ' ', name) # replace / and \
+        name = re.sub('[\\\/]', ' ', name)  # replace / and \
         return name

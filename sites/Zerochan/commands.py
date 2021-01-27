@@ -1,41 +1,41 @@
+from telethon import events
+from utils import NazurinError, handleBadRequest, sendDocuments, sendPhotos
+
 from .api import Zerochan
-from utils import sendPhotos, sendDocuments, handleBadRequest, NazurinError
-from telegram.ext import CommandHandler
-from telegram.error import BadRequest
 
 api = Zerochan()
 
-def zerochan_view(update, context):
-    message = update.message
+@events.register(events.NewMessage(pattern=r'/zerochan (\S+)'))
+async def zerochan_view(event):
     try:
-        post_id = int(context.args[0])
+        post_id = int(event.pattern_match.group(1))
         if post_id < 0:
-            message.reply_text('Invalid post id!')
+            await event.reply('Invalid post id!')
             return
         imgs, details = api.view(post_id)
-        sendPhotos(update, context, imgs, details)
+        await sendPhotos(event, imgs, details)
     except (IndexError, ValueError):
-        message.reply_text('Usage: /zerochan <post_id>')
-    except BadRequest as error:
-        handleBadRequest(update, context, error)
+        await event.reply('Usage: /zerochan <post_id>')
     except NazurinError as error:
-        message.reply_text(error.msg)
+        await event.reply(error.msg)
+    # except BadRequest as error:
+    #     handleBadRequest(event, error)
 
-def zerochan_download(update, context):
-    message = update.message
+@events.register(events.NewMessage(pattern=r'/zerochan_download (\S+)'))
+async def zerochan_download(event):
     try:
-        post_id = int(context.args[0])
+        post_id = int(event.pattern_match.group(1))
         if post_id <= 0:
-            message.reply_text('Invalid post id!')
+            await event.reply('Invalid post id!')
             return
         imgs = api.download(post_id)
-        sendDocuments(update, context, imgs)
+        await sendDocuments(event, imgs)
     except (IndexError, ValueError):
-        message.reply_text('Usage: /zerochan_download <post_id>')
+        await event.reply('Usage: /zerochan_download <post_id>')
     except NazurinError as error:
-        message.reply_text(error.msg)
+        await event.reply(error.msg)
 
 commands = [
-    CommandHandler('zerochan', zerochan_view, pass_args=True, run_async=True),
-    CommandHandler('zerochan_download', zerochan_download, pass_args=True, run_async=True)
+    zerochan_view,
+    zerochan_download,
 ]

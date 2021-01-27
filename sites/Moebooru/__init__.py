@@ -1,7 +1,7 @@
 """Moebooru site plugin."""
 from .api import Moebooru
-from .config import PRIORITY
 from .commands import commands
-from .interface import patterns, handle
+from .config import PRIORITY
+from .interface import handle, patterns
 
 __all__ = ['Moebooru', 'commands', 'PRIORITY', 'patterns', 'handle']

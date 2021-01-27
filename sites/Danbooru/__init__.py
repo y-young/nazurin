@@ -1,7 +1,7 @@
 """Danbooru site plugin."""
 from .api import Danbooru
-from .config import PRIORITY
 from .commands import commands
-from .interface import patterns, handle
+from .config import PRIORITY
+from .interface import handle, patterns
 
 __all__ = ['Danbooru', 'commands', 'PRIORITY', 'patterns', 'handle']

@@ -1,4 +1,6 @@
-# Nazurin
+# Nazurin-v2
+
+**Warning: Nazurin v2 is still under development, do not use for production.**
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/5cbfed1b51a644b187ed5d9521a4ea95)](https://www.codacy.com/manual/y-young/nazurin?utm_source=github.com&utm_medium=referral&utm_content=y-young/nazurin&utm_campaign=Badge_Grade)
 ![](https://img.shields.io/badge/python->%3D%203.6-blue)
@@ -104,14 +106,3 @@ Commands:
 Send the bot a message with a link of [supported sites](#supported-sites), this message will be forwarded to `GALLERY` channel, the bot will then download the original images from the site, send the files to `ALBUM` channel, and finally store to your custom destination.
 
 > Tips: On mobile you can use the _share_ button in apps, as long as the final message contains a link.
-
-## Roadmap
-
--   [x] Introduce plugin system and extract some functions
--   [x] Support local database
--   [ ] Thorough error handling
--   [ ] Support more sites
--   [x] Support Pixiv ugoira
--   [ ] Support Moebooru pools
--   [ ] Reverse Image Search
--   [ ] Provide more configurable options

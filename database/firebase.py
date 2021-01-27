@@ -1,7 +1,9 @@
-import os
 import json
+import os
+
 import firebase_admin
-from firebase_admin import firestore, credentials
+from firebase_admin import credentials, firestore
+
 
 class Firebase(object):
     """Firestore driver of Firebase."""

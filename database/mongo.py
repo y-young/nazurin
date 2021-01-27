@@ -1,11 +1,11 @@
 from os import environ
-from utils import NazurinError
+
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
+from utils import NazurinError
 
 class Mongo(object):
     """MongoDB driver for MongoDB Atlas or local server."""
-
     def __init__(self):
         """Load credentials and initialize client."""
         URI = environ.get('MONGO_URI', 'mongodb://localhost:27017/nazurin')
@@ -24,7 +24,8 @@ class Mongo(object):
         return self._collection.find_one({'_id': self._document})
 
     def exists(self):
-        return self._collection.count_documents({'_id': self._document}, limit=1) > 0
+        return self._collection.count_documents({'_id': self._document},
+                                                limit=1) > 0
 
     def insert(self, key, data):
         if key:
@@ -35,7 +36,13 @@ class Mongo(object):
             raise NazurinError('Already exists in database.')
 
     def update(self, data):
-        return self._collection.update_one({'_id': self._document}, {'$set': data}).modified_count == 1
+        return self._collection.update_one({
+            '_id': self._document
+        }, {
+            '$set': data
+        }).modified_count == 1
 
     def delete(self):
-        return self._collection.delete_one({'_id': self._document}).deleted_count == 1
+        return self._collection.delete_one({
+            '_id': self._document
+        }).deleted_count == 1

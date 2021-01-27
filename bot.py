@@ -1,23 +1,33 @@
 # -*- coding: utf-8 -*-
+import asyncio
 import shutil
 import traceback
+
+from telethon import TelegramClient, events
+
 import config
-from utils import typing, logger, sendDocuments, NazurinError
 from sites import SiteManager
 from storage import Storage
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Defaults
+from utils import (NazurinError, chat_action, getUrlsFromEvent, logger,
+                   sendDocuments)
 
+bot = TelegramClient('bot', config.API_ID,
+                     config.API_HASH).start(bot_token=config.TOKEN)
 sites = SiteManager()
 storage = Storage()
 
-def start(update, context):
-    update.message.reply_text('Hi!')
-@typing
-def ping(update, context):
-    update.message.reply_text('pong!')
-@typing
-def get_help(update, context):
-    update.message.reply_text('''
+@bot.on(events.NewMessage(incoming=True))
+async def user_filter(event):
+    if event.chat_id in config.ADMIN_ID + config.GROUP_ID\
+        or event.sender_id in config.ADMIN_ID\
+        or (await event.get_sender()).username in config.ADMIN_USERNAME:
+        return
+    else:
+        raise events.StopPropagation
+
+@bot.on(events.NewMessage(pattern='/help'))
+async def show_help(event):
+    await event.reply('''
     小さな小さな賢将, can help you collect images from various sites.
     Commands:
     /ping - pong
@@ -30,101 +40,60 @@ def get_help(update, context):
     /konachan <id> - view konachan post
     /konachan_download <id> - download konachan post
     /bookmark <id> - bookmark pixiv artwork
-    /clear_downloads - clear download cache
+    /clear_cache - clear download cache
     /help - get this help text
     PS: Send Pixiv/Danbooru/Yandere/Konachan/Twitter URL to download image(s)
     ''')
-def collection_update(update, context):
-    message = update.message
-    message_id = message.message_id
-    chat_id = message.chat_id
-    bot = context.bot
+    raise event.StopPropagation
 
-    # Match URL
-    if message.entities:
-        entities = message.entities
-        text = message.text
-    elif message.caption_entities:
-        entities = message.caption_entities
-        text = message.caption
-    else:
-        message.reply_text('Error: URL not found')
+@bot.on(events.NewMessage(pattern='/start'))
+async def start(event):
+    await show_help(event)
+
+@bot.on(events.NewMessage(pattern='/ping'))
+async def ping(event):
+    await event.reply('pong!')
+    raise event.StopPropagation
+
+@bot.on(events.NewMessage(incoming=True))
+async def update_collection(event):
+    urls = getUrlsFromEvent(event)
+    if not urls:
         return
-    # Telegram counts entity offset and length in UTF-16 code units
-    text = text.encode('utf-16-le')
-    urls = list()
-    for item in entities:
-        if item.type == 'text_link':
-            urls.append(item.url)
-        elif item.type == 'url':
-            offset = item.offset
-            length = item.length
-            urls.append(text[offset * 2:(offset + length) * 2].decode('utf-16-le'))
-
     result = sites.match(urls)
     if not result:
-        message.reply_text('Error: No source matched')
-        return
-    logger.info('Collection update: site=%s, match=%s', result['site'], result['match'].groups())
+        await event.reply('Error: No source matched')
+        raise event.StopPropagation
+    logger.info('Collection update: site=%s, match=%s', result['site'],
+                result['match'].groups())
     # Forward to gallery & Save to album
-    bot.forwardMessage(config.GALLERY_ID, chat_id, message_id)
-    chat_id = config.ALBUM_ID
-    message_id = None # No need to reply to message
+    await event.message.forward_to(config.GALLERY_ID)
 
     try:
         imgs = sites.handle_update(result)
-        sendDocuments(update, context, imgs, chat_id=chat_id)
+        await sendDocuments(event, imgs, chat_id=config.ALBUM_ID)
         storage.store(imgs)
-        message.reply_text('Done!')
+        await event.reply('Done!')
     except NazurinError as error:
-        message.reply_text(error.msg)
-def clear_downloads(update, context):
-    message = update.message
+        await event.reply(error.msg)
+    raise events.StopPropagation
+
+@bot.on(events.NewMessage(pattern='/clear_cache'))
+async def clear_cache(event):
     try:
         shutil.rmtree('./downloads')
-        message.reply_text("downloads directory cleared successfully.")
+        await event.reply("downloads directory cleared successfully.")
     except PermissionError:
-        message.reply_text("Permission denied.")
+        await event.reply("Permission denied.")
     except OSError as error:
-        message.reply_text(error.strerror)
-
-def handle_error(update, context):
-    logger.error('Update "%s" caused error "%s"', update, context.error)
-    traceback.print_exc()
+        await event.reply(error.strerror)
 
 def main():
-    global sites, storage
-    defaults = Defaults(quote=True)
-    urlFilter = Filters.entity('url') | Filters.entity('text_link') | Filters.caption_entity('url') | Filters.caption_entity('text_link')
+    global sites, storage, bot
     sites.load()
-
-    # Set up the Updater
-    updater = Updater(config.TOKEN, workers=32, use_context=True, defaults=defaults)
-    # Get the dispatcher to register handlers
-    dp = updater.dispatcher
-
-    dp.add_handler(CommandHandler('start', start, config.adminFilter, run_async=True))
-    dp.add_handler(CommandHandler('ping', ping, config.adminFilter, run_async=True))
-    dp.add_handler(CommandHandler('help', get_help, config.adminFilter, run_async=True))
-    sites.register_commands(dp)
-    dp.add_handler(CommandHandler('clear_downloads', clear_downloads, config.adminFilter, pass_args=True))
-    dp.add_handler(MessageHandler(config.adminFilter & urlFilter & (~ Filters.update.channel_posts), collection_update, pass_chat_data=True, run_async=True))
-
-    # log all errors
-    dp.add_error_handler(handle_error)
-
-    if config.ENV == 'production':
-        # Webhook mode
-        updater.start_webhook(listen="0.0.0.0", port=config.PORT, url_path=config.TOKEN)
-        updater.bot.setWebhook(url=config.WEBHOOK_URL + config.TOKEN, allowed_updates=["message"])
-        logger.info('Set webhook')
-    else:
-        # Polling mode
-        updater.start_polling()
-        logger.info('Started polling')
-
+    sites.register_commands(bot)
     storage.load()
-    updater.idle()
+    bot.run_until_disconnected()
 
 if __name__ == '__main__':
     main()

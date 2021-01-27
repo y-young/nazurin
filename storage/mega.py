@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
-from config import STORAGE_DIR, NAZURIN_DATA
-from utils import logger
+
+from config import NAZURIN_DATA, STORAGE_DIR
 from database import Database
+from utils import logger
+
 from mega import Mega as mega
 from mega.errors import RequestError
 
@@ -20,11 +22,12 @@ class Mega(object):
     def login(self, initialize=False):
         Mega.api.login(MEGA_USER, MEGA_PASS)
         if initialize:
-            Mega.collection.insert(MEGA_DOCUMENT, {
-                'sid': Mega.api.sid,
-                'master_key': list(Mega.api.master_key),
-                'root_id': Mega.api.root_id
-            })
+            Mega.collection.insert(
+                MEGA_DOCUMENT, {
+                    'sid': Mega.api.sid,
+                    'master_key': list(Mega.api.master_key),
+                    'root_id': Mega.api.root_id
+                })
         else:
             Mega.document.update({
                 'sid': Mega.api.sid,
@@ -44,7 +47,7 @@ class Mega(object):
                 if 'destination' in tokens.keys():
                     Mega.destination = tokens['destination']
                     logger.info('MEGA retrieved destination from cache')
-            else: # Initialize database
+            else:  # Initialize database
                 self.login(initialize=True)
         if not Mega.destination:
             self.getDestination()
@@ -56,9 +59,7 @@ class Mega(object):
         else:
             result = Mega.api.create_folder(STORAGE_DIR)
             Mega.destination = result[STORAGE_DIR]
-        Mega.document.update({
-            'destination': Mega.destination
-        })
+        Mega.document.update({'destination': Mega.destination})
         logger.info('MEGA destination cached')
 
     def store(self, files):

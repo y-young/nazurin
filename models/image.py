@@ -1,6 +1,7 @@
 import os
-import requests
 from dataclasses import dataclass
+
+import requests
 from config import TEMP_DIR
 from utils import logger, sanitizeFilename
 
@@ -28,7 +29,7 @@ class Image:
         if self._chosen_url:
             return self._chosen_url
         self._chosen_url = self.url
-        if self.size > 5*1024*1024 and self.thumbnail:
+        if self.size > 5 * 1024 * 1024 and self.thumbnail:
             self._chosen_url = self.thumbnail
             logger.info('Use thumbnail: ' + self._chosen_url)
         return self._chosen_url
@@ -37,7 +38,10 @@ class Image:
     def size(self):
         if self._size:
             return self._size
-        headers = requests.head(self.url, headers={'Referer': 'https://www.pixiv.net/'}).headers
+        headers = requests.head(self.url,
+                                headers={
+                                    'Referer': 'https://www.pixiv.net/'
+                                }).headers
         if 'Content-Length' in headers.keys():
             self._size = int(headers['Content-Length'])
         return self._size

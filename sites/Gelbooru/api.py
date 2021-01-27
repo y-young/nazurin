@@ -5,7 +5,8 @@ from utils import NazurinError, downloadImages
 class Gelbooru(object):
     def getPost(self, post_id):
         """Fetch an post."""
-        api = 'https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&id=' + str(post_id)
+        api = 'https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&id=' + str(
+            post_id)
         response = requests.get(api)
         if not response.text:
             raise NazurinError('Post not found')
