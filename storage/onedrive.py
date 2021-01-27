@@ -71,7 +71,7 @@ class OneDrive(object):
             # decorate upload api url
             url = 'https://graph.microsoft.com/v1.0/me/drive/items/{parent_id}:/{filename}:/content'.format(parent_id=self.folder_id,filename=item.name)
             file = open(item.path,mode='rb')
-            self.api._put(url,files=(item.name,file))
+            self.api._put(url,files={'file':file})
             file.close()
 
 
