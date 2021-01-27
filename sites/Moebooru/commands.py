@@ -28,7 +28,7 @@ async def yandere_download(event):
         if post_id <= 0:
             await event.reply('Invalid post id!')
             return
-        imgs = moebooru.site('yande.re').download(post_id)
+        imgs = await moebooru.site('yande.re').download(post_id)
         await sendDocuments(event, imgs)
     except (IndexError, ValueError):
         await event.reply('Usage: /yandere_download <post_id>')
@@ -58,7 +58,7 @@ async def konachan_download(event):
         if post_id <= 0:
             await event.reply('Invalid post id!')
             return
-        imgs = moebooru.site('konachan.com').download(post_id)
+        imgs = await moebooru.site('konachan.com').download(post_id)
         await sendDocuments(event, imgs)
     except (IndexError, ValueError):
         await event.reply('Usage: /konachan_download <post_id>')

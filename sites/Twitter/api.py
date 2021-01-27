@@ -1,11 +1,12 @@
 import os
+from typing import List, Tuple
 
 import requests
 from models import Image
 from utils import NazurinError, downloadImages
 
 class Twitter(object):
-    def getTweet(self, status_id):
+    def getTweet(self, status_id: int):
         """Get a tweet from API."""
         # Old: 'https://syndication.twitter.com/tweets.json?ids='+ status_id +'&lang=en'
         api = 'https://cdn.syndication.twimg.com/tweet?id=' + str(
@@ -16,14 +17,14 @@ class Twitter(object):
         tweet = response.json()
         return tweet
 
-    def fetch(self, status_id):
+    async def fetch(self, status_id: int):
         """Fetch & return tweet images and information."""
         tweet = self.getTweet(status_id)
         imgs = self.getImages(tweet)
-        downloadImages(imgs)
+        await downloadImages(imgs)
         return imgs, tweet
 
-    def getImages(self, tweet):
+    def getImages(self, tweet) -> List[Image]:
         """Get all images in a tweet."""
         if 'photos' not in tweet.keys():
             raise NazurinError('No photo found.')
@@ -35,12 +36,14 @@ class Twitter(object):
                 Image('twitter - ' + tweet['id_str'] + ' - ' + filename, url))
         return imgs
 
-    def parseUrl(self, src):
+    def parseUrl(self, src: str) -> Tuple[str, str]:
         """Get filename & the url of the original image
 
         eg:
-            src: https://pbs.twimg.com/media/DOhM30VVwAEpIHq.jpg
-            return: DOhM30VVwAEpIHq.jpg, https://pbs.twimg.com/media/DOhM30VVwAEpIHq?format=jpg&name=orig
+
+            src: 'https://pbs.twimg.com/media/DOhM30VVwAEpIHq.jpg'
+
+            return: 'DOhM30VVwAEpIHq.jpg', 'https://pbs.twimg.com/media/DOhM30VVwAEpIHq?format=jpg&name=orig'
 
         Doc: https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/entities-object
         """

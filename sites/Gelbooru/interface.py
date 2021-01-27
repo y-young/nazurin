@@ -10,12 +10,12 @@ patterns = [
     r'gelbooru\.com/index\.php\?page=post&s=view&id=(\d+)'
 ]
 
-def handle(match, **kwargs):
+async def handle(match, **kwargs):
     post_id = match.group(1)
     db = Database().driver()
     collection = db.collection(COLLECTION)
 
-    imgs, post = Gelbooru().fetch(post_id)
+    imgs, post = await Gelbooru().fetch(post_id)
     post['collected_at'] = time()
     collection.insert(int(post_id), post)
     return imgs

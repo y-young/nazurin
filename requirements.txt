@@ -1,4 +1,10 @@
-python-telegram-bot
+telethon
+cryptg
+pillow
+aiohttp
+aiofiles
+tenacity
+
 pixivpy>=3.5.10
 beautifulsoup4
 Pybooru

@@ -2,10 +2,11 @@
 import json
 import os
 import time
+from typing import Callable, List, Optional
 
 from database import Database
 from pixivpy3 import AppPixivAPI, PixivError
-from utils import NazurinError, logger
+from utils import NazurinError, downloadImages, logger
 
 from config import NAZURIN_DATA, TEMP_DIR
 
@@ -44,7 +45,7 @@ class Pixiv(object):
             Pixiv.api.access_token = tokens['access_token']
             logger.info('Pixiv logged in through cached tokens')
 
-    def getArtwork(self, artwork_id):
+    def getArtwork(self, artwork_id: int):
         """Fetch an artwork."""
         response = self.call(Pixiv.api.illust_detail, artwork_id)
         if 'illust' in response.keys():
@@ -57,7 +58,7 @@ class Pixiv(object):
             raise NazurinError("Artwork is private")
         return illust
 
-    def view_illust(self, artwork_id):
+    def view_illust(self, artwork_id: int):
         illust = self.getArtwork(artwork_id)
         if illust.type == 'ugoira':
             raise NazurinError('Ugoira view is not supported.')
@@ -65,7 +66,9 @@ class Pixiv(object):
         imgs = self.getImages(illust)
         return imgs, details
 
-    def download_illust(self, artwork_id=None, illust=None):
+    async def download_illust(self,
+                              artwork_id: Optional[int] = None,
+                              illust=None) -> List[PixivImage]:
         """Download and return images of an illustration."""
         if not illust:
             imgs, _ = self.view_illust(artwork_id)
@@ -73,13 +76,11 @@ class Pixiv(object):
             imgs = self.getImages(illust)
         if not os.path.exists(TEMP_DIR):
             os.makedirs(TEMP_DIR)
-        for img in imgs:
-            if (not os.path.exists(img.path)) or os.stat(
-                    img.path).st_size == 0:
-                Pixiv.api.download(img.url, path=TEMP_DIR, name=img.name)
+        await downloadImages(imgs,
+                             headers={'Referer': 'https://app-api.pixiv.net/'})
         return imgs
 
-    def download_ugoira(self, illust):
+    def download_ugoira(self, illust) -> List[PixivImage]:
         """Download ugoira zip file and store animation data."""
         metadata = json.dumps(
             Pixiv.api.ugoira_metadata(illust.id).ugoira_metadata)
@@ -96,7 +97,7 @@ class Pixiv(object):
         Pixiv.api.download(zip_url, path=TEMP_DIR, name=filename)
         return imgs
 
-    def bookmark(self, artwork_id):
+    def bookmark(self, artwork_id: int):
         response = self.call(Pixiv.api.illust_bookmark_add, artwork_id)
         if 'error' in response.keys():
             logger.error(response)
@@ -125,7 +126,7 @@ class Pixiv(object):
             Pixiv.document.delete()
             self._login()
 
-    def call(self, func, *args):
+    def call(self, func: Callable, *args):
         """Call API with login state check."""
         if not Pixiv.api.access_token or not Pixiv.api.refresh_token:
             self.login()
@@ -136,7 +137,7 @@ class Pixiv(object):
             response = func(*args)
         return response
 
-    def getImages(self, illust):
+    def getImages(self, illust) -> List[PixivImage]:
         """Get images from an artwork."""
         imgs = list()
         if illust.meta_pages:  # Contains more than one image
@@ -170,7 +171,7 @@ class Pixiv(object):
         details['bookmarked'] = illust.is_bookmarked
         return details
 
-    def getFilename(self, url, illust):
+    def getFilename(self, url: str, illust) -> str:
         basename = os.path.basename(url)
         filename, extension = os.path.splitext(basename)
         name = "%s - %s - %s(%d)%s" % (filename, illust.title,
@@ -178,7 +179,7 @@ class Pixiv(object):
                                        extension)
         return name
 
-    def getThumbnail(self, url):
+    def getThumbnail(self, url: str) -> str:
         pre, _ = os.path.splitext(url)
         pre = pre.replace('img-original', 'img-master')
         thumbnail = pre + '_master1200.jpg'

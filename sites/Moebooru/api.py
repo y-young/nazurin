@@ -1,5 +1,6 @@
 import json
 import os
+from typing import List, Optional
 from urllib.parse import unquote
 
 import requests
@@ -12,11 +13,11 @@ from utils import NazurinError, downloadImages, logger
 from config import TEMP_DIR
 
 class Moebooru(object):
-    def site(self, site_url='yande.re'):
+    def site(self, site_url: Optional[str] = 'yande.re'):
         self.url = site_url
         return self
 
-    def getPost(self, post_id):
+    def getPost(self, post_id: int):
         url = 'https://' + self.url + '/post/show/' + str(post_id)
         response = requests.get(url)
         try:
@@ -44,21 +45,23 @@ class Moebooru(object):
             logger.error(err)
         return post, tags
 
-    def view(self, post_id):
+    def view(self, post_id: int):
         post, tags = self.getPost(post_id)
         imgs = self.getImages(post)
         caption = self.buildCaption(post, tags)
         return imgs, caption
 
-    def download(self, post_id=None, post=None):
+    async def download(self,
+                       post_id: Optional[int] = None,
+                       post=None) -> List[Image]:
         if post:
             imgs = self.getImages(post)
         else:
             imgs, _ = self.view(post_id)
-        downloadImages(imgs)
+        await downloadImages(imgs)
         return imgs
 
-    def pool(self, pool_id, jpeg=False):
+    def pool(self, pool_id: int, jpeg=False):
         client = moebooru(self.site)
         info = client.pool_posts(id=pool_id)
         posts = info['posts']
@@ -73,7 +76,7 @@ class Moebooru(object):
         details = {'name': info['name'], 'description': info['description']}
         return imgs, details
 
-    def download_pool(self, pool_id, jpeg=False):
+    async def download_pool(self, pool_id, jpeg=False):
         imgs, details = self.pool(pool_id, jpeg)
         pool_name = details['name']
         if not os.path.exists(TEMP_DIR + pool_name):
@@ -84,9 +87,9 @@ class Moebooru(object):
             _, ext = self.parseUrl(img.url)
             filename += ext
             img.name = pool_name + '/' + img.name
-            downloadImages([img])  #TODO
+            await downloadImages([img])  #TODO
 
-    def getImages(self, post):
+    def getImages(self, post) -> List[Image]:
         file_url = post['file_url']
         name = unquote(os.path.basename(file_url))
         imgs = [Image(name, file_url, post['sample_url'], post['file_size'])]
@@ -119,6 +122,6 @@ class Moebooru(object):
             details['has_children'] = True
         return details
 
-    def parseUrl(self, url):
+    def parseUrl(self, url: str) -> str:
         name = os.path.basename(url)
         return os.path.splitext(name)

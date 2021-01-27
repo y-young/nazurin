@@ -8,5 +8,5 @@ PASSWORD = environ.get('PIXIV_PASS')
 COLLECTION = 'pixiv'
 DOCUMENT = 'pixiv'
 
-IMG_PROXY = environ.get('PIXIV_MIRROR', 'i.pixiv.cat')
+IMG_PROXY = environ.get('PIXIV_MIRROR', 'i.pximg.net')
 TRANSLATION = environ.get('PIXIV_TRANSLATION', None)

@@ -14,7 +14,7 @@ patterns = [
     r'cdn\.donmai\.us/\w+/(?:[a-f0-9]{2}/){2}(?P<md5>[a-f0-9]{32})'
 ]
 
-def handle(match, **kwargs):
+async def handle(match, **kwargs):
     api = Danbooru()
     db = Database().driver()
     collection = db.collection(COLLECTION)

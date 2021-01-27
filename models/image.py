@@ -17,15 +17,15 @@ class Image:
         self.name = sanitizeFilename(self.name)
 
     @property
-    def path(self):
+    def path(self) -> str:
         return os.path.join(TEMP_DIR, self.name)
 
     @property
-    def display_url(self):
+    def display_url(self) -> str:
         return self.chosen_url
 
     @property
-    def chosen_url(self):
+    def chosen_url(self) -> str:
         if self._chosen_url:
             return self._chosen_url
         self._chosen_url = self.url
@@ -35,7 +35,7 @@ class Image:
         return self._chosen_url
 
     @property
-    def size(self):
+    def size(self) -> int:
         if self._size:
             return self._size
         headers = requests.head(self.url,
@@ -47,5 +47,5 @@ class Image:
         return self._size
 
     @size.setter
-    def size(self, value):
+    def size(self, value: int):
         self._size = value

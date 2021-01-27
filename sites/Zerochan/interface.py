@@ -14,14 +14,14 @@ patterns = [
     r'zerochan\.net/\S+\.(\d+)\.\w+$'
 ]
 
-def handle(match, **kwargs):
+async def handle(match, **kwargs):
     post_id = match.group(1)
     api = Zerochan()
     db = Database().driver()
     collection = db.collection(COLLECTION)
 
     post = api.getPost(post_id)
-    imgs = api.download(post=post)
+    imgs = await api.download(post=post)
     post['collected_at'] = time()
     collection.insert(int(post_id), post)
     return imgs

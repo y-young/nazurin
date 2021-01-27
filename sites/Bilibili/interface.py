@@ -13,12 +13,12 @@ patterns = [
     r't\.bilibili\.com/h5/dynamic/detail/(\d+)'
 ]
 
-def handle(match, **kwargs):
+async def handle(match, **kwargs):
     dynamic_id = match.group(1)
     db = Database().driver()
     collection = db.collection(COLLECTION)
 
-    imgs, data = Bilibili().fetch(dynamic_id)
+    imgs, data = await Bilibili().fetch(dynamic_id)
     data['collected_at'] = time()
     collection.insert(int(dynamic_id), data)
     return imgs

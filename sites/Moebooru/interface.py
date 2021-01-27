@@ -25,7 +25,7 @@ patterns = [
     r'(lolibooru\.moe)/(?:image|jpeg|sample)/[a-f0-9]{32}/lolibooru%20(\d+)'
 ]
 
-def handle(match, **kwargs):
+async def handle(match, **kwargs):
     site_url = match.group(1)
     post_id = match.group(2)
     db = Database().driver()
@@ -33,7 +33,7 @@ def handle(match, **kwargs):
     api = Moebooru().site(site_url)
 
     post, _ = api.getPost(post_id)
-    imgs = api.download(post=post)
+    imgs = await api.download(post=post)
     post['collected_at'] = time()
     collection.insert(int(post_id), post)
     return imgs

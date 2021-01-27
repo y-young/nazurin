@@ -13,11 +13,11 @@ patterns = [
     r'(?:mobile\.|www\.)?twitter\.com/[^.]+/status/(\d+)'
 ]
 
-def handle(match, **kwargs):
+async def handle(match, **kwargs):
     status_id = match.group(1)
     db = Database().driver()
     collection = db.collection(COLLECTION)
-    imgs, tweet = Twitter().fetch(status_id)
+    imgs, tweet = await Twitter().fetch(status_id)
     tweet['collected_at'] = time()
     collection.insert(int(status_id), tweet)
     return imgs

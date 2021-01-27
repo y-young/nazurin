@@ -1,12 +1,13 @@
 import json
 import os
+from typing import List
 
 import requests
 from models import Image
 from utils import downloadImages
 
 class Bilibili(object):
-    def getDynamic(self, dynamic_id):
+    def getDynamic(self, dynamic_id: int):
         """Get dynamic data from API."""
         api = 'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail?dynamic_id=' + str(
             dynamic_id)
@@ -14,14 +15,14 @@ class Bilibili(object):
         card = json.loads(source['data']['card']['card'])
         return card
 
-    def fetch(self, dynamic_id):
+    async def fetch(self, dynamic_id: int):
         """Fetch images and detail."""
         card = self.getDynamic(dynamic_id)
         imgs = self.getImages(card, dynamic_id)
-        downloadImages(imgs)
+        await downloadImages(imgs)
         return imgs, card
 
-    def getImages(self, card, dynamic_id):
+    def getImages(self, card, dynamic_id: int) -> List[Image]:
         """Get all images in a dynamic card."""
         pics = card['item']['pictures']
         imgs = list()

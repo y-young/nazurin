@@ -1,5 +1,6 @@
 import re
 from os import path
+from typing import List, Optional, Tuple
 
 from models import Image
 from pybooru import Danbooru as danbooru
@@ -12,7 +13,9 @@ class Danbooru(object):
         self.site = site
         self.api = danbooru(site)
 
-    def getPost(self, post_id=None, md5=None):
+    def getPost(self,
+                post_id: Optional[int] = None,
+                md5: Optional[str] = None):
         """Fetch an post."""
         try:
             if post_id:
@@ -28,17 +31,17 @@ class Danbooru(object):
                 post['source'])
         return post
 
-    def view(self, post_id):
+    def view(self, post_id: int):
         post = self.getPost(post_id)
         imgs, caption = self.parsePost(post)
         return imgs, caption
 
-    def download(self, post_id=None, post=None):
+    async def download(self, post_id: Optional[int] = None, post=None):
         if post:
             imgs, _ = self.parsePost(post)
         else:
             imgs, _ = self.view(post_id)
-        downloadImages(imgs)
+        await downloadImages(imgs)
         return imgs
 
     def parsePost(self, post):
@@ -74,7 +77,7 @@ class Danbooru(object):
             details['has_children'] = True
         return imgs, details
 
-    def _getNames(self, post):
+    def _getNames(self, post) -> Tuple[str, str]:
         """Build title and filename."""
         characters = self._formatCharacters(post['tag_string_character'])
         copyrights = self._formatCopyrights(post['tag_string_copyright'])
@@ -94,7 +97,7 @@ class Danbooru(object):
         filename = 'danbooru ' + str(post['id']) + ' ' + filename + extension
         return title, filename
 
-    def _formatCharacters(self, characters):
+    def _formatCharacters(self, characters: str) -> str:
         if not characters:
             return ''
         characters = characters.split(' ')
@@ -108,7 +111,7 @@ class Danbooru(object):
                                                                 1) + ' more'
         return result
 
-    def _formatCopyrights(self, copyrights):
+    def _formatCopyrights(self, copyrights: str) -> str:
         if not copyrights:
             return ''
         copyrights = copyrights.split(' ')
@@ -120,12 +123,12 @@ class Danbooru(object):
             result = copyrights[0] + ' and ' + str(size - 1) + ' more'
         return result
 
-    def _formatArtists(self, artists):
+    def _formatArtists(self, artists: str) -> str:
         if not artists:
             return ''
         return self._normalize(self._sentence(artists.split(' ')))
 
-    def _sentence(self, names):
+    def _sentence(self, names: List[str]) -> str:
         if len(names) == 1:
             return names[0]
         else:
@@ -133,8 +136,8 @@ class Danbooru(object):
             sentence += ' and ' + names[-1]
             return sentence
 
-    def _normalize(self, name):
-        name = re.sub('_\(.*\)', '', name)  # replace _(...)
+    def _normalize(self, name: str) -> str:
+        name = re.sub(r'_\(.*\)', '', name)  # replace _(...)
         name = name.replace('_', ' ')
-        name = re.sub('[\\\/]', ' ', name)  # replace / and \
+        name = re.sub(r'[\\\/]', ' ', name)  # replace / and \
         return name

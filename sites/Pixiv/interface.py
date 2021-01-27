@@ -27,7 +27,7 @@ patterns = [
     r'(?:i|img)\d+\.pixiv\.net/(?:img\d+/)?img/(?:\S+)*/(\d+)'
 ]
 
-def handle(match, **kwargs):
+async def handle(match, **kwargs):
     artwork_id = match.group(1)
     api = Pixiv()
     db = Database().driver()
@@ -38,7 +38,7 @@ def handle(match, **kwargs):
     if illust.type == 'ugoira':
         imgs = api.download_ugoira(illust)
     else:
-        imgs = api.download_illust(illust=illust)
+        imgs = await api.download_illust(illust=illust)
     illust.collected_at = time()
     collection.insert(int(artwork_id), illust)
     return imgs

@@ -1,9 +1,11 @@
+from typing import List
+
 import requests
 from models import Image
 from utils import NazurinError, downloadImages
 
 class Gelbooru(object):
-    def getPost(self, post_id):
+    def getPost(self, post_id: int):
         """Fetch an post."""
         api = 'https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&id=' + str(
             post_id)
@@ -13,13 +15,13 @@ class Gelbooru(object):
         post = response.json()[0]
         return post
 
-    def fetch(self, post_id):
+    async def fetch(self, post_id: int):
         post = self.getPost(post_id)
         imgs = self.getImages(post)
-        downloadImages(imgs)
+        await downloadImages(imgs)
         return imgs, post
 
-    def getImages(self, post):
+    def getImages(self, post) -> List[Image]:
         """Get images from post."""
         url = post['file_url']
         ext = post['image'].split('.')[1]

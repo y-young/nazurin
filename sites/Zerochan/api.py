@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, timezone
+from typing import List, Optional
 from urllib.parse import unquote
 
 import requests
@@ -9,7 +10,7 @@ from requests.exceptions import HTTPError
 from utils import NazurinError, downloadImages
 
 class Zerochan(object):
-    def getPost(self, post_id):
+    def getPost(self, post_id: int):
         response = requests.get('https://www.zerochan.net/' + str(post_id))
         try:
             response.raise_for_status()
@@ -50,21 +51,23 @@ class Zerochan(object):
         }
         return post
 
-    def view(self, post_id):
+    def view(self, post_id: int):
         post = self.getPost(post_id)
         imgs = self.getImages(post)
         caption = self.buildCaption(post)
         return imgs, caption
 
-    def download(self, post_id=None, post=None):
+    async def download(self,
+                       post_id: Optional[int] = None,
+                       post=None) -> List[Image]:
         if post:
             imgs = self.getImages(post)
         else:
             imgs, _ = self.view(post_id)
-        downloadImages(imgs)
+        await downloadImages(imgs)
         return imgs
 
-    def getImages(self, post):
+    def getImages(self, post) -> List[Image]:
         url = post['file_url']
         name = 'Zerochan ' + str(
             post['id']) + ' ' + post['name'] + '.' + post['file_ext']

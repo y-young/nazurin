@@ -30,7 +30,7 @@ async def pixiv_download(event):
         if artwork_id < 0:
             await event.reply('Invalid artwork id!')
             return
-        imgs = pixiv.download_illust(artwork_id)
+        imgs = await pixiv.download_illust(artwork_id)
         await sendDocuments(event, imgs)
     except (IndexError, ValueError):
         await event.reply('Usage: /pixiv_download <artwork_id>')

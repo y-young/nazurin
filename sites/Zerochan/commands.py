@@ -28,7 +28,7 @@ async def zerochan_download(event):
         if post_id <= 0:
             await event.reply('Invalid post id!')
             return
-        imgs = api.download(post_id)
+        imgs = await api.download(post_id)
         await sendDocuments(event, imgs)
     except (IndexError, ValueError):
         await event.reply('Usage: /zerochan_download <post_id>')

@@ -3,7 +3,9 @@ from glob import glob
 from importlib import import_module
 from os import path
 from re import search
+from typing import List
 
+from models import Image
 from utils import logger
 
 class SiteManager(object):
@@ -40,7 +42,7 @@ class SiteManager(object):
         for command in self.commands:
             bot.add_event_handler(command)
 
-    def match(self, urls):
+    def match(self, urls: List[str]):
         sources = self.sources
         urls = str.join(',', urls)
         result = None
@@ -65,6 +67,6 @@ class SiteManager(object):
             return False
         return result
 
-    def handle_update(self, result):
+    async def handle_update(self, result) -> List[Image]:
         handle = result['handler']
-        return handle(result['match'])
+        return await handle(result['match'])

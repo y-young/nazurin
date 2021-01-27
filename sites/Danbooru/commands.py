@@ -28,7 +28,7 @@ async def danbooru_download(event):
         if post_id <= 0:
             await event.reply('Invalid post id!')
             return
-        imgs = danbooru.download(post_id)
+        imgs = await danbooru.download(post_id)
         await sendDocuments(event, imgs)
     except (IndexError, ValueError):
         await event.reply('Usage: /danbooru_download <post_id>')

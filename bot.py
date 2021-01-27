@@ -11,8 +11,11 @@ from storage import Storage
 from utils import (NazurinError, chat_action, getUrlsFromEvent, logger,
                    sendDocuments)
 
-bot = TelegramClient('bot', config.API_ID,
-                     config.API_HASH).start(bot_token=config.TOKEN)
+bot = TelegramClient(
+    'bot',
+    config.API_ID,
+    config.API_HASH,
+).start(bot_token=config.TOKEN)
 sites = SiteManager()
 storage = Storage()
 
@@ -70,7 +73,7 @@ async def update_collection(event):
     await event.message.forward_to(config.GALLERY_ID)
 
     try:
-        imgs = sites.handle_update(result)
+        imgs = await sites.handle_update(result)
         await sendDocuments(event, imgs, chat_id=config.ALBUM_ID)
         storage.store(imgs)
         await event.reply('Done!')
