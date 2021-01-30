@@ -67,7 +67,7 @@ class Mega(object):
     def upload(self, file):
         while True:
             try:
-                Mega.api.upload(file.path, file.destination)
+                Mega.api.upload(file.path, Mega.destination)
                 break
             except RequestError as error:
                 # mega.errors.RequestError: ESID, Invalid or expired user session, please relogin
