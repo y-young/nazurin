@@ -49,11 +49,11 @@ class Nazurin(Dispatcher):
         self.register_message_handler(self.async_task(callback), *args,
                                       **kwargs)
 
-    async def on_startup(self):
+    async def on_startup(self, dp):
         await self.bot.set_webhook(config.WEBHOOK_URL + '/' + config.TOKEN,
                                    allowed_updates=AllowedUpdates.MESSAGE)
 
-    async def on_shutdown(self):
+    async def on_shutdown(self, dp):
         await self.bot.delete_webhook()
 
     def start(self):
