@@ -24,7 +24,7 @@ class OneDrive(object):
 
     folder_id = None
 
-    def __init__(self): 
+    def __init__(self):
         self.auth()
         # To find the folder and its id
         folders = dict(self.api.drive_root_children_items())
@@ -63,7 +63,7 @@ class OneDrive(object):
             self.collection.insert(OD_DOCUMENT, refresh_token)
             self.initialize = True
         logger.info('OneDrive refresh token cached')
-        
+                
     def store(self, files):
         self.auth()
         for item in files:
@@ -72,8 +72,3 @@ class OneDrive(object):
             file = open(item.path, mode='rb')
             self.api._put(url, files={'file':file})
             file.close()
-
-
-
-        
-
