@@ -1,15 +1,15 @@
 from os import environ
-from config import NAZURIN_DATA
+from config import NAZURIN_DATA,STORAGE_DIR
 from database import Database
 from utils import logger
 from microsoftgraph.client import Client
 import msal
 
-OD_FOLDER = environ.get('OD_FOLDER','Pictures')
+OD_FOLDER = STORAGE_DIR
 OD_CLIENT = environ.get('OD_CLIENT')
 OD_SECRET = environ.get('OD_SECRET')
-OD_RD_URL = environ.get('OD_RD_URL',r'http://localhost/get_token')
-OD_RF_TOKEN = environ.get('OD_RF_TOKEN',None)
+OD_RD_URL = environ.get('OD_RD_URL',r'http://localhost/getAToken') # Application redirect_url
+OD_RF_TOKEN = environ.get('OD_RF_TOKEN',None) # Refresh token for the first auth
 
 OD_DOCUMENT = 'onedrive'
 
@@ -20,7 +20,7 @@ class OneDrive(object):
     collection = db.collection(NAZURIN_DATA)
     document = collection.document(OD_DOCUMENT)
     initialize = False
-    refresh_token =None
+    refresh_token = None
 
     folder_id = None
 
