@@ -63,7 +63,7 @@ class OneDrive(object):
             self.collection.insert(OD_DOCUMENT, refresh_token)
             self.initialize = True
         logger.info('OneDrive refresh token cached')
-        
+
     def store(self, files):
         self.auth()
         for item in files:
