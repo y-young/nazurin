@@ -1,6 +1,4 @@
-telethon
-cryptg
-pillow
+aiogram
 aiohttp
 aiofiles
 tenacity
