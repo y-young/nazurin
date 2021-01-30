@@ -1,16 +1,16 @@
 import asyncio
 import json
-from os import environ
 
 from oauth2client.service_account import ServiceAccountCredentials
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive as GDrive
 
+from nazurin.config import env
 from nazurin.utils import NazurinError, async_wrap
 
-GD_FOLDER = environ.get('GD_FOLDER')
-GD_CREDENTIALS = environ.get('GD_CREDENTIALS',
-                             environ.get('GOOGLE_APPLICATION_CREDENTIALS'))
+GD_FOLDER = env.str('GD_FOLDER')
+GD_CREDENTIALS = env.str('GD_CREDENTIALS',
+                         default=env.str('GOOGLE_APPLICATION_CREDENTIALS'))
 
 class GoogleDrive(object):
     """Google Drive driver."""

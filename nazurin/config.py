@@ -1,41 +1,33 @@
-from ast import literal_eval
-from os import environ
+from environs import Env
 
-ENV = environ.get('ENV', 'production')
-TOKEN = environ.get('TOKEN')
+env = Env()
+# read config from .env file if exists
+env.read_env()
+
+ENV = env.str('ENV', default='production')
+TOKEN = env.str('TOKEN')
 
 # Webhook url, eg: https://xxx.herokuapp.com/, should end with '/'
-WEBHOOK_URL = environ.get('WEBHOOK_URL')
+WEBHOOK_URL = env.str('WEBHOOK_URL', default='')
 # Port is given by Heroku
-PORT = int(environ.get('PORT', '8443'))
+PORT = env.int('PORT', default=8443)
 
 TEMP_DIR = './temp/'
-STORAGE = literal_eval(environ.get('STORAGE', "['Local']"))
-STORAGE_DIR = environ.get('STORAGE_DIR', 'Pictures')
+STORAGE = env.list('STORAGE', subcast=str, default=['Local'])
+STORAGE_DIR = env.str('STORAGE_DIR', default='Pictures')
 
-DATABASE = environ.get('DATABASE', 'Local')
-# nazurin data collection in database
+DATABASE = env.str('DATABASE', default='Local')
+# Nazurin data collection in database
 NAZURIN_DATA = 'nazurin'
 
-ALBUM_ID = int(environ.get('ALBUM_ID'))
-GALLERY_ID = int(environ.get('GALLERY_ID'))
-ADMIN_ID = environ.get('ADMIN_ID')
-if ADMIN_ID:
-    ADMIN_ID = [int(ID) for ID in ADMIN_ID.split(',')]
-else:
-    ADMIN_ID = []
+ALBUM_ID = env.int('ALBUM_ID')
+GALLERY_ID = env.int('GALLERY_ID')
 
-ADMIN_USERNAME = environ.get('ADMIN_USERNAME')
-if ADMIN_USERNAME:
-    ADMIN_USERNAME = ADMIN_USERNAME.split(',')
-else:
-    ADMIN_USERNAME = []
-
-GROUP_ID = environ.get('GROUP_ID')
-if GROUP_ID:
-    GROUP_ID = [int(ID) for ID in GROUP_ID.split(',')]
-else:
-    GROUP_ID = []
+IS_PUBLIC = env.bool('IS_PUBLIC', default=False)
+# If IS_PUBLIC is True, the following items will be ignored
+ALLOW_ID = env.list('ALLOW_ID', subcast=int, default=[])
+ALLOW_USERNAME = env.list('ALLOW_USERNAME', default=[])
+ALLOW_GROUP = env.list('ALLOW_GROUP', subcast=int, default=[])
 
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"
 RETRIES = 5

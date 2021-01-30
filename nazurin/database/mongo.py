@@ -1,15 +1,14 @@
-from os import environ
-
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
 
+from nazurin.config import env
 from nazurin.utils import NazurinError
 
 class Mongo(object):
     """MongoDB driver for MongoDB Atlas or local server."""
     def __init__(self):
         """Load credentials and initialize client."""
-        URI = environ.get('MONGO_URI', 'mongodb://localhost:27017/nazurin')
+        URI = env.str('MONGO_URI', default='mongodb://localhost:27017/nazurin')
         self.client = MongoClient(URI)
         self.db = self.client.get_default_database()
 

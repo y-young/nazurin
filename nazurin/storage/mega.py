@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 import asyncio
-import os
 
 from mega import Mega as mega
 from mega.errors import RequestError
 
-from nazurin.config import NAZURIN_DATA, STORAGE_DIR
+from nazurin.config import NAZURIN_DATA, STORAGE_DIR, env
 from nazurin.database import Database
 from nazurin.utils import async_wrap, logger
 
-MEGA_USER = os.environ.get('MEGA_USER')
-MEGA_PASS = os.environ.get('MEGA_PASS')
+MEGA_USER = env.str('MEGA_USER')
+MEGA_PASS = env.str('MEGA_PASS')
 MEGA_DOCUMENT = 'mega'
 
 class Mega(object):

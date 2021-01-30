@@ -2,6 +2,7 @@ aiogram
 aiohttp
 aiofiles
 tenacity
+environs
 
 pixivpy>=3.5.10
 beautifulsoup4

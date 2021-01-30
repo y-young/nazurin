@@ -1,12 +1,12 @@
-from os import environ
+from nazurin.config import env
 
 PRIORITY = 10
 
-USER = environ.get('PIXIV_USER')
-PASSWORD = environ.get('PIXIV_PASS')
+USER = env.str('PIXIV_USER')
+PASSWORD = env.str('PIXIV_PASS')
 
 COLLECTION = 'pixiv'
 DOCUMENT = 'pixiv'
 
-IMG_PROXY = environ.get('PIXIV_MIRROR', 'i.pximg.net')
-TRANSLATION = environ.get('PIXIV_TRANSLATION', None)
+IMG_PROXY = env.str('PIXIV_MIRROR', default='i.pximg.net')
+TRANSLATION = env.str('PIXIV_TRANSLATION', default=None)

@@ -21,9 +21,11 @@ def handler(*args, **kwargs):
 
 class AuthMiddleware(BaseMiddleware):
     async def on_process_message(self, message: Message, data: dict):
-        if message.chat.id in config.ADMIN_ID + config.GROUP_ID\
-            or message.from_user.id in config.ADMIN_ID\
-            or message.from_user.username in config.ADMIN_USERNAME:
+        if config.IS_PUBLIC:
+            return
+        if message.chat.id in config.ALLOW_ID + config.ALLOW_GROUP\
+            or message.from_user.id in config.ALLOW_ID\
+            or message.from_user.username in config.ALLOW_USERNAME:
             return
         raise CancelHandler()
 

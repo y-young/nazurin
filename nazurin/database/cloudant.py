@@ -1,13 +1,11 @@
-from os import environ
-
 from cloudant.client import Cloudant as cloudant
 from requests.adapters import HTTPAdapter
 
-from nazurin.config import RETRIES
+from nazurin.config import RETRIES, env
 
-USERNAME = environ.get('CLOUDANT_USER')
-APIKEY = environ.get('CLOUDANT_APIKEY')
-DATABASE = environ.get('CLOUDANT_DB', 'nazurin')
+USERNAME = env.str('CLOUDANT_USER')
+APIKEY = env.str('CLOUDANT_APIKEY')
+DATABASE = env.str('CLOUDANT_DB', default='nazurin')
 
 class Cloudant(object):
     """Cloudant driver of IBM Cloud."""

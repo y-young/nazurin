@@ -1,14 +1,15 @@
 import json
-import os
 
 import firebase_admin
 from firebase_admin import credentials, firestore
+
+from nazurin.config import env
 
 class Firebase(object):
     """Firestore driver of Firebase."""
     def __init__(self):
         """Load credentials and initialize Firebase app."""
-        cert = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
+        cert = env.str('GOOGLE_APPLICATION_CREDENTIALS')
         if cert.startswith('{'):
             cert = json.loads(cert)
         cred = credentials.Certificate(cert)
