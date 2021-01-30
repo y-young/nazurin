@@ -50,7 +50,7 @@ class Nazurin(Dispatcher):
                                       **kwargs)
 
     async def on_startup(self, dp):
-        await self.bot.set_webhook(config.WEBHOOK_URL + '/' + config.TOKEN,
+        await self.bot.set_webhook(config.WEBHOOK_URL + config.TOKEN,
                                    allowed_updates=AllowedUpdates.MESSAGE)
 
     async def on_shutdown(self, dp):
