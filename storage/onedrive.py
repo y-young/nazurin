@@ -20,7 +20,6 @@ class OneDrive(object):
     collection = db.collection(NAZURIN_DATA)
     document = collection.document(OD_DOCUMENT)
     initialize = False
-    refresh_token = None
 
     folder_id = None
 
@@ -94,7 +93,7 @@ class OneDrive(object):
             _header['Content-Type'] = 'application/json'
         return self._parse(requests.request(method, url, headers=_header, **kwargs))
 
-    def _parse(response):
+    def _parse(self, response):
         if 'application/json' in response.headers['Content-Type']:
             r = response.json()
         else:

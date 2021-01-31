@@ -64,3 +64,6 @@ target/
 nazurin.json
 firebase.json
 temp/
+
+# Filesystem file
+.DS_Store
