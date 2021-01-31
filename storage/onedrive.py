@@ -53,6 +53,7 @@ class OneDrive(object):
         # Get a refresh_token
         token_dict = self.document.get()
         if token_dict:
+            self.initialize = True
             refresh_token = token_dict['refresh_token']
         else:
             if OD_RF_TOKEN:
@@ -76,9 +77,9 @@ class OneDrive(object):
             # Update refresh token
             refresh_token = response['refresh_token']
             if self.initialize:
-                self.document.update(refresh_token)
+                self.document.update({'refresh_token': refresh_token})
             else:
-                self.collection.insert(OD_DOCUMENT, refresh_token)
+                self.collection.insert(OD_DOCUMENT, {'refresh_token': refresh_token})
                 self.initialize = True
             logger.info('OneDrive refresh token cached')
 
