@@ -45,10 +45,8 @@ class OneDrive(object):
         for item in files:
             # decorate upload api url
             url = 'https://graph.microsoft.com/v1.0/me/drive/items/{parent_id}:/{filename}:/content'.format(parent_id=self.folder_id, filename=item.name)
-            print(item.path)
-            print(item.name)
             file = open(item.path, mode='rb')
-            self._request('PUT', url, files={'file':file})
+            self._request('PUT', url, data=file)
             file.close()
 
     def auth(self):
