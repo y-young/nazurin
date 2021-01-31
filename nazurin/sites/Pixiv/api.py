@@ -8,11 +8,11 @@ from pixivpy3 import AppPixivAPI, PixivError
 
 from nazurin.config import NAZURIN_DATA, TEMP_DIR
 from nazurin.database import Database
-from nazurin.utils import NazurinError, downloadImages, logger
+from nazurin.utils import downloadImages, logger
+from nazurin.utils.exceptions import NazurinError
 
 from .config import DOCUMENT, PASSWORD, TRANSLATION, USER
 from .models import PixivImage
-
 
 class Pixiv(object):
     api = AppPixivAPI()
@@ -104,7 +104,7 @@ class Pixiv(object):
             logger.error(response)
             raise NazurinError(response['error']['user_message'])
         else:
-            logger.info('Bookmarked artwork ' + str(artwork_id))
+            logger.info('Bookmarked artwork %s', artwork_id)
             return True
 
     def _login(self):

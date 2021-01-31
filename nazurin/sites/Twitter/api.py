@@ -4,7 +4,8 @@ from typing import List, Tuple
 import requests
 
 from nazurin.models import Image
-from nazurin.utils import NazurinError, downloadImages
+from nazurin.utils import downloadImages
+from nazurin.utils.exceptions import NazurinError
 
 class Twitter(object):
     def getTweet(self, status_id: int):

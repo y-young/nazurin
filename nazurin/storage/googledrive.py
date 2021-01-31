@@ -6,7 +6,8 @@ from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive as GDrive
 
 from nazurin.config import env
-from nazurin.utils import NazurinError, async_wrap
+from nazurin.utils.decorators import async_wrap
+from nazurin.utils.exceptions import NazurinError
 
 GD_FOLDER = env.str('GD_FOLDER')
 GD_CREDENTIALS = env.str('GD_CREDENTIALS',

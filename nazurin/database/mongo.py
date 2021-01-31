@@ -2,7 +2,7 @@ from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
 
 from nazurin.config import env
-from nazurin.utils import NazurinError
+from nazurin.utils.exceptions import NazurinError
 
 class Mongo(object):
     """MongoDB driver for MongoDB Atlas or local server."""

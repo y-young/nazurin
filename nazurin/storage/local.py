@@ -3,7 +3,7 @@ import os
 import shutil
 
 from nazurin.config import STORAGE_DIR
-from nazurin.utils import async_wrap
+from nazurin.utils.decorators import async_wrap
 
 class Local(object):
     def __init__(self):

@@ -2,7 +2,7 @@ from aiogram.dispatcher import filters
 from aiogram.types import Message
 
 from nazurin import bot
-from nazurin.utils import NazurinError, sendDocuments, sendPhotos
+from nazurin.utils.exceptions import NazurinError
 
 from .api import Pixiv
 
@@ -17,13 +17,11 @@ async def pixiv_view(message: Message, regexp_command):
             await message.reply('Invalid artwork id!')
             return
         imgs, details = pixiv.view_illust(artwork_id)
-        await sendPhotos(message, imgs, details)
+        await bot.sendPhotos(message, imgs, details)
     except (IndexError, ValueError):
         await message.reply('Usage: /pixiv <artwork_id>')
     except NazurinError as error:
         await message.reply(error.msg)
-    # except BadRequest as error:
-    #     handleBadRequest(message, error)
 
 @bot.handler(
     filters.RegexpCommandsFilter(regexp_commands=[r'/pixiv_download (\S+)']))
@@ -35,7 +33,7 @@ async def pixiv_download(message: Message, regexp_command):
             await message.reply('Invalid artwork id!')
             return
         imgs = await pixiv.download_illust(artwork_id)
-        await sendDocuments(message, imgs)
+        await bot.sendDocuments(message, imgs)
     except (IndexError, ValueError):
         await message.reply('Usage: /pixiv_download <artwork_id>')
     except NazurinError as error:

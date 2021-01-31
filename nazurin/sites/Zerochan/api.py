@@ -8,8 +8,8 @@ from bs4 import BeautifulSoup
 from requests.exceptions import HTTPError
 
 from nazurin.models import Image
-from nazurin.utils import NazurinError, downloadImages
-
+from nazurin.utils import downloadImages
+from nazurin.utils.exceptions import NazurinError
 
 class Zerochan(object):
     def getPost(self, post_id: int):

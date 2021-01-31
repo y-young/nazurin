@@ -4,7 +4,8 @@ from dataclasses import dataclass
 import requests
 
 from nazurin.config import TEMP_DIR
-from nazurin.utils import logger, sanitizeFilename
+from nazurin.utils import logger
+from nazurin.utils.helpers import sanitizeFilename
 
 @dataclass
 class Image:
@@ -32,13 +33,14 @@ class Image:
         self._chosen_url = self.url
         if self.size > 5 * 1024 * 1024 and self.thumbnail:
             self._chosen_url = self.thumbnail
-            logger.info('Use thumbnail: ' + self._chosen_url)
+            logger.info('Use thumbnail: %s', self._chosen_url)
         return self._chosen_url
 
     @property
     def size(self) -> int:
         if self._size:
             return self._size
+        # TODO: use aiohttp
         headers = requests.head(self.url,
                                 headers={
                                     'Referer': 'https://www.pixiv.net/'

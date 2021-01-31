@@ -10,8 +10,8 @@ from requests.exceptions import HTTPError
 
 from nazurin.config import TEMP_DIR
 from nazurin.models import Image
-from nazurin.utils import NazurinError, downloadImages, logger
-
+from nazurin.utils import downloadImages, logger
+from nazurin.utils.exceptions import NazurinError
 
 class Moebooru(object):
     def site(self, site_url: Optional[str] = 'yande.re'):

@@ -6,7 +6,8 @@ from pybooru import Danbooru as danbooru
 from pybooru import PybooruHTTPError
 
 from nazurin.models import Image
-from nazurin.utils import NazurinError, downloadImages
+from nazurin.utils import downloadImages
+from nazurin.utils.exceptions import NazurinError
 
 class Danbooru(object):
     def __init__(self, site='danbooru'):

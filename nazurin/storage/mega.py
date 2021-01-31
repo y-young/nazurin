@@ -6,7 +6,8 @@ from mega.errors import RequestError
 
 from nazurin.config import NAZURIN_DATA, STORAGE_DIR, env
 from nazurin.database import Database
-from nazurin.utils import async_wrap, logger
+from nazurin.utils import logger
+from nazurin.utils.decorators import async_wrap
 
 MEGA_USER = env.str('MEGA_USER')
 MEGA_PASS = env.str('MEGA_PASS')

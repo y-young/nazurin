@@ -1,4 +1,10 @@
+import logging
+
 from environs import Env
+
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO)
 
 env = Env()
 # read config from .env file if exists

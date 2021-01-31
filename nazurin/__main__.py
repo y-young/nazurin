@@ -3,20 +3,22 @@ import asyncio
 import shutil
 from typing import List
 
-from aiogram.types import ChatActions, ContentType, Message
+from aiogram.types import ChatActions, ContentType, Message, Update
 
 from nazurin import config
-from nazurin.bot import Nazurin, URLFilter
+from nazurin.bot import Nazurin, URLFilter, sendDocuments
 from nazurin.sites import SiteManager
 from nazurin.storage import Storage
-from nazurin.utils import NazurinError, chat_action, logger, sendDocuments
+from nazurin.utils import logger
+from nazurin.utils.decorators import chat_action
+from nazurin.utils.exceptions import NazurinError
 
 bot = Nazurin()
 sites = SiteManager()
 storage = Storage()
 
-@chat_action(ChatActions.TYPING)
 @bot.message_handler(commands=['start', 'help'])
+@chat_action(ChatActions.TYPING)
 async def show_help(message: Message):
     await message.reply('''
     小さな小さな賢将, can help you collect images from various sites.
@@ -36,8 +38,8 @@ async def show_help(message: Message):
     PS: Send Pixiv/Danbooru/Yandere/Konachan/Twitter URL to download image(s)
     ''')
 
-@chat_action(ChatActions.TYPING)
 @bot.message_handler(commands=['ping'])
+@chat_action(ChatActions.TYPING)
 async def ping(message: Message):
     await message.reply('pong!')
 
@@ -65,12 +67,17 @@ async def update_collection(message: Message, urls: List[str]):
 @bot.message_handler(commands=['clear_cache'])
 async def clear_cache(message: Message):
     try:
-        shutil.rmtree('./downloads')
-        await message.reply("downloads directory cleared successfully.")
+        shutil.rmtree(config.TEMP_DIR)
+        await message.reply("Cache cleared successfully.")
     except PermissionError:
         await message.reply("Permission denied.")
     except OSError as error:
         await message.reply(error.strerror)
+
+@bot.errors_handler()
+async def on_error(update: Update, error: Exception):
+    logger.error('Update %s caused %s: %s', update, type(error), error)
+    return True
 
 def main():
     sites.load()
