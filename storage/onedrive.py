@@ -86,7 +86,8 @@ class OneDrive(object):
     def _request(self, method, url, headers=None, **kwargs):
         _header = {
             'Accept': 'application/json',
-            'Authorization': 'Bearer ' + self.token
+            'Authorization': 'Bearer ' + self.token,
+            'Content-Type': 'image/jpeg'
         }
         if headers:
             _header.update(headers)
