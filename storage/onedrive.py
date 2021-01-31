@@ -4,6 +4,7 @@ from database import Database
 from utils import logger
 from microsoftgraph.client import Client
 import msal
+import requests
 
 OD_FOLDER = STORAGE_DIR
 OD_CLIENT = environ.get('OD_CLIENT')
@@ -12,6 +13,8 @@ OD_RD_URL = environ.get('OD_RD_URL', r'http://localhost/getAToken') # Applicatio
 OD_RF_TOKEN = environ.get('OD_RF_TOKEN', None) # Refresh token for the first auth
 
 OD_DOCUMENT = 'onedrive'
+
+TOKEN_ENDPOINT = 'https://login.microsoftonline.com/common/oauth2/v2.0/token'
 
 class OneDrive(object):
     """Onedrive driver."""
@@ -72,3 +75,19 @@ class OneDrive(object):
             file = open(item.path, mode='rb')
             self.api._put(url, files={'file':file})
             file.close()
+
+    def get_token(self, redirect_url, refresh_token):
+        data = {
+            'client_id': OD_CLIENT,
+            'client_secret': OD_SECRET,
+            'redirect_url': OD_RD_URL,
+            'refresh_token': OD_RF_TOKEN,
+            'grant_type': 'refresh_token'
+        }
+        response = requests.post(TOKEN_ENDPOINT, data=data)
+        if 'application/json' in response.headers['Content-Type']:
+            r = response.json()
+        else:
+            r = response.content
+        # error handler place
+        return r
