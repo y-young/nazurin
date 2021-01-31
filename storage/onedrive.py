@@ -7,12 +7,12 @@ import requests
 OD_FOLDER = STORAGE_DIR
 OD_CLIENT = environ.get('OD_CLIENT')
 OD_SECRET = environ.get('OD_SECRET')
-OD_RD_URL = environ.get('OD_RD_URL', r'http://localhost/getAToken') # Application redirect_url
+# OD_RD_URL = environ.get('OD_RD_URL', r'http://localhost/getAToken') # Application redirect_url
 OD_RF_TOKEN = environ.get('OD_RF_TOKEN', None) # Refresh token for the first auth
 
 OD_DOCUMENT = 'onedrive'
 
-TOKEN_ENDPOINT = 'https://login.microsoftonline.com/common/oauth2/v2.0/token'
+AUTH_URL = 'https://login.microsoftonline.com/common/oauth2/v2.0/token'
 
 class OneDrive(object):
     """Onedrive driver."""
@@ -64,11 +64,11 @@ class OneDrive(object):
         data = {
             'client_id': OD_CLIENT,
             'client_secret': OD_SECRET,
-            'redirect_url': OD_RD_URL,
+            # 'redirect_url': OD_RD_URL,
             'refresh_token': refresh_token,
             'grant_type': 'refresh_token'
         }
-        response = requests.post(TOKEN_ENDPOINT, data=data)
+        response = requests.post(AUTH_URL, data=data)
         response = self._parse(response)
         # error handler place
         if response.get('access_token'):
