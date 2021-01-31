@@ -7,7 +7,6 @@ import requests
 OD_FOLDER = STORAGE_DIR
 OD_CLIENT = environ.get('OD_CLIENT')
 OD_SECRET = environ.get('OD_SECRET')
-# OD_RD_URL = environ.get('OD_RD_URL', r'http://localhost/getAToken') # Application redirect_url
 OD_RF_TOKEN = environ.get('OD_RF_TOKEN', None) # Refresh token for the first auth
 
 OD_DOCUMENT = 'onedrive'
@@ -26,7 +25,8 @@ class OneDrive(object):
     def __init__(self):
         self.auth()
         # To find the folder and its id
-        url = 'https://graph.microsoft.com/v1.0/me/drive/root/children'
+        url = 'https://graph.microsoft.com/v1.0/me/drive/root/children' # Here only list the root's children
+        # https://docs.microsoft.com/zh-cn/graph/api/driveitem-list-children?view=graph-rest-1.0&tabs=http
         folders = dict(self._request('GET', url))
         folders = folders.get('value')
         for folder in folders:
@@ -45,15 +45,16 @@ class OneDrive(object):
         for item in files:
             # decorate upload api url
             url = 'https://graph.microsoft.com/v1.0/me/drive/items/{parent_id}:/{filename}:/content'.format(parent_id=self.folder_id, filename=item.name)
+            # https://docs.microsoft.com/zh-cn/graph/api/driveitem-put-content?view=graph-rest-1.0&tabs=http
             file = open(item.path, mode='rb')
             self._request('PUT', url, data=file)
             file.close()
 
     def auth(self):
-        # Get a refresh_token
+        # Get a refresh_token from database
         token_dict = self.document.get()
         if token_dict:
-            self.initialize = True
+            self.initialize = True # To decide whether to insert a document
             refresh_token = token_dict['refresh_token']
         else:
             if OD_RF_TOKEN:
@@ -70,8 +71,8 @@ class OneDrive(object):
         }
         response = requests.post(AUTH_URL, data=data)
         response = self._parse(response)
-        # error handler place
         if response.get('access_token'):
+            # Set access token
             self.token = response['access_token']
             logger.info('OneDrive logged in')
             # Update refresh token
@@ -84,6 +85,7 @@ class OneDrive(object):
             logger.info('OneDrive refresh token cached')
 
     def _request(self, method, url, headers=None, **kwargs):
+        # make a request with access token
         _header = {
             'Accept': 'application/json',
             'Authorization': 'Bearer ' + self.token,
@@ -96,6 +98,7 @@ class OneDrive(object):
         return self._parse(requests.request(method, url, headers=_header, **kwargs))
 
     def _parse(self, response):
+        # stylish response
         if 'application/json' in response.headers['Content-Type']:
             r = response.json()
         else:
