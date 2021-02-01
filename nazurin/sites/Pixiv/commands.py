@@ -16,8 +16,8 @@ async def pixiv_view(message: Message, regexp_command):
         if artwork_id < 0:
             await message.reply('Invalid artwork id!')
             return
-        imgs, details = pixiv.view_illust(artwork_id)
-        await bot.sendPhotos(message, imgs, details)
+        imgs, caption = pixiv.view_illust(artwork_id)
+        await bot.sendPhotos(message, imgs, caption)
     except (IndexError, ValueError):
         await message.reply('Usage: /pixiv <artwork_id>')
     except NazurinError as error:

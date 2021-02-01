@@ -16,8 +16,8 @@ async def zerochan_view(message: Message, regexp_command):
         if post_id < 0:
             await message.reply('Invalid post id!')
             return
-        imgs, details = api.view(post_id)
-        await bot.sendPhotos(message, imgs, details)
+        imgs, caption = api.view(post_id)
+        await bot.sendPhotos(message, imgs, caption)
     except (IndexError, ValueError):
         await message.reply('Usage: /zerochan <post_id>')
     except NazurinError as error:

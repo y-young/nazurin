@@ -9,7 +9,7 @@ from pybooru import Moebooru as moebooru
 from requests.exceptions import HTTPError
 
 from nazurin.config import TEMP_DIR
-from nazurin.models import Image
+from nazurin.models import Caption, Image
 from nazurin.utils import downloadImages, logger
 from nazurin.utils.exceptions import NazurinError
 
@@ -74,12 +74,15 @@ class Moebooru(object):
                 url = post['jpeg_url']
             name, _ = self.parseUrl(url)
             imgs.append(Image(name, url))
-        details = {'name': info['name'], 'description': info['description']}
-        return imgs, details
+        caption = Caption({
+            'name': info['name'],
+            'description': info['description']
+        })
+        return imgs, caption
 
     async def download_pool(self, pool_id, jpeg=False):
-        imgs, details = self.pool(pool_id, jpeg)
-        pool_name = details['name']
+        imgs, caption = self.pool(pool_id, jpeg)
+        pool_name = caption['name']
         if not os.path.exists(TEMP_DIR + pool_name):
             os.makedirs(TEMP_DIR + pool_name)
         for key, img in enumerate(imgs):
@@ -96,7 +99,7 @@ class Moebooru(object):
         imgs = [Image(name, file_url, post['sample_url'], post['file_size'])]
         return imgs
 
-    def buildCaption(self, post, tags):
+    def buildCaption(self, post, tags) -> Caption:
         """Build media caption from an post."""
         title = post['tags']
         source = post['source']
@@ -106,22 +109,16 @@ class Moebooru(object):
                 artists += tag + ' '
             else:
                 tag_string += '#' + tag + ' '
-        details = dict()
-        if title:
-            details['title'] = title
-        if artists:
-            details['artists'] = artists
-        details['url'] = 'https://' + self.url + '/post/show/' + str(
-            post['id'])
-        if tag_string:
-            details['tags'] = tag_string
-        if source:
-            details['source'] = source
-        if post['parent_id']:
-            details['parent_id'] = post['parent_id']
-        if post['has_children']:
-            details['has_children'] = True
-        return details
+        caption = Caption({
+            'title': title,
+            'artists': artists,
+            'url': 'https://' + self.url + '/post/show/' + str(post['id']),
+            'tags': tag_string,
+            'source': source,
+            'parent_id': post['parent_id'],
+            'has_children': post['has_children']
+        })
+        return caption
 
     def parseUrl(self, url: str) -> str:
         name = os.path.basename(url)

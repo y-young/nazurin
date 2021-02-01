@@ -2,12 +2,13 @@
 import json
 import os
 import time
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Tuple
 
 from pixivpy3 import AppPixivAPI, PixivError
 
 from nazurin.config import NAZURIN_DATA, TEMP_DIR
 from nazurin.database import Database
+from nazurin.models import Caption
 from nazurin.utils import downloadImages, logger
 from nazurin.utils.exceptions import NazurinError
 
@@ -59,13 +60,13 @@ class Pixiv(object):
             raise NazurinError("Artwork is private")
         return illust
 
-    def view_illust(self, artwork_id: int):
+    def view_illust(self, artwork_id: int) -> Tuple[List[PixivImage], Caption]:
         illust = self.getArtwork(artwork_id)
         if illust.type == 'ugoira':
             raise NazurinError('Ugoira view is not supported.')
-        details = self.buildCaption(illust)
+        caption = self.buildCaption(illust)
         imgs = self.getImages(illust)
-        return imgs, details
+        return imgs, caption
 
     async def download_illust(self,
                               artwork_id: Optional[int] = None,
@@ -153,7 +154,7 @@ class Pixiv(object):
             imgs.append(PixivImage(name, url, self.getThumbnail(url)))
         return imgs
 
-    def buildCaption(self, illust):
+    def buildCaption(self, illust) -> Caption:
         """Build media caption from an artwork."""
         tags = str()
         for tag in illust.tags:
@@ -162,15 +163,15 @@ class Pixiv(object):
             else:
                 tag_name = tag.name
             tags += '#' + tag_name.replace(' ', '_') + ' '
-        details = {
+        caption = Caption({
             'title': illust.title,
             'author': illust.user.name,
             'tags': tags,
             'total_bookmarks': illust.total_bookmarks,
-            'url': 'pixiv.net/i/' + str(illust.id)
-        }
-        details['bookmarked'] = illust.is_bookmarked
-        return details
+            'url': 'pixiv.net/i/' + str(illust.id),
+            'bookmarked': illust.is_bookmarked
+        })
+        return caption
 
     def getFilename(self, url: str, illust) -> str:
         basename = os.path.basename(url)

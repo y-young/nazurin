@@ -5,7 +5,7 @@ from typing import List, Optional, Tuple
 from pybooru import Danbooru as danbooru
 from pybooru import PybooruHTTPError
 
-from nazurin.models import Image
+from nazurin.models import Caption, Image
 from nazurin.utils import downloadImages
 from nazurin.utils.exceptions import NazurinError
 
@@ -33,12 +33,14 @@ class Danbooru(object):
                 post['source'])
         return post
 
-    def view(self, post_id: int):
+    def view(self, post_id: int) -> Tuple[List[Image], Caption]:
         post = self.getPost(post_id)
         imgs, caption = self.parsePost(post)
         return imgs, caption
 
-    async def download(self, post_id: Optional[int] = None, post=None):
+    async def download(self,
+                       post_id: Optional[int] = None,
+                       post=None) -> List[Image]:
         if post:
             imgs, _ = self.parsePost(post)
         else:
@@ -46,7 +48,7 @@ class Danbooru(object):
         await downloadImages(imgs)
         return imgs
 
-    def parsePost(self, post):
+    def parsePost(self, post) -> Tuple[List[Image], Caption]:
         """Get images and build caption."""
         # Get images
         url = post['file_url']
@@ -60,24 +62,17 @@ class Danbooru(object):
         tag_string = str()
         for character in tags:
             tag_string += '#' + character + ' '
-        details = dict()
-        if title:
-            details['title'] = title
-        if artists:
-            details['artists'] = artists
-        details.update({
-            'url':
-            'https://' + self.site + '.donmai.us/posts/' + str(post['id']),
-            'tags':
-            tag_string
+        caption = Caption({
+            'title': title,
+            'artists': artists,
+            'url': 'https://' + self.site + '.donmai.us/posts/' +
+            str(post['id']),
+            'tags': tag_string,
+            'parent_id': post['parent_id'],
+            'pixiv_id': post['pixiv_id'],
+            'has_children': post['has_children']
         })
-        if post['parent_id']:
-            details['parent_id'] = post['parent_id']
-        if post['pixiv_id']:
-            details['pixiv_id'] = post['pixiv_id']
-        if post['has_children']:
-            details['has_children'] = True
-        return imgs, details
+        return imgs, caption
 
     def _getNames(self, post) -> Tuple[str, str]:
         """Build title and filename."""

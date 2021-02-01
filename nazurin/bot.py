@@ -1,6 +1,6 @@
 from html import escape
 from mimetypes import guess_type
-from typing import List
+from typing import List, Optional
 
 from aiogram import Bot, Dispatcher, executor
 from aiogram.dispatcher.handler import CancelHandler
@@ -11,6 +11,7 @@ from aiogram.utils.exceptions import BadRequest
 from aiogram.utils.executor import start_webhook
 
 from nazurin import config
+from nazurin.models import Caption
 from nazurin.utils import logger
 from nazurin.utils.decorators import chat_action, retry_after
 from nazurin.utils.filters import URLFilter
@@ -27,18 +28,16 @@ def handler(*args, **kwargs):
 
 @chat_action(ChatActions.UPLOAD_PHOTO)
 @retry_after
-async def sendPhotos(message: Message, imgs: List['Image'], details=None):
-    if details is None:
-        details = dict()
+async def sendPhotos(message: Message,
+                     imgs: List['Image'],
+                     caption: Optional[Caption] = Caption()):
     media = list()
     if len(imgs) > 10:
         # TODO
         imgs = imgs[:10]
         await message.reply('Notice: Too many pages, sending only 10 of them')
 
-    caption = str()
-    for key, value in details.items():
-        caption += str(key) + ': ' + str(value) + '\n'
+    caption = caption.text
     if len(caption) > 1024:
         caption = caption[:1024]
         await message.reply('Notice: Caption too long, trimmed')

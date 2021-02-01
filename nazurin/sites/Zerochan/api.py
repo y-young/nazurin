@@ -1,13 +1,13 @@
 import json
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from urllib.parse import unquote
 
 import requests
 from bs4 import BeautifulSoup
 from requests.exceptions import HTTPError
 
-from nazurin.models import Image
+from nazurin.models import Caption, Image
 from nazurin.utils import downloadImages
 from nazurin.utils.exceptions import NazurinError
 
@@ -53,7 +53,7 @@ class Zerochan(object):
         }
         return post
 
-    def view(self, post_id: int):
+    def view(self, post_id: int) -> Tuple[List[Image], Caption]:
         post = self.getPost(post_id)
         imgs = self.getImages(post)
         caption = self.buildCaption(post)
@@ -75,10 +75,8 @@ class Zerochan(object):
             post['id']) + ' ' + post['name'] + '.' + post['file_ext']
         return [Image(name, url)]
 
-    def buildCaption(self, post):
+    def buildCaption(self, post) -> Caption:
         """Build media caption from an post."""
-        details = dict()
-        details['title'] = post['name']
         tag_string = artists = source = str()
         for tag, tag_type in post['tags'].items():
             if tag_type == 'Mangaka':
@@ -87,11 +85,11 @@ class Zerochan(object):
                 source += tag + ' '
             else:
                 tag_string += '#' + tag + ' '
-        if artists:
-            details['artists'] = artists
-        details['url'] = 'https://www.zerochan.net/' + str(post['id'])
-        if source:
-            details['source'] = source
-        if tag_string:
-            details['tags'] = tag_string
-        return details
+        caption = Caption({
+            'title': post['name'],
+            'artists': artists,
+            'url': 'https://www.zerochan.net/' + str(post['id']),
+            'source': source,
+            'tags': tag_string
+        })
+        return caption
