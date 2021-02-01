@@ -15,7 +15,7 @@ OD_RF_TOKEN = environ.get('OD_RF_TOKEN',
 OD_DOCUMENT = 'onedrive'
 
 class OneDrive(object):
-    """Onedrive driver."""
+    """OneDrive driver."""
     db = Database().driver()
     collection = db.collection(NAZURIN_DATA)
     document = collection.document(OD_DOCUMENT)
@@ -72,7 +72,7 @@ class OneDrive(object):
                 return folder['id']
         return None
 
-    def createFolder(self, name):
+    def createFolder(self, name: str):
         self.requireAuth()
         # https://docs.microsoft.com/zh-cn/graph/api/driveitem-post-children?view=graph-rest-1.0&tabs=http
         url = 'https://graph.microsoft.com/v1.0/me/drive/root/children'
@@ -95,7 +95,6 @@ class OneDrive(object):
                 self.access_token = credentials['access_token']
                 self.expires_at = credentials['expires_at']
                 logger.info('OneDrive logged in through cached tokens')
-                return
             else:
                 self.auth()  # Refresh access_token
         else:
