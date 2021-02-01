@@ -48,11 +48,12 @@ You can also implement your own database driver by creating a file under `databa
 
 ### Supported Storage
 
-|     Name     |             URL             |                             Usage                            |   Note  |
-| :----------: | :-------------------------: | :----------------------------------------------------------: | :-----: |
-|     Local    |                             |                      Set `STORAGE = []`                      | Default |
-|     MEGA     |      <https://mega.nz/>     |     [Wiki](https://github.com/y-young/nazurin/wiki/MEGA)     |         |
-| Google Drive | <https://drive.google.com/> | [Wiki](https://github.com/y-young/nazurin/wiki/Google-Drive) |         |
+|     Name     |              URL             |                             Usage                            |   Note  |
+| :----------: | :--------------------------: | :----------------------------------------------------------: | :-----: |
+|     Local    |                              |                      Set `STORAGE = []`                      | Default |
+|     MEGA     |      <https://mega.nz/>      |     [Wiki](https://github.com/y-young/nazurin/wiki/MEGA)     |         |
+| Google Drive |  <https://drive.google.com/> | [Wiki](https://github.com/y-young/nazurin/wiki/Google-Drive) |         |
+|   OneDrive   | <https://onedrive.live.com/> |   [Wiki](https://github.com/y-young/nazurin/wiki/OneDrive)   |         |
 
 ## Configuration
 
