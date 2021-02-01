@@ -14,7 +14,7 @@ ENV = env.str('ENV', default='production')
 TOKEN = env.str('TOKEN')
 
 # Webhook url, eg: https://xxx.herokuapp.com/, should end with '/'
-WEBHOOK_URL = env.str('WEBHOOK_URL', default='')
+WEBHOOK_URL = env.str('WEBHOOK_URL', default=None)
 # Port is given by Heroku
 PORT = env.int('PORT', default=8443)
 
@@ -25,6 +25,8 @@ STORAGE_DIR = env.str('STORAGE_DIR', default='Pictures')
 DATABASE = env.str('DATABASE', default='Local')
 # Nazurin data collection in database
 NAZURIN_DATA = 'nazurin'
+# Ignored items in image caption
+CAPTION_IGNORE = env.list('CAPTION_IGNORE', subcast=str, default=[])
 
 ALBUM_ID = env.int('ALBUM_ID')
 GALLERY_ID = env.int('GALLERY_ID')
