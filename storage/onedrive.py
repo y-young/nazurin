@@ -1,5 +1,5 @@
 import time
-from os import environ
+from os import environ, path
 
 import requests
 
@@ -33,11 +33,23 @@ class OneDrive(object):
             self.getDestination()
 
         for item in files:
-            # decorate upload api url
-            url = 'https://graph.microsoft.com/v1.0/me/drive/items/{parent_id}:/{filename}:/content'.format(
-                parent_id=self.folder_id, filename=item.name)
-            with open(item.path, mode='rb') as file:
-                self._request('PUT', url, data=file)
+            # create file for upload
+            create_file_url = 'https://graph.microsoft.com/v1.0/me/drive/items/{parent_id}/children'.format(
+                parent_id=self.folder_id)
+            body = {"name": item.name, "file": {}}
+            response = self._request('POST', create_file_url, json=body)
+            # create session for upload
+            create_session_url = 'https://graph.microsoft.com/v1.0/me/drive/items/{item_id}/createUploadSession'.format(
+                item_id=response['id'])
+            response = self._request('POST', create_session_url)
+            # upload
+            if response.get('uploadUrl'):
+                item_size = path.getsize(item.path)
+                header = {
+                    'Content-Range': 'bytes 0-{end}/{size}'.format(end=item_size-1, size=item_size)
+                }
+                with open(item.path, mode='rb') as file:
+                    self._request('PUT', response['uploadUrl'], headers=header, data=file)
 
     def findFolder(self, name):
         self.requireAuth()
