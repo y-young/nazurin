@@ -36,7 +36,7 @@ class OneDrive(object):
             # create file for upload
             create_file_url = 'https://graph.microsoft.com/v1.0/me/drive/items/{parent_id}/children'.format(
                 parent_id=self.folder_id)
-            body = {"name": item.name, "file": {}}
+            body = {"name": item.name, "file": {}, "@microsoft.graph.conflictBehavior": "replace"}
             response = self._request('POST', create_file_url, json=body)
             # create session for upload
             create_session_url = 'https://graph.microsoft.com/v1.0/me/drive/items/{item_id}/createUploadSession'.format(
