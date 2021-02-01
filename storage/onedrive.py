@@ -133,11 +133,10 @@ class OneDrive(object):
         _header = {
             'Accept': 'application/json',
             'Authorization': 'Bearer ' + self.access_token,
-            'Content-Type': 'image/jpeg'
         }
         if headers:
             _header.update(headers)
-        if 'files' not in kwargs:
+        if 'data' not in kwargs:
             _header['Content-Type'] = 'application/json'
         response = requests.request(method, url, headers=_header, **kwargs)
         response.raise_for_status()
