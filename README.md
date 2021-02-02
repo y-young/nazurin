@@ -10,7 +10,7 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 
 ## Architecture
 
-![architecture.png](https://i.loli.net/2020/11/20/6crBeadbIq7sOE1.png)
+![architecture.png](https://i.loli.net/2021/02/02/8G7QJ9kiFTcmlwf.png)
 
 ## Features
 
