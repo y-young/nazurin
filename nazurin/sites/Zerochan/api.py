@@ -17,7 +17,7 @@ class Zerochan(object):
         try:
             response.raise_for_status()
         except HTTPError as err:
-            raise NazurinError(err)
+            raise NazurinError(err) from None
 
         # Override post_id if there's a redirection
         if response.history:

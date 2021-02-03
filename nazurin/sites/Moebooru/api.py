@@ -24,7 +24,7 @@ class Moebooru(object):
         try:
             response.raise_for_status()
         except HTTPError as err:
-            raise NazurinError(err)
+            raise NazurinError(err) from None
 
         response = response.text
         soup = BeautifulSoup(response, 'html.parser')
