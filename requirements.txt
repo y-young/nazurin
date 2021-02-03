@@ -14,8 +14,7 @@ tinydb
 # Firebase:
 firebase-admin
 # Mongo:
-pymongo
-dnspython
+motor
 # Cloudant:
 cloudant
 
