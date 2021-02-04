@@ -4,6 +4,7 @@ import shutil
 from typing import List
 
 from aiogram.types import ChatActions, ContentType, Message, Update
+from aiogram.utils.exceptions import TelegramAPIError
 
 from nazurin import config
 from nazurin.bot import Nazurin, URLFilter, sendDocuments
@@ -77,6 +78,8 @@ async def clear_cache(message: Message):
 @bot.errors_handler()
 async def on_error(update: Update, error: Exception):
     logger.error('Update %s caused %s: %s', update, type(error), error)
+    if not isinstance(error, TelegramAPIError):
+        await update.message.reply(str(error))
     return True
 
 def main():

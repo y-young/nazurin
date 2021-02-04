@@ -53,11 +53,9 @@ class GoogleDrive(object):
 
     def findFolder(self, name):
         query = {
-            'q':
-            "mimeType='application/vnd.google-apps.folder' and title='" +
+            'q': "mimeType='application/vnd.google-apps.folder' and title='" +
             name + "'",
-            'spaces':
-            'drive'
+            'spaces': 'drive'
         }
         result = GoogleDrive.drive.ListFile(query).GetList()
         return result[0].get('id')

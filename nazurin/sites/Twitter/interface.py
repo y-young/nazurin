@@ -19,5 +19,5 @@ async def handle(match, **kwargs):
     collection = db.collection(COLLECTION)
     imgs, tweet = await Twitter().fetch(status_id)
     tweet['collected_at'] = time()
-    collection.insert(int(status_id), tweet)
+    await collection.insert(int(status_id), tweet)
     return imgs

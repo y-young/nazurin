@@ -20,5 +20,5 @@ async def handle(match, **kwargs):
 
     imgs, data = await Bilibili().fetch(dynamic_id)
     data['collected_at'] = time()
-    collection.insert(int(dynamic_id), data)
+    await collection.insert(int(dynamic_id), data)
     return imgs

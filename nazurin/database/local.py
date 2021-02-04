@@ -10,7 +10,7 @@ class Local(object):
         self._key = key
         return self
 
-    def get(self):
+    async def get(self):
         Document = Query()
         result = self.db.search(Document.key == self._key)
         if result:
@@ -18,15 +18,15 @@ class Local(object):
         else:
             return None
 
-    def insert(self, key, data):
+    async def insert(self, key, data):
         if key:
             data['key'] = key
         return self.db.insert(data)
 
-    def update(self, data):
+    async def update(self, data):
         Document = Query()
         return self.db.update(data, Document.key == self._key)
 
-    def delete(self):
+    async def delete(self):
         Document = Query()
         return self.db.remove(Document.key == self._key)

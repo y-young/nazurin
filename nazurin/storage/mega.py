@@ -20,26 +20,26 @@ class Mega(object):
     document = collection.document(MEGA_DOCUMENT)
     destination = None
 
-    def login(self, initialize=False):
-        Mega.api.login(MEGA_USER, MEGA_PASS)
+    async def login(self, initialize=False):
+        Mega.api.login(MEGA_USER, MEGA_PASS)  #TODO
         if initialize:
-            Mega.collection.insert(
+            await Mega.collection.insert(
                 MEGA_DOCUMENT, {
                     'sid': Mega.api.sid,
                     'master_key': list(Mega.api.master_key),
                     'root_id': Mega.api.root_id
                 })
         else:
-            Mega.document.update({
+            await Mega.document.update({
                 'sid': Mega.api.sid,
                 'master_key': list(Mega.api.master_key),
                 'root_id': Mega.api.root_id
             })
         logger.info('MEGA tokens cached')
 
-    def requireAuth(self):
+    async def requireAuth(self):
         if not Mega.api.sid:
-            tokens = Mega.document.get()
+            tokens = await Mega.document.get()
             if tokens and 'sid' in tokens.keys():
                 Mega.api.sid = tokens['sid']
                 Mega.api.master_key = tuple(tokens['master_key'])
@@ -49,18 +49,18 @@ class Mega(object):
                     Mega.destination = tokens['destination']
                     logger.info('MEGA retrieved destination from cache')
             else:  # Initialize database
-                self.login(initialize=True)
+                await self.login(initialize=True)
         if not Mega.destination:
-            self.getDestination()
+            await self.getDestination()
 
-    def getDestination(self):
-        result = Mega.api.find(STORAGE_DIR, exclude_deleted=True)
+    async def getDestination(self):
+        result = Mega.api.find(STORAGE_DIR, exclude_deleted=True)  #TODO
         if result:
             Mega.destination = result[0]
         else:
-            result = Mega.api.create_folder(STORAGE_DIR)
+            result = Mega.api.create_folder(STORAGE_DIR)  #TODO
             Mega.destination = result[STORAGE_DIR]
-        Mega.document.update({'destination': Mega.destination})
+        await Mega.document.update({'destination': Mega.destination})
         logger.info('MEGA destination cached')
 
     @async_wrap
@@ -77,6 +77,6 @@ class Mega(object):
                     self.login()
 
     async def store(self, files):
-        self.requireAuth()
+        await self.requireAuth()
         tasks = [self.upload(file) for file in files]
         await asyncio.gather(*tasks)

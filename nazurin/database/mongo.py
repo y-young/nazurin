@@ -10,7 +10,7 @@ class Mongo(object):
     """MongoDB driver for MongoDB Atlas or local server."""
     def __init__(self):
         """Load credentials and initialize client."""
-        URI = env.str('MONGO_URI', default='mongodb://localhost:27017/nazurin')
+        URI = env.str('MONGO_URI', default='mongodb://localhost:27017/test')
         self.client = AsyncIOMotorClient(URI)
         self.db = self.client.get_default_database()
 

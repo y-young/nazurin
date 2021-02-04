@@ -4,6 +4,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 
 from nazurin.config import env
+from nazurin.utils.decorators import async_wrap
 
 class Firebase(object):
     """Firestore driver of Firebase."""
@@ -25,20 +26,25 @@ class Firebase(object):
         self._document = self._collection.document(str(key))
         return self
 
+    @async_wrap
     def get(self):
         return self._document.get().to_dict()
 
+    @async_wrap
     def exists(self):
         return self._document.get().exists
 
+    @async_wrap
     def insert(self, key, data):
         if key:
             return self._collection.document(str(key)).set(data)
         else:
             return self._collection.add(data)
 
+    @async_wrap
     def update(self, data):
         return self._document.update(data)
 
+    @async_wrap
     def delete(self):
         return self._document.delete()

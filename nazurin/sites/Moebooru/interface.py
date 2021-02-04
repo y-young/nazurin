@@ -35,5 +35,5 @@ async def handle(match, **kwargs):
     post, _ = api.getPost(post_id)
     imgs = await api.download(post=post)
     post['collected_at'] = time()
-    collection.insert(int(post_id), post)
+    await collection.insert(int(post_id), post)
     return imgs

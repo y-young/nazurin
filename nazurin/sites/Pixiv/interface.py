@@ -33,12 +33,12 @@ async def handle(match, **kwargs):
     db = Database().driver()
     collection = db.collection(COLLECTION)
 
-    api.bookmark(artwork_id)
-    illust = api.getArtwork(artwork_id)
+    await api.bookmark(artwork_id)
+    illust = await api.getArtwork(artwork_id)
     if illust.type == 'ugoira':
-        imgs = api.download_ugoira(illust)
+        imgs = await api.download_ugoira(illust)
     else:
         imgs = await api.download_illust(illust=illust)
     illust.collected_at = time()
-    collection.insert(int(artwork_id), illust)
+    await collection.insert(int(artwork_id), illust)
     return imgs

@@ -17,5 +17,5 @@ async def handle(match, **kwargs):
 
     imgs, post = await Gelbooru().fetch(post_id)
     post['collected_at'] = time()
-    collection.insert(int(post_id), post)
+    await collection.insert(int(post_id), post)
     return imgs

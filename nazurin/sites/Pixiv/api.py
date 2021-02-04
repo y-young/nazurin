@@ -4,12 +4,14 @@ import os
 import time
 from typing import Callable, List, Optional, Tuple
 
+import aiofiles
 from pixivpy3 import AppPixivAPI, PixivError
 
 from nazurin.config import NAZURIN_DATA, TEMP_DIR
 from nazurin.database import Database
 from nazurin.models import Caption
 from nazurin.utils import downloadImages, logger
+from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
 
 from .config import DOCUMENT, PASSWORD, TRANSLATION, USER
@@ -22,23 +24,29 @@ class Pixiv(object):
     document = collection.document(DOCUMENT)
     updated_time = 0
 
+    illust_detail = async_wrap(api.illust_detail)
+    ugoira_metadata = async_wrap(api.ugoira_metadata)
+    illust_bookmark_add = async_wrap(api.illust_bookmark_add)
+    api_login = async_wrap(api.login)
+    api_auth = async_wrap(api.auth)
+
     def __init__(self):
         if TRANSLATION:
             Pixiv.api.set_accept_language(TRANSLATION)
 
-    def login(self, refresh=False):
+    async def login(self, refresh=False):
         if not refresh:
-            tokens = Pixiv.document.get()
+            tokens = await Pixiv.document.get()
             if tokens:
                 Pixiv.api.refresh_token = tokens['refresh_token']
                 Pixiv.updated_time = tokens['updated_time']
             else:  # Initialize database
-                self._login()
+                await self._login()
                 return
         if refresh or time.time(
         ) - Pixiv.updated_time >= 3600:  # Access token expired
-            self._refreshToken()
-            Pixiv.document.update({
+            await self._refreshToken()
+            await Pixiv.document.update({
                 'access_token': Pixiv.api.access_token,
                 'updated_time': Pixiv.updated_time
             })
@@ -47,9 +55,9 @@ class Pixiv(object):
             Pixiv.api.access_token = tokens['access_token']
             logger.info('Pixiv logged in through cached tokens')
 
-    def getArtwork(self, artwork_id: int):
+    async def getArtwork(self, artwork_id: int):
         """Fetch an artwork."""
-        response = self.call(Pixiv.api.illust_detail, artwork_id)
+        response = await self.call(Pixiv.illust_detail, artwork_id)
         if 'illust' in response.keys():
             illust = response.illust
         else:
@@ -60,8 +68,9 @@ class Pixiv(object):
             raise NazurinError("Artwork is private")
         return illust
 
-    def view_illust(self, artwork_id: int) -> Tuple[List[PixivImage], Caption]:
-        illust = self.getArtwork(artwork_id)
+    async def view_illust(self,
+                          artwork_id: int) -> Tuple[List[PixivImage], Caption]:
+        illust = await self.getArtwork(artwork_id)
         if illust.type == 'ugoira':
             raise NazurinError('Ugoira view is not supported.')
         caption = self.buildCaption(illust)
@@ -73,7 +82,7 @@ class Pixiv(object):
                               illust=None) -> List[PixivImage]:
         """Download and return images of an illustration."""
         if not illust:
-            imgs, _ = self.view_illust(artwork_id)
+            imgs, _ = await self.view_illust(artwork_id)
         else:
             imgs = self.getImages(illust)
         if not os.path.exists(TEMP_DIR):
@@ -82,10 +91,10 @@ class Pixiv(object):
                              headers={'Referer': 'https://app-api.pixiv.net/'})
         return imgs
 
-    def download_ugoira(self, illust) -> List[PixivImage]:
+    async def download_ugoira(self, illust) -> List[PixivImage]:
         """Download ugoira zip file and store animation data."""
-        metadata = json.dumps(
-            Pixiv.api.ugoira_metadata(illust.id).ugoira_metadata)
+        metadata = await Pixiv.ugoira_metadata(illust.id)
+        metadata = json.dumps(metadata.ugoira_metadata)
         url = illust.meta_single_page.original_image_url
         zip_url = url.replace('/img-original/', '/img-zip-ugoira/')
         zip_url = zip_url.split('_ugoira0')[0] + '_ugoira1920x1080.zip'
@@ -94,13 +103,13 @@ class Pixiv(object):
         imgs = [PixivImage(filename, zip_url), PixivImage(metafile)]
         if not os.path.exists(TEMP_DIR):
             os.makedirs(TEMP_DIR)
-        with open(os.path.join(TEMP_DIR, metafile), 'w') as f:
-            f.write(metadata)
-        Pixiv.api.download(zip_url, path=TEMP_DIR, name=filename)
+        async with aiofiles.open(os.path.join(TEMP_DIR, metafile), 'w') as f:
+            await f.write(metadata)
+        Pixiv.api.download(zip_url, path=TEMP_DIR, name=filename)  #TODO
         return imgs
 
-    def bookmark(self, artwork_id: int):
-        response = self.call(Pixiv.api.illust_bookmark_add, artwork_id)
+    async def bookmark(self, artwork_id: int):
+        response = await self.call(Pixiv.illust_bookmark_add, artwork_id)
         if 'error' in response.keys():
             logger.error(response)
             raise NazurinError(response['error']['user_message'])
@@ -108,10 +117,10 @@ class Pixiv(object):
             logger.info('Bookmarked artwork %s', artwork_id)
             return True
 
-    def _login(self):
-        Pixiv.api.login(USER, PASSWORD)
+    async def _login(self):
+        await Pixiv.api_login(USER, PASSWORD)
         Pixiv.updated_time = time.time()
-        Pixiv.collection.insert(
+        await Pixiv.collection.insert(
             DOCUMENT, {
                 'access_token': Pixiv.api.access_token,
                 'refresh_token': Pixiv.api.refresh_token,
@@ -119,24 +128,24 @@ class Pixiv(object):
             })
         logger.info('Pixiv logged in with password')
 
-    def _refreshToken(self):
+    async def _refreshToken(self):
         try:
-            Pixiv.api.auth()
+            await Pixiv.api_auth()
             Pixiv.updated_time = time.time()
             logger.info('Pixiv access token updated')
         except PixivError:  # Refresh token may be expired, try to login with password
-            Pixiv.document.delete()
-            self._login()
+            await Pixiv.document.delete()
+            await self._login()
 
-    def call(self, func: Callable, *args):
+    async def call(self, func: Callable, *args):
         """Call API with login state check."""
         if not Pixiv.api.access_token or not Pixiv.api.refresh_token:
-            self.login()
-        response = func(*args)
+            await self.login()
+        response = await func(*args)
         if 'error' in response.keys(
         ) and 'invalid_grant' in response.error.message:  # Access token expired
-            self.login(refresh=True)
-            response = func(*args)
+            await self.login(refresh=True)
+            response = await func(*args)
         return response
 
     def getImages(self, illust) -> List[PixivImage]:

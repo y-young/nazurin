@@ -16,7 +16,7 @@ async def pixiv_view(message: Message, regexp_command):
         if artwork_id < 0:
             await message.reply('Invalid artwork id!')
             return
-        imgs, caption = pixiv.view_illust(artwork_id)
+        imgs, caption = await pixiv.view_illust(artwork_id)
         await bot.sendPhotos(message, imgs, caption)
     except (IndexError, ValueError):
         await message.reply('Usage: /pixiv <artwork_id>')
@@ -48,7 +48,7 @@ async def pixiv_bookmark(message: Message, regexp_command):
         if artwork_id < 0:
             await message.reply('Invalid artwork id!')
             return
-        pixiv.bookmark(artwork_id)
+        await pixiv.bookmark(artwork_id)
         await message.reply('Done!')
     except (IndexError, ValueError):
         await message.reply('Usage: /bookmark <artwork_id>')
