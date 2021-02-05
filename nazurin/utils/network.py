@@ -3,7 +3,7 @@ import os
 
 from aiohttp import ClientSession, TCPConnector
 
-from nazurin.config import UA
+from nazurin.config import PROXY, UA
 
 from .decorators import retry
 
@@ -20,7 +20,7 @@ class Request(ClientSession):
             headers = dict()
         headers.update({'User-Agent': UA})
         connector = None
-        if os.environ.get('HTTP_PROXY') or os.environ.get('HTTPS_PROXY'):
+        if PROXY:
             connector = TCPConnector(verify_ssl=False)
         super().__init__(connector=connector,
                          cookies=cookies,

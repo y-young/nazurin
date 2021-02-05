@@ -1,3 +1,4 @@
+import os
 from html import escape
 from mimetypes import guess_type
 from typing import List, Optional
@@ -87,7 +88,7 @@ class NazurinBot(Bot):
 
 class Nazurin(Dispatcher):
     def __init__(self):
-        bot = NazurinBot(token=config.TOKEN)
+        bot = NazurinBot(token=config.TOKEN, proxy=config.PROXY)
         super().__init__(bot)
         self.middleware.setup(AuthMiddleware())
         self.filters_factory.bind(URLFilter,
