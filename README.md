@@ -12,7 +12,7 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 
 ## Architecture
 
-![architecture.png](https://i.loli.net/2020/11/20/6crBeadbIq7sOE1.png)
+![architecture.png](https://i.loli.net/2021/02/02/8G7QJ9kiFTcmlwf.png)
 
 ## Features
 
@@ -50,11 +50,12 @@ You can also implement your own database driver by creating a file under `databa
 
 ### Supported Storage
 
-|     Name     |             URL             |                             Usage                            |   Note  |
-| :----------: | :-------------------------: | :----------------------------------------------------------: | :-----: |
-|     Local    |                             |                      Set `STORAGE = []`                      | Default |
-|     MEGA     |      <https://mega.nz/>     |     [Wiki](https://github.com/y-young/nazurin/wiki/MEGA)     |         |
-| Google Drive | <https://drive.google.com/> | [Wiki](https://github.com/y-young/nazurin/wiki/Google-Drive) |         |
+|     Name     |              URL             |                             Usage                            |   Note  |
+| :----------: | :--------------------------: | :----------------------------------------------------------: | :-----: |
+|     Local    |                              |                      Set `STORAGE = []`                      | Default |
+|     MEGA     |      <https://mega.nz/>      |     [Wiki](https://github.com/y-young/nazurin/wiki/MEGA)     |         |
+| Google Drive |  <https://drive.google.com/> | [Wiki](https://github.com/y-young/nazurin/wiki/Google-Drive) |         |
+|   OneDrive   | <https://onedrive.live.com/> |   [Wiki](https://github.com/y-young/nazurin/wiki/OneDrive)   |         |
 
 ## Configuration
 
