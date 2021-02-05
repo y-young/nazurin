@@ -3,7 +3,7 @@ import os
 from typing import List
 
 from nazurin.models import Image
-from nazurin.utils import Request, downloadImages
+from nazurin.utils import Request, downloadFiles
 
 class Bilibili(object):
     async def getDynamic(self, dynamic_id: int):
@@ -20,7 +20,7 @@ class Bilibili(object):
         """Fetch images and detail."""
         card = await self.getDynamic(dynamic_id)
         imgs = self.getImages(card, dynamic_id)
-        await downloadImages(imgs)
+        await downloadFiles(imgs)
         return imgs, card
 
     def getImages(self, card, dynamic_id: int) -> List[Image]:

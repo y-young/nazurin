@@ -6,7 +6,7 @@ from pybooru import Danbooru as danbooru
 from pybooru import PybooruHTTPError
 
 from nazurin.models import Caption, Image
-from nazurin.utils import downloadImages
+from nazurin.utils import downloadFiles
 from nazurin.utils.exceptions import NazurinError
 
 class Danbooru(object):
@@ -45,7 +45,7 @@ class Danbooru(object):
             imgs, _ = self.parsePost(post)
         else:
             imgs, _ = self.view(post_id)
-        await downloadImages(imgs)
+        await downloadFiles(imgs)
         return imgs
 
     def parsePost(self, post) -> Tuple[List[Image], Caption]:

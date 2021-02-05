@@ -9,7 +9,7 @@ from pybooru import Moebooru as moebooru
 
 from nazurin.config import TEMP_DIR
 from nazurin.models import Caption, Image
-from nazurin.utils import Request, downloadImages, logger
+from nazurin.utils import Request, downloadFiles, logger
 from nazurin.utils.exceptions import NazurinError
 
 class Moebooru(object):
@@ -58,7 +58,7 @@ class Moebooru(object):
             imgs = self.getImages(post)
         else:
             imgs, _ = await self.view(post_id)
-        await downloadImages(imgs)
+        await downloadFiles(imgs)
         return imgs
 
     def pool(self, pool_id: int, jpeg=False):
@@ -90,7 +90,7 @@ class Moebooru(object):
             _, ext = self.parseUrl(img.url)
             filename += ext
             img.name = pool_name + '/' + img.name
-            await downloadImages([img])  #TODO
+            await downloadFiles([img])  #TODO
 
     def getImages(self, post) -> List[Image]:
         file_url = post['file_url']

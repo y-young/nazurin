@@ -6,7 +6,7 @@ from aiogram import Bot
 from aiogram.types import ChatActions, InputFile, InputMediaPhoto, Message
 from aiogram.utils.exceptions import BadRequest
 
-from nazurin.models import Caption
+from nazurin.models import Caption, File, Image
 from nazurin.utils.decorators import chat_action, retry_after
 from nazurin.utils.helpers import handleBadRequest
 
@@ -16,7 +16,7 @@ class NazurinBot(Bot):
     @chat_action(ChatActions.UPLOAD_PHOTO)
     @retry_after
     async def sendPhotos(self,
-                         imgs: List['Image'],
+                         imgs: List[Image],
                          message: Message,
                          caption: Optional[Caption] = Caption()):
         media = list()
@@ -46,14 +46,14 @@ class NazurinBot(Bot):
             await handleBadRequest(message, error)
 
     @retry_after
-    async def sendDocument(self, img: 'Image', chat_id, message_id=None):
+    async def sendDocument(self, file: File, chat_id, message_id=None):
         await self.send_document(chat_id,
-                                 InputFile(img.path),
+                                 InputFile(file.path),
                                  reply_to_message_id=message_id)
 
     @chat_action(ChatActions.UPLOAD_DOCUMENT)
     async def sendDocuments(self,
-                            imgs: List['Image'],
+                            files: List[File],
                             message: Optional[Message] = None,
                             chat_id=None):
         if message:
@@ -62,5 +62,5 @@ class NazurinBot(Bot):
                 chat_id = message.chat.id
         else:
             message_id = None  # Sending to channel, no message to reply
-        for img in imgs:
-            await self.sendDocument(img, chat_id, message_id)
+        for file in files:
+            await self.sendDocument(file, chat_id, message_id)

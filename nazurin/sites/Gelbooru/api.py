@@ -1,7 +1,7 @@
 from typing import List
 
 from nazurin.models import Image
-from nazurin.utils import Request, downloadImages
+from nazurin.utils import Request, downloadFiles
 from nazurin.utils.exceptions import NazurinError
 
 class Gelbooru(object):
@@ -20,7 +20,7 @@ class Gelbooru(object):
     async def fetch(self, post_id: int):
         post = await self.getPost(post_id)
         imgs = self.getImages(post)
-        await downloadImages(imgs)
+        await downloadFiles(imgs)
         return imgs, post
 
     def getImages(self, post) -> List[Image]:

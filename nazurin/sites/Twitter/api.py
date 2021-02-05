@@ -2,7 +2,7 @@ import os
 from typing import List, Tuple
 
 from nazurin.models import Image
-from nazurin.utils import Request, downloadImages
+from nazurin.utils import Request, downloadFiles
 from nazurin.utils.exceptions import NazurinError
 
 class Twitter(object):
@@ -22,7 +22,7 @@ class Twitter(object):
         """Fetch & return tweet images and information."""
         tweet = await self.getTweet(status_id)
         imgs = self.getImages(tweet)
-        await downloadImages(imgs)
+        await downloadFiles(imgs)
         return imgs, tweet
 
     def getImages(self, tweet) -> List[Image]:

@@ -11,3 +11,5 @@ with env.prefixed('PIXIV_'):
 
     IMG_PROXY = env.str('MIRROR', default='i.pximg.net')
     TRANSLATION = env.str('TRANSLATION', default=None)
+
+HEADERS = {'Referer': 'https://app-api.pixiv.net/'}

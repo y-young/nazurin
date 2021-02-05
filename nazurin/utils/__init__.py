@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import os
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional
 
 import aiofiles
 import aiofiles.os
@@ -13,24 +13,24 @@ from .decorators import retry
 from .network import Request
 
 if TYPE_CHECKING:
-    from nazurin.models import Image
+    from nazurin.models import File
 
 logger = logging.getLogger('nazurin')
 
-async def downloadImage(img: 'Image', session: aiohttp.ClientSession):
+async def downloadFile(file: 'File', session: aiohttp.ClientSession):
     if os.path.exists(
-            img.path) and (await aiofiles.os.stat(img.path)).st_size != 0:
+            file.path) and (await aiofiles.os.stat(file.path)).st_size != 0:
         return
-    async with session.get(img.url) as response:
-        async with aiofiles.open(img.path, 'wb') as f:
+    async with session.get(file.url) as response:
+        async with aiofiles.open(file.path, 'wb') as f:
             await f.write(await response.read())
 
-async def downloadImages(imgs: List['Image'], headers=None):
+async def downloadFiles(files: List['File'], headers: Optional[dict] = None):
     if not os.path.exists(TEMP_DIR):
         os.makedirs(TEMP_DIR)
 
     async with Request(headers=headers) as session:
         tasks = []
-        for img in imgs:
-            tasks.append(asyncio.create_task(downloadImage(img, session)))
+        for file in files:
+            tasks.append(asyncio.create_task(downloadFile(file, session)))
         await asyncio.gather(*tasks)

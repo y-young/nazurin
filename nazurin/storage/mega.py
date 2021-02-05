@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 import asyncio
+from typing import List
 
 from mega import Mega as mega
 from mega.errors import RequestError
 
 from nazurin.config import NAZURIN_DATA, STORAGE_DIR, env
 from nazurin.database import Database
+from nazurin.models import File
 from nazurin.utils import logger
 from nazurin.utils.decorators import async_wrap
 
@@ -64,7 +66,7 @@ class Mega(object):
         logger.info('MEGA destination cached')
 
     @async_wrap
-    def upload(self, file):
+    def upload(self, file: File):
         while True:
             try:
                 Mega.api.upload(file.path, Mega.destination)
@@ -76,7 +78,7 @@ class Mega(object):
                     Mega.api.sid = None
                     self.login()
 
-    async def store(self, files):
+    async def store(self, files: List[File]):
         await self.requireAuth()
         tasks = [self.upload(file) for file in files]
         await asyncio.gather(*tasks)

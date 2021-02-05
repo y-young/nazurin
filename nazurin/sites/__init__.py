@@ -5,7 +5,7 @@ from os import path
 from re import search
 from typing import List
 
-from nazurin.models import Image
+from nazurin.models import File
 from nazurin.utils import logger
 
 class SiteManager(object):
@@ -61,6 +61,6 @@ class SiteManager(object):
             return False
         return result
 
-    async def handle_update(self, result) -> List[Image]:
+    async def handle_update(self, result) -> List[File]:
         handle = result['handler']
         return await handle(result['match'])

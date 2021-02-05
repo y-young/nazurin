@@ -1,11 +1,13 @@
 import asyncio
 import json
+from typing import List
 
 from oauth2client.service_account import ServiceAccountCredentials
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive as GDrive
 
 from nazurin.config import env
+from nazurin.models import File
 from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
 
@@ -41,17 +43,17 @@ class GoogleDrive(object):
         GoogleDrive.drive = GDrive(gauth)
 
     @async_wrap
-    def upload(self, file):
+    def upload(self, file: File):
         metadata = {'title': file.name, 'parents': [{'id': GD_FOLDER}]}
         f = GoogleDrive.drive.CreateFile(metadata)
         f.SetContentFile(file.path)
         f.Upload()
 
-    async def store(self, files):
+    async def store(self, files: List[File]):
         tasks = [self.upload(item) for item in files]
         await asyncio.gather(*tasks)
 
-    def findFolder(self, name):
+    def findFolder(self, name: str) -> str:
         query = {
             'q': "mimeType='application/vnd.google-apps.folder' and title='" +
             name + "'",
@@ -60,7 +62,7 @@ class GoogleDrive(object):
         result = GoogleDrive.drive.ListFile(query).GetList()
         return result[0].get('id')
 
-    def createFolder(self, name):
+    def createFolder(self, name: str) -> str:
         metadata = {
             'title': name,
             'mimeType': 'application/vnd.google-apps.folder',

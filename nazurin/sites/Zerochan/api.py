@@ -7,7 +7,7 @@ from aiohttp.client_exceptions import ClientResponseError
 from bs4 import BeautifulSoup
 
 from nazurin.models import Caption, Image
-from nazurin.utils import Request, downloadImages
+from nazurin.utils import Request, downloadFiles
 from nazurin.utils.exceptions import NazurinError
 
 class Zerochan(object):
@@ -68,7 +68,7 @@ class Zerochan(object):
             imgs = self.getImages(post)
         else:
             imgs, _ = await self.view(post_id)
-        await downloadImages(imgs)
+        await downloadFiles(imgs)
         return imgs
 
     def getImages(self, post) -> List[Image]:

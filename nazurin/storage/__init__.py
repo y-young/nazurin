@@ -1,8 +1,10 @@
 """Nazurin storage drivers and storage manager."""
 import asyncio
 import importlib
+from typing import List
 
 from nazurin.config import STORAGE
+from nazurin.models import File
 from nazurin.utils import logger
 
 class Storage(object):
@@ -17,7 +19,7 @@ class Storage(object):
             self.disks.append(getattr(driver, driver_name)())
         logger.info("Storage loaded")
 
-    async def store(self, files):
+    async def store(self, files: List[File]):
         tasks = []
         for disk in self.disks:
             tasks.append(disk.store(files))

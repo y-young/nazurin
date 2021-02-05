@@ -9,12 +9,12 @@ from pixivpy3 import AppPixivAPI, PixivError
 
 from nazurin.config import NAZURIN_DATA, TEMP_DIR
 from nazurin.database import Database
-from nazurin.models import Caption
-from nazurin.utils import downloadImages, logger
+from nazurin.models import Caption, File
+from nazurin.utils import downloadFiles, logger
 from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
 
-from .config import DOCUMENT, PASSWORD, TRANSLATION, USER
+from .config import DOCUMENT, HEADERS, PASSWORD, TRANSLATION, USER
 from .models import PixivImage
 
 class Pixiv(object):
@@ -87,11 +87,10 @@ class Pixiv(object):
             imgs = self.getImages(illust)
         if not os.path.exists(TEMP_DIR):
             os.makedirs(TEMP_DIR)
-        await downloadImages(imgs,
-                             headers={'Referer': 'https://app-api.pixiv.net/'})
+        await downloadFiles(imgs, headers=HEADERS)
         return imgs
 
-    async def download_ugoira(self, illust) -> List[PixivImage]:
+    async def download_ugoira(self, illust) -> List[File]:
         """Download ugoira zip file and store animation data."""
         metadata = await Pixiv.ugoira_metadata(illust.id)
         metadata = json.dumps(metadata.ugoira_metadata)
@@ -100,12 +99,13 @@ class Pixiv(object):
         zip_url = zip_url.split('_ugoira0')[0] + '_ugoira1920x1080.zip'
         filename = str(illust.id) + '_ugoira1920x1080.zip'
         metafile = str(illust.id) + '_ugoira.json'
-        imgs = [PixivImage(filename, zip_url), PixivImage(metafile)]
+        gif_zip = File(filename, zip_url)
+        imgs = [gif_zip, File(metafile)]
         if not os.path.exists(TEMP_DIR):
             os.makedirs(TEMP_DIR)
         async with aiofiles.open(os.path.join(TEMP_DIR, metafile), 'w') as f:
             await f.write(metadata)
-        Pixiv.api.download(zip_url, path=TEMP_DIR, name=filename)  #TODO
+        await downloadFiles([gif_zip], HEADERS)
         return imgs
 
     async def bookmark(self, artwork_id: int):
