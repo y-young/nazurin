@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import asyncio
 import shutil
+import traceback
 from typing import List
 
 from aiogram.types import ChatActions, ContentType, Message, Update
@@ -77,10 +78,14 @@ async def clear_cache(message: Message):
 
 @bot.errors_handler()
 async def on_error(update: Update, error: Exception):
-    logger.error('Update %s caused %s: %s', update, type(error), error)
-    if not isinstance(error, TelegramAPIError):
-        await update.message.reply(str(error))
-    return True
+    try:
+        raise error
+    except Exception as error:
+        logger.error('Update %s caused %s: %s', update, type(error), error)
+        traceback.print_exc()
+        if not isinstance(error, TelegramAPIError):
+            await update.message.reply('Error: ' + str(error))
+        return True
 
 def main():
     sites.load()
