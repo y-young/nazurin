@@ -32,7 +32,7 @@ async def handle(match, **kwargs):
     collection = db.collection(COLLECTIONS[site_url])
     api = Moebooru().site(site_url)
 
-    post, _ = api.getPost(post_id)
+    post, _ = await api.getPost(post_id)
     imgs = await api.download(post=post)
     post['collected_at'] = time()
     await collection.insert(int(post_id), post)

@@ -1,10 +1,8 @@
 import os
 from dataclasses import dataclass
 
-import requests
-
 from nazurin.config import TEMP_DIR
-from nazurin.utils import logger
+from nazurin.utils import Request, logger
 from nazurin.utils.helpers import sanitizeFilename
 
 @dataclass
@@ -22,33 +20,30 @@ class Image:
     def path(self) -> str:
         return os.path.join(TEMP_DIR, self.name)
 
-    @property
-    def display_url(self) -> str:
-        return self.chosen_url
+    async def display_url(self) -> str:
+        return await self.chosen_url()
 
-    @property
-    def chosen_url(self) -> str:
+    async def chosen_url(self) -> str:
         if self._chosen_url:
             return self._chosen_url
         self._chosen_url = self.url
-        if self.size > 5 * 1024 * 1024 and self.thumbnail:
+        size = await self.size()
+        if size > 5 * 1024 * 1024 and self.thumbnail:
             self._chosen_url = self.thumbnail
             logger.info('Use thumbnail: %s', self._chosen_url)
         return self._chosen_url
 
-    @property
-    def size(self) -> int:
+    async def size(self) -> int:
         if self._size:
             return self._size
-        # TODO: use aiohttp
-        headers = requests.head(self.url,
-                                headers={
-                                    'Referer': 'https://www.pixiv.net/'
-                                }).headers
+        async with Request(
+                headers={'Referer': 'https://www.pixiv.net/'}) as request:
+            async with request.head(self.url) as response:
+                headers = response.headers
+
         if 'Content-Length' in headers.keys():
             self._size = int(headers['Content-Length'])
         return self._size
 
-    @size.setter
-    def size(self, value: int):
+    def set_size(self, value: int):
         self._size = value

@@ -3,26 +3,28 @@ from datetime import datetime, timezone
 from typing import List, Optional, Tuple
 from urllib.parse import unquote
 
-import requests
 from bs4 import BeautifulSoup
 from requests.exceptions import HTTPError
 
 from nazurin.models import Caption, Image
-from nazurin.utils import downloadImages
+from nazurin.utils import Request, downloadImages
 from nazurin.utils.exceptions import NazurinError
 
 class Zerochan(object):
-    def getPost(self, post_id: int):
-        response = requests.get('https://www.zerochan.net/' + str(post_id))
-        try:
-            response.raise_for_status()
-        except HTTPError as err:
-            raise NazurinError(err) from None
+    async def getPost(self, post_id: int):
+        async with Request() as request:
+            async with request.get('https://www.zerochan.net/' +
+                                   str(post_id)) as response:
+                try:
+                    response.raise_for_status()
+                except HTTPError as err:
+                    raise NazurinError(err) from None
 
-        # Override post_id if there's a redirection
-        if response.history:
-            post_id = response.url.split('/')[3]
-        response = response.text
+                # Override post_id if there's a redirection TODO: Check
+                if response.history:
+                    post_id = response.url.path[1:]
+                response = await response.text()
+
         soup = BeautifulSoup(response, 'html.parser')
         info = soup.find("script", {"type": "application/ld+json"}).contents
         info = json.loads(''.join(info).replace('\\\'', '\''))
@@ -53,8 +55,8 @@ class Zerochan(object):
         }
         return post
 
-    def view(self, post_id: int) -> Tuple[List[Image], Caption]:
-        post = self.getPost(post_id)
+    async def view(self, post_id: int) -> Tuple[List[Image], Caption]:
+        post = await self.getPost(post_id)
         imgs = self.getImages(post)
         caption = self.buildCaption(post)
         return imgs, caption
@@ -65,7 +67,7 @@ class Zerochan(object):
         if post:
             imgs = self.getImages(post)
         else:
-            imgs, _ = self.view(post_id)
+            imgs, _ = await self.view(post_id)
         await downloadImages(imgs)
         return imgs
 

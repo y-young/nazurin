@@ -7,8 +7,7 @@ from .config import IMG_PROXY
 
 @dataclass
 class PixivImage(Image):
-    @property
-    def display_url(self):
+    async def display_url(self):
         # use reverse proxy to avoid strange problems
-        return self.chosen_url.replace('i.pximg.net', IMG_PROXY) + '?' + str(
-            random())
+        url = await self.chosen_url()
+        return url.replace('i.pximg.net', IMG_PROXY) + '?' + str(random())

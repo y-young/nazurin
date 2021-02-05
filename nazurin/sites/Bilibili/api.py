@@ -2,23 +2,23 @@ import json
 import os
 from typing import List
 
-import requests
-
 from nazurin.models import Image
-from nazurin.utils import downloadImages
+from nazurin.utils import Request, downloadImages
 
 class Bilibili(object):
-    def getDynamic(self, dynamic_id: int):
+    async def getDynamic(self, dynamic_id: int):
         """Get dynamic data from API."""
         api = 'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail?dynamic_id=' + str(
             dynamic_id)
-        source = requests.get(api).json()
+        async with Request() as request:
+            async with request.get(api) as response:
+                source = await response.json()
         card = json.loads(source['data']['card']['card'])
         return card
 
     async def fetch(self, dynamic_id: int):
         """Fetch images and detail."""
-        card = self.getDynamic(dynamic_id)
+        card = await self.getDynamic(dynamic_id)
         imgs = self.getImages(card, dynamic_id)
         await downloadImages(imgs)
         return imgs, card

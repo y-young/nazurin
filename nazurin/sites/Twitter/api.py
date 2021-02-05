@@ -1,27 +1,26 @@
 import os
 from typing import List, Tuple
 
-import requests
-
 from nazurin.models import Image
-from nazurin.utils import downloadImages
+from nazurin.utils import Request, downloadImages
 from nazurin.utils.exceptions import NazurinError
 
 class Twitter(object):
-    def getTweet(self, status_id: int):
+    async def getTweet(self, status_id: int):
         """Get a tweet from API."""
         # Old: 'https://syndication.twitter.com/tweets.json?ids='+ status_id +'&lang=en'
         api = 'https://cdn.syndication.twimg.com/tweet?id=' + str(
             status_id) + '&lang=en'
-        response = requests.get(api)
-        if response.status_code == 404:
-            raise NazurinError('Tweet not found or unavailable.')
-        tweet = response.json()
-        return tweet
+        async with Request() as request:
+            async with request.get(api) as response:
+                if response.status_code == 404:
+                    raise NazurinError('Tweet not found or unavailable.')
+                tweet = await response.json()
+                return tweet
 
     async def fetch(self, status_id: int):
         """Fetch & return tweet images and information."""
-        tweet = self.getTweet(status_id)
+        tweet = await self.getTweet(status_id)
         imgs = self.getImages(tweet)
         await downloadImages(imgs)
         return imgs, tweet

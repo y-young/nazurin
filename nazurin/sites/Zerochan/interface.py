@@ -20,7 +20,7 @@ async def handle(match, **kwargs):
     db = Database().driver()
     collection = db.collection(COLLECTION)
 
-    post = api.getPost(post_id)
+    post = await api.getPost(post_id)
     imgs = await api.download(post=post)
     post['collected_at'] = time()
     await collection.insert(int(post_id), post)

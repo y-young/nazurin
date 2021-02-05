@@ -46,7 +46,7 @@ async def sendPhotos(message: Message,
     for img in imgs:
         filetype = str(guess_type(img.url)[0])
         if filetype.startswith('image'):
-            media.append(InputMediaPhoto(img.display_url))
+            media.append(InputMediaPhoto(await img.display_url()))  # TODO
         else:
             await message.reply('File is not image, try download option.')
             return

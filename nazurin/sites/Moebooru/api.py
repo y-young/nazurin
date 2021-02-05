@@ -3,14 +3,13 @@ import os
 from typing import List, Optional
 from urllib.parse import unquote
 
-import requests
 from bs4 import BeautifulSoup
 from pybooru import Moebooru as moebooru
 from requests.exceptions import HTTPError
 
 from nazurin.config import TEMP_DIR
 from nazurin.models import Caption, Image
-from nazurin.utils import downloadImages, logger
+from nazurin.utils import Request, downloadImages, logger
 from nazurin.utils.exceptions import NazurinError
 
 class Moebooru(object):
@@ -18,15 +17,15 @@ class Moebooru(object):
         self.url = site_url
         return self
 
-    def getPost(self, post_id: int):
+    async def getPost(self, post_id: int):
         url = 'https://' + self.url + '/post/show/' + str(post_id)
-        response = requests.get(url)
-        try:
-            response.raise_for_status()
-        except HTTPError as err:
-            raise NazurinError(err) from None
-
-        response = response.text
+        async with Request() as request:
+            async with request.get(url) as response:
+                try:
+                    response.raise_for_status()
+                except HTTPError as err:
+                    raise NazurinError(err) from None
+                response = await response.text()
         soup = BeautifulSoup(response, 'html.parser')
         tag = soup.find(id="post-view").find(recursive=False)
         if tag.name == 'script':
@@ -46,8 +45,8 @@ class Moebooru(object):
             logger.error(err)
         return post, tags
 
-    def view(self, post_id: int):
-        post, tags = self.getPost(post_id)
+    async def view(self, post_id: int):
+        post, tags = await self.getPost(post_id)
         imgs = self.getImages(post)
         caption = self.buildCaption(post, tags)
         return imgs, caption
@@ -58,7 +57,7 @@ class Moebooru(object):
         if post:
             imgs = self.getImages(post)
         else:
-            imgs, _ = self.view(post_id)
+            imgs, _ = await self.view(post_id)
         await downloadImages(imgs)
         return imgs
 
