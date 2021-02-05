@@ -1,15 +1,15 @@
 from aiogram.dispatcher import filters
 from aiogram.types import Message
 
-from nazurin import bot
+from nazurin import bot, dp
 from nazurin.utils.exceptions import NazurinError
 
 from .api import Danbooru
 
 danbooru = Danbooru()
 
-@bot.handler(filters.RegexpCommandsFilter(regexp_commands=[r'/danbooru (\S+)'])
-             )
+@dp.message_handler(
+    filters.RegexpCommandsFilter(regexp_commands=[r'/danbooru (\S+)']))
 async def danbooru_view(message: Message, regexp_command):
     try:
         post_id = int(regexp_command.group(1))
@@ -17,13 +17,13 @@ async def danbooru_view(message: Message, regexp_command):
             await message.reply('Invalid post id!')
             return
         imgs, caption = danbooru.view(post_id)
-        await bot.sendPhotos(message, imgs, caption)
+        await bot.sendPhotos(imgs, message, caption)
     except (IndexError, ValueError):
         await message.reply('Usage: /danbooru <post_id>')
     except NazurinError as error:
         await message.reply(error.msg)
 
-@bot.handler(
+@dp.message_handler(
     filters.RegexpCommandsFilter(regexp_commands=[r'/danbooru_download (\S+)'])
 )
 async def danbooru_download(message: Message, regexp_command):
@@ -33,10 +33,8 @@ async def danbooru_download(message: Message, regexp_command):
             await message.reply('Invalid post id!')
             return
         imgs = await danbooru.download(post_id)
-        await bot.sendDocuments(message, imgs)
+        await bot.sendDocuments(imgs, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /danbooru_download <post_id>')
     except NazurinError as error:
         await message.reply(error.msg)
-
-commands = [danbooru_view, danbooru_download]

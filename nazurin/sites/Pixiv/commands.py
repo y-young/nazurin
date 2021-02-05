@@ -1,14 +1,15 @@
 from aiogram.dispatcher import filters
 from aiogram.types import Message
 
-from nazurin import bot
+from nazurin import bot, dp
 from nazurin.utils.exceptions import NazurinError
 
 from .api import Pixiv
 
 pixiv = Pixiv()
 
-@bot.handler(filters.RegexpCommandsFilter(regexp_commands=[r'/pixiv (\S+)']))
+@dp.message_handler(
+    filters.RegexpCommandsFilter(regexp_commands=[r'/pixiv (\S+)']))
 async def pixiv_view(message: Message, regexp_command):
     try:
         # args[0] should contain the queried artwork id
@@ -17,13 +18,13 @@ async def pixiv_view(message: Message, regexp_command):
             await message.reply('Invalid artwork id!')
             return
         imgs, caption = await pixiv.view_illust(artwork_id)
-        await bot.sendPhotos(message, imgs, caption)
+        await bot.sendPhotos(imgs, message, caption)
     except (IndexError, ValueError):
         await message.reply('Usage: /pixiv <artwork_id>')
     except NazurinError as error:
         await message.reply(error.msg)
 
-@bot.handler(
+@dp.message_handler(
     filters.RegexpCommandsFilter(regexp_commands=[r'/pixiv_download (\S+)']))
 async def pixiv_download(message: Message, regexp_command):
     try:
@@ -33,13 +34,13 @@ async def pixiv_download(message: Message, regexp_command):
             await message.reply('Invalid artwork id!')
             return
         imgs = await pixiv.download_illust(artwork_id)
-        await bot.sendDocuments(message, imgs)
+        await bot.sendDocuments(imgs, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /pixiv_download <artwork_id>')
     except NazurinError as error:
         await message.reply(error.msg)
 
-@bot.handler(
+@dp.message_handler(
     filters.RegexpCommandsFilter(regexp_commands=[r'/pixiv_bookmark (\S+)']))
 async def pixiv_bookmark(message: Message, regexp_command):
     try:
@@ -54,5 +55,3 @@ async def pixiv_bookmark(message: Message, regexp_command):
         await message.reply('Usage: /bookmark <artwork_id>')
     except NazurinError as error:
         await message.reply(error.msg)
-
-commands = [pixiv_view, pixiv_download, pixiv_bookmark]

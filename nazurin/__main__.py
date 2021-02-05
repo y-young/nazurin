@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import asyncio
 import shutil
 import traceback
 from typing import List
@@ -7,19 +6,18 @@ from typing import List
 from aiogram.types import ChatActions, ContentType, Message, Update
 from aiogram.utils.exceptions import TelegramAPIError
 
-from nazurin import config
-from nazurin.bot import Nazurin, URLFilter, sendDocuments
+from nazurin import config, dp
 from nazurin.sites import SiteManager
 from nazurin.storage import Storage
 from nazurin.utils import logger
 from nazurin.utils.decorators import chat_action
 from nazurin.utils.exceptions import NazurinError
+from nazurin.utils.filters import URLFilter
 
-bot = Nazurin()
 sites = SiteManager()
 storage = Storage()
 
-@bot.message_handler(commands=['start', 'help'])
+@dp.message_handler(commands=['start', 'help'])
 @chat_action(ChatActions.TYPING)
 async def show_help(message: Message):
     await message.reply('''
@@ -40,13 +38,13 @@ async def show_help(message: Message):
     PS: Send Pixiv/Danbooru/Yandere/Konachan/Twitter URL to download image(s)
     ''')
 
-@bot.message_handler(commands=['ping'])
+@dp.message_handler(commands=['ping'])
 @chat_action(ChatActions.TYPING)
 async def ping(message: Message):
     await message.reply('pong!')
 
-@bot.message_handler(URLFilter(),
-                     content_types=[ContentType.TEXT, ContentType.PHOTO])
+@dp.message_handler(URLFilter(),
+                    content_types=[ContentType.TEXT, ContentType.PHOTO])
 async def update_collection(message: Message, urls: List[str]):
     result = sites.match(urls)
     if not result:
@@ -59,14 +57,12 @@ async def update_collection(message: Message, urls: List[str]):
 
     try:
         imgs = await sites.handle_update(result)
-        await asyncio.gather(
-            sendDocuments(message, imgs, chat_id=config.ALBUM_ID),
-            storage.store(imgs))
+        await storage.store(imgs)
         await message.reply('Done!')
     except NazurinError as error:
         await message.reply(error.msg)
 
-@bot.message_handler(commands=['clear_cache'])
+@dp.message_handler(commands=['clear_cache'])
 async def clear_cache(message: Message):
     try:
         shutil.rmtree(config.TEMP_DIR)
@@ -76,7 +72,7 @@ async def clear_cache(message: Message):
     except OSError as error:
         await message.reply(error.strerror)
 
-@bot.errors_handler()
+@dp.errors_handler()
 async def on_error(update: Update, error: Exception):
     try:
         raise error
@@ -89,9 +85,8 @@ async def on_error(update: Update, error: Exception):
 
 def main():
     sites.load()
-    sites.register_commands(bot)
     storage.load()
-    bot.start()
+    dp.start()
 
 if __name__ == '__main__':
     main()

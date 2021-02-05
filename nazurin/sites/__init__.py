@@ -13,7 +13,6 @@ class SiteManager(object):
     def __init__(self):
         """Initialize."""
         self.sites = dict()
-        self.commands = list()
         self.sources = list()
 
     def load(self):
@@ -26,8 +25,6 @@ class SiteManager(object):
 
             module = import_module('nazurin.sites.' + module_name)
             self.sites[module_name.lower()] = getattr(module, module_name)()
-            if hasattr(module, 'commands'):
-                self.commands += getattr(module, 'commands')
             if hasattr(module, 'patterns') and hasattr(module, 'handle'):
                 PRIORITY = getattr(module, 'PRIORITY')
                 patterns = getattr(module, 'patterns')
@@ -38,10 +35,6 @@ class SiteManager(object):
 
     def api(self, site):
         return self.sites[site]
-
-    def register_commands(self, bot):
-        for command in self.commands:
-            bot.add_handler(command)
 
     def match(self, urls: List[str]):
         sources = self.sources
