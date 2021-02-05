@@ -3,9 +3,9 @@ import os
 from typing import List, Optional
 from urllib.parse import unquote
 
+from aiohttp.client_exceptions import ClientResponseError
 from bs4 import BeautifulSoup
 from pybooru import Moebooru as moebooru
-from requests.exceptions import HTTPError
 
 from nazurin.config import TEMP_DIR
 from nazurin.models import Caption, Image
@@ -23,7 +23,7 @@ class Moebooru(object):
             async with request.get(url) as response:
                 try:
                     response.raise_for_status()
-                except HTTPError as err:
+                except ClientResponseError as err:
                     raise NazurinError(err) from None
                 response = await response.text()
         soup = BeautifulSoup(response, 'html.parser')

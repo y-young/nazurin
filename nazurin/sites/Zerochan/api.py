@@ -3,8 +3,8 @@ from datetime import datetime, timezone
 from typing import List, Optional, Tuple
 from urllib.parse import unquote
 
+from aiohttp.client_exceptions import ClientResponseError
 from bs4 import BeautifulSoup
-from requests.exceptions import HTTPError
 
 from nazurin.models import Caption, Image
 from nazurin.utils import Request, downloadImages
@@ -17,7 +17,7 @@ class Zerochan(object):
                                    str(post_id)) as response:
                 try:
                     response.raise_for_status()
-                except HTTPError as err:
+                except ClientResponseError as err:
                     raise NazurinError(err) from None
 
                 # Override post_id if there's a redirection TODO: Check

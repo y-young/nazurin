@@ -26,7 +26,7 @@ class Danbooru(object):
                 post = self.api.post_list(md5=md5)
         except PybooruHTTPError as err:
             if 'Not Found' in err._msg:
-                raise NazurinError('Post not found')
+                raise NazurinError('Post not found') from None
         if 'file_url' not in post.keys():
             raise NazurinError(
                 'You may need a gold account to view this post\nSource: ' +
