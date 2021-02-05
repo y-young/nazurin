@@ -27,10 +27,11 @@ class Image:
         if self._chosen_url:
             return self._chosen_url
         self._chosen_url = self.url
-        size = await self.size()
-        if size > 5 * 1024 * 1024 and self.thumbnail:
-            self._chosen_url = self.thumbnail
-            logger.info('Use thumbnail: %s', self._chosen_url)
+        if self.thumbnail:
+            size = await self.size()
+            if size > 5 * 1024 * 1024:
+                self._chosen_url = self.thumbnail
+                logger.info('Use thumbnail: %s', self._chosen_url)
         return self._chosen_url
 
     async def size(self) -> int:
@@ -40,6 +41,7 @@ class Image:
                 headers={'Referer': 'https://www.pixiv.net/'}) as request:
             async with request.head(self.url) as response:
                 headers = response.headers
+                print(headers)
 
         if 'Content-Length' in headers.keys():
             self._size = int(headers['Content-Length'])
