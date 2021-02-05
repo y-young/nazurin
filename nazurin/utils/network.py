@@ -13,7 +13,11 @@ if os.name == 'nt':
 class Request(ClientSession):
     get = retry(ClientSession.get)
     post = retry(ClientSession.post)
+    put = retry(ClientSession.put)
+    patch = retry(ClientSession.patch)
+    delete = retry(ClientSession.delete)
     head = retry(ClientSession.head)
+    request = retry(ClientSession.request)
 
     def __init__(self, cookies=None, headers=None, **kwargs):
         if not headers:

@@ -1,6 +1,8 @@
 import os
 from dataclasses import dataclass
 
+import aiofiles.os
+
 from nazurin.config import TEMP_DIR
 from nazurin.utils.helpers import sanitizeFilename
 
@@ -18,4 +20,5 @@ class File:
 
     async def size(self):
         if os.path.exists(self.path):
-            return os.stat(self.path).st_size
+            stat = await aiofiles.os.stat(self.path)
+            return stat.st_size

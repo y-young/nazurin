@@ -25,6 +25,7 @@ class Image(File):
         return self._chosen_url
 
     async def size(self) -> int:
+        self._size = self._size or await super().size()
         if self._size:
             return self._size
         async with Request(
