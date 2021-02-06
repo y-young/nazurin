@@ -16,6 +16,10 @@ class NazurinDispatcher(Dispatcher):
         self.filters_factory.bind(URLFilter,
                                   event_handlers=[self.message_handlers])
 
+    def register_message_handler(self, callback, *args, **kwargs):
+        return super().register_message_handler(self.async_task(callback),
+                                                *args, **kwargs)
+
     async def on_startup(self, dp):
         await self.bot.set_webhook(config.WEBHOOK_URL + config.TOKEN,
                                    allowed_updates=AllowedUpdates.MESSAGE)
