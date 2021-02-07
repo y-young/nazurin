@@ -8,9 +8,16 @@ from aiogram.utils.exceptions import RetryAfter
 
 from nazurin import config
 
-retry = tenacity.retry(stop=tenacity.stop_after_attempt(config.RETRIES),
-                       before=tenacity.before_log(
-                           logging.getLogger('tenacity'), logging.INFO))
+def after_log(retry_state):
+    logging.getLogger('tenacity').log(
+        logging.INFO, '%s during %s execution, %s of %s attempted.',
+        repr(retry_state.outcome.exception()),
+        tenacity._utils.get_callback_name(retry_state.fn),
+        retry_state.attempt_number, config.RETRIES)
+
+retry = tenacity.retry(reraise=True,
+                       stop=tenacity.stop_after_attempt(config.RETRIES),
+                       after=after_log)
 
 def chat_action(action: str):
     """Sends `action` while processing."""

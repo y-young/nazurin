@@ -36,10 +36,10 @@ class NazurinDispatcher(Dispatcher):
         self.bot.init()
         # TODO
         if config.ENV == 'production':
+            logger.info('Set webhook')
             self.executor.set_webhook(webhook_path='/' + config.TOKEN,
                                       web_app=self.server)
             self.executor.run_app(host="0.0.0.0", port=config.PORT)
-            logger.info('Set webhook')
         else:
             # self.server.start()
             executor.start_polling(self, skip_updates=True)
