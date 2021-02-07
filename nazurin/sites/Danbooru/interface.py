@@ -21,12 +21,12 @@ async def handle(match, **kwargs):
 
     if match.lastgroup == 'id':
         post_id = match.group(1)
-        post = api.getPost(post_id)
+        post = await api.getPost(post_id)
     else:
         md5 = match.group(1)
-        post = api.getPost(md5=md5)
+        post = await api.getPost(md5=md5)
 
-    imgs = api.download(post=post)
+    imgs = await api.download(post=post)
     post['collected_at'] = time()
     await collection.insert(int(post['id']), post)
     return imgs

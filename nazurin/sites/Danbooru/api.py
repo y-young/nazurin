@@ -7,6 +7,7 @@ from pybooru import PybooruHTTPError
 
 from nazurin.models import Caption, Image
 from nazurin.utils import downloadFiles
+from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
 
 class Danbooru(object):
@@ -14,16 +15,18 @@ class Danbooru(object):
         """Set Danbooru site."""
         self.site = site
         self.api = danbooru(site)
+        self.post_show = async_wrap(self.api.post_show)
+        self.post_list = async_wrap(self.api.post_list)
 
-    def getPost(self,
-                post_id: Optional[int] = None,
-                md5: Optional[str] = None):
+    async def getPost(self,
+                      post_id: Optional[int] = None,
+                      md5: Optional[str] = None):
         """Fetch an post."""
         try:
             if post_id:
-                post = self.api.post_show(post_id)
+                post = await self.post_show(post_id)
             else:
-                post = self.api.post_list(md5=md5)
+                post = await self.post_list(md5=md5)
         except PybooruHTTPError as err:
             if 'Not Found' in err._msg:
                 raise NazurinError('Post not found') from None
@@ -33,8 +36,8 @@ class Danbooru(object):
                 post['source'])
         return post
 
-    def view(self, post_id: int) -> Tuple[List[Image], Caption]:
-        post = self.getPost(post_id)
+    async def view(self, post_id: int) -> Tuple[List[Image], Caption]:
+        post = await self.getPost(post_id)
         imgs, caption = self.parsePost(post)
         return imgs, caption
 
@@ -44,7 +47,7 @@ class Danbooru(object):
         if post:
             imgs, _ = self.parsePost(post)
         else:
-            imgs, _ = self.view(post_id)
+            imgs, _ = await self.view(post_id)
         await downloadFiles(imgs)
         return imgs
 

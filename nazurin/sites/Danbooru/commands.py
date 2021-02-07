@@ -16,7 +16,7 @@ async def danbooru_view(message: Message, regexp_command):
         if post_id <= 0:
             await message.reply('Invalid post id!')
             return
-        imgs, caption = danbooru.view(post_id)
+        imgs, caption = await danbooru.view(post_id)
         await bot.sendPhotos(imgs, message, caption)
     except (IndexError, ValueError):
         await message.reply('Usage: /danbooru <post_id>')
