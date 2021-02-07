@@ -1,6 +1,6 @@
 from aiogram import Dispatcher, executor
 from aiogram.types import AllowedUpdates
-from aiogram.utils.executor import start_webhook
+from aiogram.utils.executor import Executor
 
 from nazurin import config
 from nazurin.utils import logger
@@ -8,6 +8,7 @@ from nazurin.utils.filters import URLFilter
 
 from .bot import NazurinBot
 from .middleware import AuthMiddleware
+from .server import NazurinServer
 
 class NazurinDispatcher(Dispatcher):
     def __init__(self, bot: NazurinBot):
@@ -15,6 +16,10 @@ class NazurinDispatcher(Dispatcher):
         self.middleware.setup(AuthMiddleware())
         self.filters_factory.bind(URLFilter,
                                   event_handlers=[self.message_handlers])
+        self.server = NazurinServer(bot)
+        self.server.on_startup.append(self.on_startup)
+        self.server.on_shutdown.append(self.on_shutdown)
+        self.executor = Executor(self)
 
     def register_message_handler(self, callback, *args, **kwargs):
         return super().register_message_handler(self.async_task(callback),
@@ -28,15 +33,13 @@ class NazurinDispatcher(Dispatcher):
         await self.bot.delete_webhook()  # TODO
 
     def start(self):
+        self.bot.init()
         # TODO
         if config.ENV == 'production':
-            start_webhook(self,
-                          webhook_path='/' + config.TOKEN,
-                          on_startup=self.on_startup,
-                          on_shutdown=self.on_shutdown,
-                          skip_updates=True,
-                          host="0.0.0.0",
-                          port=config.PORT)
+            self.executor.set_webhook(webhook_path='/' + config.TOKEN,
+                                      web_app=self.server)
+            self.executor.run_app(host="0.0.0.0", port=config.PORT)
             logger.info('Set webhook')
         else:
+            # self.server.start()
             executor.start_polling(self, skip_updates=True)

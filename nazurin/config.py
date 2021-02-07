@@ -32,6 +32,7 @@ GALLERY_ID = env.int('GALLERY_ID')
 
 IS_PUBLIC = env.bool('IS_PUBLIC', default=False)
 # If IS_PUBLIC is True, the following items will be ignored
+ADMIN_ID = env.int('ADMIN_ID')
 ALLOW_ID = env.list('ALLOW_ID', subcast=int, default=[])
 ALLOW_USERNAME = env.list('ALLOW_USERNAME', default=[])
 ALLOW_GROUP = env.list('ALLOW_GROUP', subcast=int, default=[])

@@ -7,15 +7,10 @@ from aiogram.types import ChatActions, ContentType, Message, Update
 from aiogram.utils.exceptions import TelegramAPIError
 
 from nazurin import config, dp
-from nazurin.sites import SiteManager
-from nazurin.storage import Storage
 from nazurin.utils import logger
 from nazurin.utils.decorators import chat_action
 from nazurin.utils.exceptions import NazurinError
 from nazurin.utils.filters import URLFilter
-
-sites = SiteManager()
-storage = Storage()
 
 @dp.message_handler(commands=['start', 'help'])
 @chat_action(ChatActions.TYPING)
@@ -46,18 +41,8 @@ async def ping(message: Message):
 @dp.message_handler(URLFilter(),
                     content_types=[ContentType.TEXT, ContentType.PHOTO])
 async def update_collection(message: Message, urls: List[str]):
-    result = sites.match(urls)
-    if not result:
-        await message.reply('Error: No source matched')
-        return
-    logger.info('Collection update: site=%s, match=%s', result['site'],
-                result['match'].groups())
-    # Forward to gallery & Save to album
-    await message.forward(config.GALLERY_ID)
-
     try:
-        imgs = await sites.handle_update(result)
-        await storage.store(imgs)
+        await dp.bot.update_collection(urls, message)
         await message.reply('Done!')
     except NazurinError as error:
         await message.reply(error.msg)
@@ -84,8 +69,6 @@ async def on_error(update: Update, error: Exception):
         return True
 
 def main():
-    sites.load()
-    storage.load()
     dp.start()
 
 if __name__ == '__main__':
