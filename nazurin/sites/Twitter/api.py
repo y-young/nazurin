@@ -13,7 +13,7 @@ class Twitter(object):
             status_id) + '&lang=en'
         async with Request() as request:
             async with request.get(api) as response:
-                if response.status_code == 404:
+                if response.status == 404:
                     raise NazurinError('Tweet not found or unavailable.')
                 tweet = await response.json()
                 return tweet
