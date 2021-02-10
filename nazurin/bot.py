@@ -29,23 +29,9 @@ class NazurinBot(Bot):
 
     @chat_action(ChatActions.UPLOAD_PHOTO)
     @retry_after
-    async def sendPhotos(self,
-                         imgs: List[Image],
-                         message: Message,
-                         caption: Optional[Caption] = Caption()):
+    async def sendSingleGroup(self, imgs: List[Image], message: Message,
+                              caption: str):
         media = list()
-        if len(imgs) > 10:
-            # TODO
-            imgs = imgs[:10]
-            await message.reply(
-                'Notice: Too many pages, sending only 10 of them')
-
-        caption = caption.text
-        if len(caption) > 1024:
-            caption = caption[:1024]
-            await message.reply('Notice: Caption too long, trimmed')
-        caption = escape(caption, quote=False)
-
         for img in imgs:
             filetype = str(guess_type(img.url)[0])
             if filetype.startswith('image'):
@@ -58,6 +44,24 @@ class NazurinBot(Bot):
             await message.reply_media_group(media)
         except BadRequest as error:
             await handleBadRequest(message, error)
+
+    async def sendPhotos(self,
+                         imgs: List[Image],
+                         message: Message,
+                         caption: Optional[Caption] = Caption()):
+        caption = caption.text
+        if len(caption) > 1024:
+            caption = caption[:1024]
+            await message.reply('Notice: Caption too long, trimmed')
+        caption = escape(caption, quote=False)
+
+        groups = list()
+        while imgs:
+            groups.append(imgs[:10])
+            imgs = imgs[10:]
+
+        for group in groups:
+            await self.sendSingleGroup(group, message, caption)
 
     @retry_after
     async def sendDocument(self, file: File, chat_id, message_id=None):
