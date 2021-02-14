@@ -17,7 +17,7 @@ class NazurinServer(web.Application):
 
     async def do_update(self, url):
         try:
-            await self.bot.update_collection([url])
+            await self.bot.updateCollection([url])
         except Exception as error:
             await self.bot.send_message(
                 config.ADMIN_ID, f'Error processing {url}: {str(error)}')

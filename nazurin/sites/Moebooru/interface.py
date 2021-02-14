@@ -1,6 +1,7 @@
 from time import time
 
 from nazurin.database import Database
+from nazurin.models import Illust
 
 from .api import Moebooru
 from .config import COLLECTIONS
@@ -25,15 +26,14 @@ patterns = [
     r'(lolibooru\.moe)/(?:image|jpeg|sample)/[a-f0-9]{32}/lolibooru%20(\d+)'
 ]
 
-async def handle(match, **kwargs):
+async def handle(match, **kwargs) -> Illust:
     site_url = match.group(1)
     post_id = match.group(2)
     db = Database().driver()
     collection = db.collection(COLLECTIONS[site_url])
     api = Moebooru().site(site_url)
 
-    post, _ = await api.getPost(post_id)
-    imgs = await api.download(post=post)
-    post['collected_at'] = time()
-    await collection.insert(int(post_id), post)
-    return imgs
+    illust = await api.view(post_id)
+    illust.metadata['collected_at'] = time()
+    await collection.insert(int(post_id), illust.metadata)
+    return illust

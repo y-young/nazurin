@@ -1,7 +1,7 @@
 from typing import List
 
-from nazurin.models import Image
-from nazurin.utils import Request, downloadFiles
+from nazurin.models import Caption, Illust, Image
+from nazurin.utils import Request
 from nazurin.utils.exceptions import NazurinError
 
 class Gelbooru(object):
@@ -17,11 +17,11 @@ class Gelbooru(object):
                 post = response[0]
                 return post
 
-    async def fetch(self, post_id: int):
+    async def fetch(self, post_id: int) -> Illust:
         post = await self.getPost(post_id)
         imgs = self.getImages(post)
-        await downloadFiles(imgs)
-        return imgs, post
+        caption = self.buildCaption(post)
+        return Illust(imgs, caption, post)
 
     def getImages(self, post) -> List[Image]:
         """Get images from post."""
@@ -31,3 +31,15 @@ class Gelbooru(object):
         imgs = list()
         imgs.append(Image(filename, url))
         return imgs
+
+    def buildCaption(self, post) -> Caption:
+        tags = post['tags'].split(' ')
+        tag_string = str()
+        for tag in tags:
+            tag_string += '#' + tag + ' '
+        return Caption({
+            'title': post['title'],
+            'source': post['source'],
+            'url': f"https://gelbooru.com/index.php?page=post&s=view&id={post['id']}",
+            'tags': tag_string
+        })

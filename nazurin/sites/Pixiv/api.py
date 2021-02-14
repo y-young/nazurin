@@ -2,7 +2,7 @@
 import json
 import os
 import time
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, List, Optional
 
 import aiofiles
 from pixivpy3 import AppPixivAPI, PixivError
@@ -10,12 +10,12 @@ from pixivpy3 import AppPixivAPI, PixivError
 from nazurin.config import NAZURIN_DATA, TEMP_DIR
 from nazurin.database import Database
 from nazurin.models import Caption, File
-from nazurin.utils import downloadFiles, logger
+from nazurin.utils import logger
 from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
 
-from .config import DOCUMENT, HEADERS, PASSWORD, TRANSLATION, USER
-from .models import PixivImage
+from .config import DOCUMENT, PASSWORD, TRANSLATION, USER
+from .models import PixivIllust, PixivImage
 
 class Pixiv(object):
     api = AppPixivAPI()
@@ -69,28 +69,17 @@ class Pixiv(object):
         return illust
 
     async def view_illust(self,
-                          artwork_id: int) -> Tuple[List[PixivImage], Caption]:
-        illust = await self.getArtwork(artwork_id)
+                          artwork_id: Optional[int] = None,
+                          illust=None) -> PixivIllust:
+        if artwork_id:
+            illust = await self.getArtwork(artwork_id)
         if illust.type == 'ugoira':
             raise NazurinError('Ugoira view is not supported.')
         caption = self.buildCaption(illust)
         imgs = self.getImages(illust)
-        return imgs, caption
+        return PixivIllust(imgs, caption, illust)
 
-    async def download_illust(self,
-                              artwork_id: Optional[int] = None,
-                              illust=None) -> List[PixivImage]:
-        """Download and return images of an illustration."""
-        if not illust:
-            imgs, _ = await self.view_illust(artwork_id)
-        else:
-            imgs = self.getImages(illust)
-        if not os.path.exists(TEMP_DIR):
-            os.makedirs(TEMP_DIR)
-        await downloadFiles(imgs, headers=HEADERS)
-        return imgs
-
-    async def download_ugoira(self, illust) -> List[File]:
+    async def download_ugoira(self, illust) -> PixivIllust:
         """Download ugoira zip file and store animation data."""
         metadata = await Pixiv.ugoira_metadata(illust.id)
         metadata = json.dumps(metadata.ugoira_metadata)
@@ -100,13 +89,12 @@ class Pixiv(object):
         filename = str(illust.id) + '_ugoira1920x1080.zip'
         metafile = str(illust.id) + '_ugoira.json'
         gif_zip = File(filename, zip_url)
-        imgs = [gif_zip, File(metafile)]
+        files = [gif_zip, File(metafile)]
         if not os.path.exists(TEMP_DIR):
             os.makedirs(TEMP_DIR)
         async with aiofiles.open(os.path.join(TEMP_DIR, metafile), 'w') as f:
             await f.write(metadata)
-        await downloadFiles([gif_zip], HEADERS)
-        return imgs
+        return PixivIllust(files=files)
 
     async def bookmark(self, artwork_id: int):
         response = await self.call(Pixiv.illust_bookmark_add, artwork_id)

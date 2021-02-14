@@ -1,8 +1,8 @@
 import os
 from typing import List, Tuple
 
-from nazurin.models import Image
-from nazurin.utils import Request, downloadFiles
+from nazurin.models import Caption, Illust, Image
+from nazurin.utils import Request
 from nazurin.utils.exceptions import NazurinError
 
 class Twitter(object):
@@ -18,12 +18,12 @@ class Twitter(object):
                 tweet = await response.json()
                 return tweet
 
-    async def fetch(self, status_id: int):
+    async def fetch(self, status_id: int) -> Illust:
         """Fetch & return tweet images and information."""
         tweet = await self.getTweet(status_id)
         imgs = self.getImages(tweet)
-        await downloadFiles(imgs)
-        return imgs, tweet
+        caption = self.buildCaption(tweet)
+        return Illust(imgs, caption, tweet)
 
     def getImages(self, tweet) -> List[Image]:
         """Get all images in a tweet."""
@@ -36,6 +36,13 @@ class Twitter(object):
             imgs.append(
                 Image('twitter - ' + tweet['id_str'] + ' - ' + filename, url))
         return imgs
+
+    def buildCaption(self, tweet) -> Caption:
+        return Caption({
+            'url': f"https://twitter.com/{tweet['user']['screen_name']}/status/{tweet['id_str']}",
+            'author:': f"{tweet['user']['name']} #{tweet['user']['screen_name']}",
+            'text': tweet['text']
+        })
 
     def parseUrl(self, src: str) -> Tuple[str, str]:
         """Get filename & the url of the original image

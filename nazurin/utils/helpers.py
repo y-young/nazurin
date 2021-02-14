@@ -1,11 +1,15 @@
 import os
 import re
+from html import escape
+from mimetypes import guess_type
 from pathlib import Path
 from typing import List
 
 from aiogram.types import Message
 from aiogram.utils.exceptions import (BadRequest, InvalidHTTPUrlContent,
                                       WrongFileIdentifier)
+
+from nazurin.models import Caption
 
 from . import logger
 
@@ -38,6 +42,13 @@ def sanitizeFilename(name: str) -> str:
         name = filename[:255 - len(ext)] + ext
     return name
 
+def sanitizeCaption(caption: Caption) -> str:
+    content = caption.text
+    if len(content) > 1024:
+        content = content[:1024]
+    content = escape(content, quote=False)
+    return content
+
 def getUrlsFromMessage(message: Message) -> List[str]:
     if message.entities:
         entities = message.entities
@@ -59,3 +70,15 @@ def getUrlsFromMessage(message: Message) -> List[str]:
             urls.append(text[offset * 2:(offset + length) *
                              2].decode('utf-16-le'))
     return urls
+
+def isImage(url: str) -> bool:
+    '''
+    Guess if a file is image by extension
+    '''
+
+    filetype = str(guess_type(url)[0])
+    return filetype.startswith('image')
+
+def ensureExistence(path: str):
+    if not os.path.exists(path):
+        os.makedirs(path)

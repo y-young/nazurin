@@ -1,6 +1,7 @@
 from time import time
 
 from nazurin.database import Database
+from nazurin.models import Illust
 
 from .api import Zerochan
 from .config import COLLECTION
@@ -14,14 +15,13 @@ patterns = [
     r'zerochan\.net/\S+\.(\d+)\.\w+$'
 ]
 
-async def handle(match, **kwargs):
+async def handle(match, **kwargs) -> Illust:
     post_id = match.group(1)
     api = Zerochan()
     db = Database().driver()
     collection = db.collection(COLLECTION)
 
-    post = await api.getPost(post_id)
-    imgs = await api.download(post=post)
-    post['collected_at'] = time()
-    await collection.insert(int(post_id), post)
-    return imgs
+    illust = await api.view(post_id)
+    illust.metadata['collected_at'] = time()
+    await collection.insert(int(post_id), illust.metadata)
+    return illust

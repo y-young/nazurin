@@ -1,6 +1,7 @@
 from time import time
 
 from nazurin.database import Database
+from nazurin.models import Illust
 
 from .api import Pixiv
 from .config import COLLECTION
@@ -27,7 +28,7 @@ patterns = [
     r'(?:i|img)\d+\.pixiv\.net/(?:img\d+/)?img/(?:\S+)*/(\d+)'
 ]
 
-async def handle(match, **kwargs):
+async def handle(match, **kwargs) -> Illust:
     artwork_id = match.group(1)
     api = Pixiv()
     db = Database().driver()
@@ -36,9 +37,9 @@ async def handle(match, **kwargs):
     await api.bookmark(artwork_id)
     illust = await api.getArtwork(artwork_id)
     if illust.type == 'ugoira':
-        imgs = await api.download_ugoira(illust)
+        illust = await api.download_ugoira(illust)
     else:
-        imgs = await api.download_illust(illust=illust)
-    illust.collected_at = time()
-    await collection.insert(int(artwork_id), illust)
-    return imgs
+        illust = await api.view_illust(illust=illust)
+    illust.metadata['collected_at'] = time()
+    await collection.insert(int(artwork_id), illust.metadata)
+    return illust

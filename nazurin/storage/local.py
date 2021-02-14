@@ -6,11 +6,11 @@ from typing import List
 from nazurin.config import STORAGE_DIR
 from nazurin.models import File
 from nazurin.utils.decorators import async_wrap
+from nazurin.utils.helpers import ensureExistence
 
 class Local(object):
     def __init__(self):
-        if not os.path.exists(STORAGE_DIR):
-            os.makedirs(STORAGE_DIR)
+        ensureExistence(STORAGE_DIR)
 
     @async_wrap
     def moveFile(self, file: File):

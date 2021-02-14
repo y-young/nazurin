@@ -2,8 +2,8 @@ import json
 import os
 from typing import List
 
-from nazurin.models import Image
-from nazurin.utils import Request, downloadFiles
+from nazurin.models import Caption, Illust, Image
+from nazurin.utils import Request
 
 class Bilibili(object):
     async def getDynamic(self, dynamic_id: int):
@@ -16,12 +16,13 @@ class Bilibili(object):
         card = json.loads(source['data']['card']['card'])
         return card
 
-    async def fetch(self, dynamic_id: int):
+    async def fetch(self, dynamic_id: int) -> Illust:
         """Fetch images and detail."""
         card = await self.getDynamic(dynamic_id)
         imgs = self.getImages(card, dynamic_id)
-        await downloadFiles(imgs)
-        return imgs, card
+        caption = self.buildCaption(card)
+        caption['url'] = f"https://t.bilibili.com/{dynamic_id}"
+        return Illust(imgs, caption, card)
 
     def getImages(self, card, dynamic_id: int) -> List[Image]:
         """Get all images in a dynamic card."""
@@ -34,3 +35,9 @@ class Bilibili(object):
             imgs.append(
                 Image(str(dynamic_id) + '_' + str(index) + extension, url))
         return imgs
+
+    def buildCaption(self, card) -> Caption:
+        return Caption({
+            'author': card['user']['name'],
+            'content': card['item']['description']
+        })

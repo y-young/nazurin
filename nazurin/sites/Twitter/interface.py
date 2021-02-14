@@ -1,6 +1,7 @@
 from time import time
 
 from nazurin.database import Database
+from nazurin.models import Illust
 
 from .api import Twitter
 from .config import COLLECTION
@@ -13,11 +14,11 @@ patterns = [
     r'(?:mobile\.|www\.)?twitter\.com/[^.]+/status/(\d+)'
 ]
 
-async def handle(match, **kwargs):
+async def handle(match, **kwargs) -> Illust:
     status_id = match.group(1)
     db = Database().driver()
     collection = db.collection(COLLECTION)
-    imgs, tweet = await Twitter().fetch(status_id)
-    tweet['collected_at'] = time()
-    await collection.insert(int(status_id), tweet)
-    return imgs
+    illust = await Twitter().fetch(status_id)
+    illust.metadata['collected_at'] = time()
+    await collection.insert(int(status_id), illust.metadata)
+    return illust

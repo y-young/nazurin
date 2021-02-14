@@ -1,6 +1,7 @@
 from time import time
 
 from nazurin.database import Database
+from nazurin.models import Illust
 
 from .api import Gelbooru
 from .config import COLLECTION
@@ -10,12 +11,12 @@ patterns = [
     r'gelbooru\.com/index\.php\?page=post&s=view&id=(\d+)'
 ]
 
-async def handle(match, **kwargs):
+async def handle(match, **kwargs) -> Illust:
     post_id = match.group(1)
     db = Database().driver()
     collection = db.collection(COLLECTION)
 
-    imgs, post = await Gelbooru().fetch(post_id)
-    post['collected_at'] = time()
-    await collection.insert(int(post_id), post)
-    return imgs
+    illust = await Gelbooru().fetch(post_id)
+    illust.metadata['collected_at'] = time()
+    await collection.insert(int(post_id), illust.metadata)
+    return illust

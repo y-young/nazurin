@@ -1,6 +1,7 @@
 from time import time
 
 from nazurin.database import Database
+from nazurin.models import Illust
 
 from .api import Bilibili
 from .config import COLLECTION
@@ -13,12 +14,12 @@ patterns = [
     r't\.bilibili\.com/h5/dynamic/detail/(\d+)'
 ]
 
-async def handle(match, **kwargs):
+async def handle(match, **kwargs) -> Illust:
     dynamic_id = match.group(1)
     db = Database().driver()
     collection = db.collection(COLLECTION)
 
-    imgs, data = await Bilibili().fetch(dynamic_id)
-    data['collected_at'] = time()
-    await collection.insert(int(dynamic_id), data)
-    return imgs
+    illust = await Bilibili().fetch(dynamic_id)
+    illust.metadata['collected_at'] = time()
+    await collection.insert(int(dynamic_id), illust.metadata)
+    return illust

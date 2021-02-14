@@ -5,10 +5,10 @@ from typing import List, Optional, Tuple
 from pybooru import Danbooru as danbooru
 from pybooru import PybooruHTTPError
 
-from nazurin.models import Caption, Image
-from nazurin.utils import downloadFiles
+from nazurin.models import Caption, File, Illust, Image
 from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
+from nazurin.utils.helpers import isImage
 
 class Danbooru(object):
     def __init__(self, site='danbooru'):
@@ -36,29 +36,25 @@ class Danbooru(object):
                 post['source'])
         return post
 
-    async def view(self, post_id: int) -> Tuple[List[Image], Caption]:
-        post = await self.getPost(post_id)
-        imgs, caption = self.parsePost(post)
-        return imgs, caption
+    async def view(self,
+                   post_id: Optional[int] = None,
+                   md5: Optional[str] = None) -> Illust:
+        post = await self.getPost(post_id, md5)
+        illust = self.parsePost(post)
+        return illust
 
-    async def download(self,
-                       post_id: Optional[int] = None,
-                       post=None) -> List[Image]:
-        if post:
-            imgs, _ = self.parsePost(post)
-        else:
-            imgs, _ = await self.view(post_id)
-        await downloadFiles(imgs)
-        return imgs
-
-    def parsePost(self, post) -> Tuple[List[Image], Caption]:
+    def parsePost(self, post) -> Illust:
         """Get images and build caption."""
         # Get images
         url = post['file_url']
         artists = post['tag_string_artist']
         title, filename = self._getNames(post)
         imgs = list()
-        imgs.append(Image(filename, url))
+        files = list()
+        if isImage(url):
+            imgs.append(Image(filename, url))
+        else:  # danbooru has non-image posts, such as #animated
+            files.append(File(filename, url))
 
         # Build media caption
         tags = post['tag_string'].split(' ')
@@ -75,7 +71,7 @@ class Danbooru(object):
             'pixiv_id': post['pixiv_id'],
             'has_children': post['has_children']
         })
-        return imgs, caption
+        return Illust(imgs, caption, post, files)
 
     def _getNames(self, post) -> Tuple[str, str]:
         """Build title and filename."""

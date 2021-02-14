@@ -42,7 +42,7 @@ async def ping(message: Message):
                     content_types=[ContentType.TEXT, ContentType.PHOTO])
 async def update_collection(message: Message, urls: List[str]):
     try:
-        await dp.bot.update_collection(urls, message)
+        await dp.bot.updateCollection(urls, message)
         await message.reply('Done!')
     except NazurinError as error:
         await message.reply(error.msg)

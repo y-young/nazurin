@@ -1,10 +1,9 @@
 """Nazurin storage drivers and storage manager."""
 import asyncio
 import importlib
-from typing import List
 
 from nazurin.config import STORAGE
-from nazurin.models import File
+from nazurin.models import Illust
 from nazurin.utils import logger
 
 class Storage(object):
@@ -19,9 +18,9 @@ class Storage(object):
             self.disks.append(getattr(driver, driver_name)())
         logger.info("Storage loaded")
 
-    async def store(self, files: List[File]):
+    async def store(self, illust: Illust):
         tasks = []
         for disk in self.disks:
-            tasks.append(disk.store(files))
+            tasks.append(disk.store(illust.all_files))
         await asyncio.gather(*tasks)
         logger.info('Storage completed')

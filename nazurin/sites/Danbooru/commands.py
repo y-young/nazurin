@@ -16,8 +16,8 @@ async def danbooru_view(message: Message, regexp_command):
         if post_id <= 0:
             await message.reply('Invalid post id!')
             return
-        imgs, caption = await danbooru.view(post_id)
-        await bot.sendPhotos(imgs, message, caption)
+        illust = await danbooru.view(post_id)
+        await bot.sendPhotos(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /danbooru <post_id>')
     except NazurinError as error:
@@ -32,8 +32,9 @@ async def danbooru_download(message: Message, regexp_command):
         if post_id <= 0:
             await message.reply('Invalid post id!')
             return
-        imgs = await danbooru.download(post_id)
-        await bot.sendDocuments(imgs, message)
+        illust = await danbooru.view(post_id)
+        await illust.download()
+        await bot.sendDocuments(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /danbooru_download <post_id>')
     except NazurinError as error:

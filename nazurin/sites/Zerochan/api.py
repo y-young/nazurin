@@ -1,13 +1,13 @@
 import json
 from datetime import datetime, timezone
-from typing import List, Optional, Tuple
+from typing import List
 from urllib.parse import unquote
 
 from aiohttp.client_exceptions import ClientResponseError
 from bs4 import BeautifulSoup
 
-from nazurin.models import Caption, Image
-from nazurin.utils import Request, downloadFiles
+from nazurin.models import Caption, Illust, Image
+from nazurin.utils import Request
 from nazurin.utils.exceptions import NazurinError
 
 class Zerochan(object):
@@ -55,21 +55,11 @@ class Zerochan(object):
         }
         return post
 
-    async def view(self, post_id: int) -> Tuple[List[Image], Caption]:
+    async def view(self, post_id: int) -> Illust:
         post = await self.getPost(post_id)
         imgs = self.getImages(post)
         caption = self.buildCaption(post)
-        return imgs, caption
-
-    async def download(self,
-                       post_id: Optional[int] = None,
-                       post=None) -> List[Image]:
-        if post:
-            imgs = self.getImages(post)
-        else:
-            imgs, _ = await self.view(post_id)
-        await downloadFiles(imgs)
-        return imgs
+        return Illust(imgs, caption, post)
 
     def getImages(self, post) -> List[Image]:
         url = post['file_url']

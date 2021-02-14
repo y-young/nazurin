@@ -16,8 +16,8 @@ async def yandere_view(message: Message, regexp_command):
         if post_id < 0:
             await message.reply('Invalid post id!')
             return
-        imgs, caption = await moebooru.site('yande.re').view(post_id)
-        await bot.sendPhotos(imgs, message, caption)
+        illust = await moebooru.site('yande.re').view(post_id)
+        await bot.sendPhotos(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /yandere <post_id>')
     except NazurinError as error:
@@ -31,8 +31,9 @@ async def yandere_download(message: Message, regexp_command):
         if post_id <= 0:
             await message.reply('Invalid post id!')
             return
-        imgs = await moebooru.site('yande.re').download(post_id)
-        await bot.sendDocuments(imgs, message)
+        illust = await moebooru.site('yande.re').view(post_id)
+        await illust.download()
+        await bot.sendDocuments(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /yandere_download <post_id>')
     except NazurinError as error:
@@ -46,8 +47,8 @@ async def konachan_view(message: Message, regexp_command):
         if post_id < 0:
             await message.reply('Invalid post id!')
             return
-        imgs, caption = await moebooru.site('konachan.com').view(post_id)
-        await bot.sendPhotos(imgs, message, caption)
+        illust = await moebooru.site('konachan.com').view(post_id)
+        await bot.sendPhotos(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /konachan <post_id>')
     except NazurinError as error:
@@ -62,8 +63,9 @@ async def konachan_download(message: Message, regexp_command):
         if post_id <= 0:
             await message.reply('Invalid post id!')
             return
-        imgs = await moebooru.site('konachan.com').download(post_id)
-        await bot.sendDocuments(imgs, message)
+        illust = await moebooru.site('konachan.com').view(post_id)
+        await illust.download()
+        await bot.sendDocuments(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /konachan_download <post_id>')
     except NazurinError as error:

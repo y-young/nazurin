@@ -8,9 +8,10 @@ from bs4 import BeautifulSoup
 from pybooru import Moebooru as moebooru
 
 from nazurin.config import TEMP_DIR
-from nazurin.models import Caption, Image
-from nazurin.utils import Request, downloadFiles, logger
+from nazurin.models import Caption, Illust, Image
+from nazurin.utils import Request, logger
 from nazurin.utils.exceptions import NazurinError
+from nazurin.utils.helpers import ensureExistence
 
 class Moebooru(object):
     def site(self, site_url: Optional[str] = 'yande.re'):
@@ -45,21 +46,11 @@ class Moebooru(object):
             logger.error(err)
         return post, tags
 
-    async def view(self, post_id: int):
+    async def view(self, post_id: int) -> Illust:
         post, tags = await self.getPost(post_id)
         imgs = self.getImages(post)
         caption = self.buildCaption(post, tags)
-        return imgs, caption
-
-    async def download(self,
-                       post_id: Optional[int] = None,
-                       post=None) -> List[Image]:
-        if post:
-            imgs = self.getImages(post)
-        else:
-            imgs, _ = await self.view(post_id)
-        await downloadFiles(imgs)
-        return imgs
+        return Illust(imgs, caption, post)
 
     def pool(self, pool_id: int, jpeg=False):
         client = moebooru(self.site)
@@ -82,15 +73,14 @@ class Moebooru(object):
     async def download_pool(self, pool_id, jpeg=False):
         imgs, caption = self.pool(pool_id, jpeg)
         pool_name = caption['name']
-        if not os.path.exists(TEMP_DIR + pool_name):
-            os.makedirs(TEMP_DIR + pool_name)
+        ensureExistence(TEMP_DIR + pool_name)
         for key, img in enumerate(imgs):
             filename = str(key + 1)
             filename = '0' * (3 - len(filename)) + filename
             _, ext = self.parseUrl(img.url)
             filename += ext
             img.name = pool_name + '/' + img.name
-            await downloadFiles([img])  #TODO
+            await img.download()  # TODO
 
     def getImages(self, post) -> List[Image]:
         file_url = post['file_url']

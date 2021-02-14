@@ -17,8 +17,8 @@ async def pixiv_view(message: Message, regexp_command):
         if artwork_id < 0:
             await message.reply('Invalid artwork id!')
             return
-        imgs, caption = await pixiv.view_illust(artwork_id)
-        await bot.sendPhotos(imgs, message, caption)
+        illust = await pixiv.view_illust(artwork_id)
+        await bot.sendPhotos(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /pixiv <artwork_id>')
     except NazurinError as error:
@@ -33,8 +33,9 @@ async def pixiv_download(message: Message, regexp_command):
         if artwork_id < 0:
             await message.reply('Invalid artwork id!')
             return
-        imgs = await pixiv.download_illust(artwork_id)
-        await bot.sendDocuments(imgs, message)
+        illust = await pixiv.view_illust(artwork_id)
+        await illust.download()
+        await bot.sendDocuments(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /pixiv_download <artwork_id>')
     except NazurinError as error:

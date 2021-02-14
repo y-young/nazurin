@@ -1,7 +1,9 @@
 import os
 from dataclasses import dataclass
 
+import aiofiles
 import aiofiles.os
+import aiohttp
 
 from nazurin.config import TEMP_DIR
 from nazurin.utils.helpers import sanitizeFilename
@@ -22,3 +24,11 @@ class File:
         if os.path.exists(self.path):
             stat = await aiofiles.os.stat(self.path)
             return stat.st_size
+
+    async def download(self, session: aiohttp.ClientSession):
+        if os.path.exists(self.path) and (await aiofiles.os.stat(
+                self.path)).st_size != 0:
+            return
+        async with session.get(self.url) as response:
+            async with aiofiles.open(self.path, 'wb') as f:
+                await f.write(await response.read())

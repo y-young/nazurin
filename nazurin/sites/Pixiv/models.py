@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from random import random
 
-from nazurin.models import Image
+from nazurin.models import Illust, Image
 
-from .config import IMG_PROXY
+from .config import HEADERS, IMG_PROXY
 
 @dataclass
 class PixivImage(Image):
@@ -11,3 +11,8 @@ class PixivImage(Image):
         # use reverse proxy to avoid strange problems
         url = await self.chosen_url()
         return url.replace('i.pximg.net', IMG_PROXY) + '?' + str(random())
+
+@dataclass
+class PixivIllust(Illust):
+    async def download(self, **kwargs):
+        await super().download(headers=HEADERS, **kwargs)
