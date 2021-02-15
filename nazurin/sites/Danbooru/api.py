@@ -52,9 +52,11 @@ class Danbooru(object):
         imgs = list()
         files = list()
         if isImage(url):
-            imgs.append(Image(filename, url))
+            imgs.append(
+                Image(filename, url, post['large_file_url'], post['file_size'],
+                      post['image_width'], post['image_height']))
         else:  # danbooru has non-image posts, such as #animated
-            files.append(File(filename, url))
+            files.append(File(filename, url, post['file_size']))
 
         # Build media caption
         tags = post['tag_string'].split(' ')

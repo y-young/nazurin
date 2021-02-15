@@ -19,11 +19,13 @@ async def handleBadRequest(message: Message, error: BadRequest):
         await message.reply(
             'Failed to send image as photo, maybe the size is too big, '
             'consider using download option or try again.\n'
+            f'Message: {message.text}\n'
             f'Error: {error}')
     elif 'Group send failed' in str(error):
         await message.reply(
             'Failed to send images because one of them is too large, '
             'consider using download option or try again.\n'
+            f'Message: {message.text}\n'
             f'Error: {error}')
     else:
         raise error
@@ -72,9 +74,9 @@ def getUrlsFromMessage(message: Message) -> List[str]:
     return urls
 
 def isImage(url: str) -> bool:
-    '''
+    """
     Guess if a file is image by extension
-    '''
+    """
 
     filetype = str(guess_type(url)[0])
     return filetype.startswith('image')

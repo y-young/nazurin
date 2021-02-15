@@ -32,9 +32,13 @@ class Twitter(object):
         photos = tweet['photos']
         imgs = list()
         for photo in photos:
-            filename, url = self.parseUrl(photo['url'])
+            filename, url, thumbnail = self.parseUrl(photo['url'])
             imgs.append(
-                Image('twitter - ' + tweet['id_str'] + ' - ' + filename, url))
+                Image('twitter - ' + tweet['id_str'] + ' - ' + filename,
+                      url,
+                      thumbnail,
+                      width=photo['width'],
+                      height=photo['height']))
         return imgs
 
     def buildCaption(self, tweet) -> Caption:
@@ -44,19 +48,19 @@ class Twitter(object):
             'text': tweet['text']
         })
 
-    def parseUrl(self, src: str) -> Tuple[str, str]:
-        """Get filename & the url of the original image
+    def parseUrl(self, src: str) -> Tuple[str, str, str]:
+        """Get filename, original file url & thumbnail url of the original image
 
         eg:
 
             src: 'https://pbs.twimg.com/media/DOhM30VVwAEpIHq.jpg'
 
-            return: 'DOhM30VVwAEpIHq.jpg', 'https://pbs.twimg.com/media/DOhM30VVwAEpIHq?format=jpg&name=orig'
+            return: 'DOhM30VVwAEpIHq.jpg', 'https://pbs.twimg.com/media/DOhM30VVwAEpIHq?format=jpg&name=orig', 'https://pbs.twimg.com/media/DOhM30VVwAEpIHq?format=jpg&name=large'
 
         Doc: https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/entities-object
         """
         basename = os.path.basename(src)
         filename, extension = os.path.splitext(basename)
         url = 'https://pbs.twimg.com/media/' + filename + '?format=' + extension[
-            1:] + '&name=orig'
-        return basename, url
+            1:]
+        return basename, (url + '&name=orig'), (url + '&name=large')

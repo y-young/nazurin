@@ -138,17 +138,30 @@ class Pixiv(object):
 
     def getImages(self, illust) -> List[PixivImage]:
         """Get images from an artwork."""
+        width = illust.width
+        height = illust.height
         imgs = list()
         if illust.meta_pages:  # Contains more than one image
             pages = illust.meta_pages
             for page in pages:
                 url = page.image_urls.original
                 name = self.getFilename(url, illust)
-                imgs.append(PixivImage(name, url, self.getThumbnail(url)))
+                # For multi-page illusts, width & height will be the size of the first page
+                imgs.append(
+                    PixivImage(name,
+                               url,
+                               self.getThumbnail(url),
+                               width=width,
+                               height=height))
         else:
             url = illust.meta_single_page.original_image_url
             name = self.getFilename(url, illust)
-            imgs.append(PixivImage(name, url, self.getThumbnail(url)))
+            imgs.append(
+                PixivImage(name,
+                           url,
+                           self.getThumbnail(url),
+                           width=width,
+                           height=height))
         return imgs
 
     def buildCaption(self, illust) -> Caption:

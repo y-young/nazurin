@@ -33,7 +33,10 @@ class Bilibili(object):
             basename = os.path.basename(url)
             extension = os.path.splitext(basename)[1]
             imgs.append(
-                Image(str(dynamic_id) + '_' + str(index) + extension, url))
+                Image(
+                    str(dynamic_id) + '_' + str(index) + extension, url,
+                    url + '@518w.jpg', pic['img_size'], pic['img_width'],
+                    pic['img_height']))
         return imgs
 
     def buildCaption(self, card) -> Caption:

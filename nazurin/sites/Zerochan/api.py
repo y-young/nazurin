@@ -65,7 +65,10 @@ class Zerochan(object):
         url = post['file_url']
         name = 'Zerochan ' + str(
             post['id']) + ' ' + post['name'] + '.' + post['file_ext']
-        return [Image(name, url)]
+        return [
+            Image(name, url, post['preview_file_url'], post['file_size'],
+                  int(post['image_width']), int(post['image_height']))
+        ]
 
     def buildCaption(self, post) -> Caption:
         """Build media caption from an post."""

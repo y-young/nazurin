@@ -85,7 +85,10 @@ class Moebooru(object):
     def getImages(self, post) -> List[Image]:
         file_url = post['file_url']
         name = unquote(os.path.basename(file_url))
-        imgs = [Image(name, file_url, post['sample_url'], post['file_size'])]
+        imgs = [
+            Image(name, file_url, post['sample_url'], post['file_size'],
+                  post['width'], post['height'])
+        ]
         return imgs
 
     def buildCaption(self, post, tags) -> Caption:
