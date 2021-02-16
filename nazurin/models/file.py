@@ -6,7 +6,7 @@ import aiofiles.os
 import aiohttp
 
 from nazurin.config import TEMP_DIR
-from nazurin.utils.helpers import sanitizeFilename
+from nazurin.utils.helpers import ensureExistence, sanitizeFilename
 
 @dataclass
 class File:
@@ -34,6 +34,7 @@ class File:
     async def download(self, session: aiohttp.ClientSession):
         if await self.exists():
             return True
+        ensureExistence(TEMP_DIR)
         async with session.get(self.url) as response:
             async with aiofiles.open(self.path, 'wb') as f:
                 await f.write(await response.read())

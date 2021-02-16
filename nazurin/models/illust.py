@@ -2,9 +2,7 @@ import asyncio
 from dataclasses import dataclass, field
 from typing import List
 
-from nazurin.config import TEMP_DIR
 from nazurin.utils import Request
-from nazurin.utils.helpers import ensureExistence
 
 from .caption import Caption
 from .file import File
@@ -25,7 +23,6 @@ class Illust:
         return len(self.images) != 0
 
     async def download(self, **kwargs):
-        ensureExistence(TEMP_DIR)
         async with Request(**kwargs) as session:
             tasks = []
             for file in self.all_files:
