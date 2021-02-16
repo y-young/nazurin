@@ -20,6 +20,8 @@ class NazurinServer(web.Application):
     async def do_update(self, url):
         try:
             await self.bot.updateCollection([url])
+            await self.bot.send_message(config.ADMIN_ID,
+                                        f'Successfully collected {url}')
         except Exception as error:
             traceback.print_exc()
             await self.bot.send_message(
