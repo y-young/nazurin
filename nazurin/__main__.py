@@ -3,6 +3,7 @@ import shutil
 import traceback
 from typing import List
 
+from aiogram.dispatcher.filters import IDFilter
 from aiogram.types import ChatActions, ContentType, Message, Update
 from aiogram.utils.exceptions import TelegramAPIError
 
@@ -44,7 +45,7 @@ async def update_collection(message: Message, urls: List[str]):
     await dp.bot.updateCollection(urls, message)
     await message.reply('Done!')
 
-@dp.message_handler(commands=['clear_cache'])
+@dp.message_handler(IDFilter(config.ADMIN_ID), commands=['clear_cache'])
 async def clear_cache(message: Message):
     try:
         shutil.rmtree(config.TEMP_DIR)
