@@ -21,6 +21,9 @@ class Illust:
     def all_files(self) -> List[File]:
         return self.images + self.files
 
+    def has_image(self) -> bool:
+        return len(self.images) != 0
+
     async def download(self, **kwargs):
         ensureExistence(TEMP_DIR)
         async with Request(**kwargs) as session:

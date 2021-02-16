@@ -7,6 +7,7 @@ from nazurin.config import PROXY, UA
 
 from .decorators import retry
 
+# https://github.com/aio-libs/aiohttp/issues/4536
 if os.name == 'nt':
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 

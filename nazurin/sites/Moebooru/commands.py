@@ -17,7 +17,7 @@ async def yandere_view(message: Message, regexp_command):
             await message.reply('Invalid post id!')
             return
         illust = await moebooru.site('yande.re').view(post_id)
-        await bot.sendPhotos(illust, message)
+        await bot.sendIllust(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /yandere <post_id>')
     except NazurinError as error:
@@ -48,7 +48,7 @@ async def konachan_view(message: Message, regexp_command):
             await message.reply('Invalid post id!')
             return
         illust = await moebooru.site('konachan.com').view(post_id)
-        await bot.sendPhotos(illust, message)
+        await bot.sendIllust(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /konachan <post_id>')
     except NazurinError as error:

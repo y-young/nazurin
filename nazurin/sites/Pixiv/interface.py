@@ -35,11 +35,7 @@ async def handle(match, **kwargs) -> Illust:
     collection = db.collection(COLLECTION)
 
     await api.bookmark(artwork_id)
-    illust = await api.getArtwork(artwork_id)
-    if illust.type == 'ugoira':
-        illust = await api.download_ugoira(illust)
-    else:
-        illust = await api.view_illust(illust=illust)
+    illust = await api.view(artwork_id)
     illust.metadata['collected_at'] = time()
     await collection.insert(int(artwork_id), illust.metadata)
     return illust

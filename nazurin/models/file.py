@@ -25,10 +25,15 @@ class File:
             stat = await aiofiles.os.stat(self.path)
             return stat.st_size
 
-    async def download(self, session: aiohttp.ClientSession):
+    async def exists(self) -> bool:
         if os.path.exists(self.path) and (await aiofiles.os.stat(
                 self.path)).st_size != 0:
-            return
+            return True
+        return False
+
+    async def download(self, session: aiohttp.ClientSession):
+        if await self.exists():
+            return True
         async with session.get(self.url) as response:
             async with aiofiles.open(self.path, 'wb') as f:
                 await f.write(await response.read())

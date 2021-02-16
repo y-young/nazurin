@@ -1,20 +1,25 @@
 # -*- coding: utf-8 -*-
 import json
 import os
+import shlex
+import shutil
+import subprocess
 import time
-from typing import Callable, List, Optional
+import zipfile
+from typing import Callable, List
 
 import aiofiles
+import aiofiles.os
 from pixivpy3 import AppPixivAPI, PixivError
 
-from nazurin.config import NAZURIN_DATA, TEMP_DIR
+from nazurin.config import NAZURIN_DATA
 from nazurin.database import Database
-from nazurin.models import Caption, File
-from nazurin.utils import logger
+from nazurin.models import Caption, File, Illust, Ugoira
+from nazurin.utils import Request, logger
 from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
 
-from .config import DOCUMENT, PASSWORD, TRANSLATION, USER
+from .config import DOCUMENT, HEADERS, PASSWORD, TRANSLATION, USER
 from .models import PixivIllust, PixivImage
 
 class Pixiv(object):
@@ -68,33 +73,37 @@ class Pixiv(object):
             raise NazurinError("Artwork is private")
         return illust
 
-    async def view_illust(self,
-                          artwork_id: Optional[int] = None,
-                          illust=None) -> PixivIllust:
-        if artwork_id:
-            illust = await self.getArtwork(artwork_id)
+    async def view(self, artwork_id: int = None) -> Illust:
+        illust = await self.getArtwork(artwork_id)
         if illust.type == 'ugoira':
-            raise NazurinError('Ugoira view is not supported.')
+            illust = await self.viewUgoira(illust)
+        else:  # Ordinary illust
+            illust = await self.viewIllust(illust)
+        return illust
+
+    async def viewIllust(self, illust) -> PixivIllust:
         caption = self.buildCaption(illust)
         imgs = self.getImages(illust)
         return PixivIllust(imgs, caption, illust)
 
-    async def download_ugoira(self, illust) -> PixivIllust:
-        """Download ugoira zip file and store animation data."""
+    async def viewUgoira(self, illust) -> Ugoira:
+        """Download ugoira zip file, store animation data and convert ugoira to mp4."""
         metadata = await Pixiv.ugoira_metadata(illust.id)
-        metadata = json.dumps(metadata.ugoira_metadata)
+        frames = metadata.ugoira_metadata
         url = illust.meta_single_page.original_image_url
         zip_url = url.replace('/img-original/', '/img-zip-ugoira/')
         zip_url = zip_url.split('_ugoira0')[0] + '_ugoira1920x1080.zip'
         filename = str(illust.id) + '_ugoira1920x1080.zip'
-        metafile = str(illust.id) + '_ugoira.json'
+        metafile = File(str(illust.id) + '_ugoira.json')
         gif_zip = File(filename, zip_url)
-        files = [gif_zip, File(metafile)]
-        if not os.path.exists(TEMP_DIR):
-            os.makedirs(TEMP_DIR)
-        async with aiofiles.open(os.path.join(TEMP_DIR, metafile), 'w') as f:
-            await f.write(metadata)
-        return PixivIllust(files=files)
+        files = [gif_zip, metafile]
+        async with Request(headers=HEADERS) as session:
+            await gif_zip.download(session)
+        async with aiofiles.open(metafile.path, 'w') as f:
+            await f.write(json.dumps(frames))
+        video = await self.ugoira2Mp4(gif_zip, frames)
+        caption = self.buildCaption(illust)
+        return Ugoira(video, caption, illust, files)
 
     async def bookmark(self, artwork_id: int):
         response = await self.call(Pixiv.illust_bookmark_add, artwork_id)
@@ -135,6 +144,50 @@ class Pixiv(object):
             await self.login(refresh=True)
             response = await func(*args)
         return response
+
+    async def ugoira2Mp4(self, ugoira_zip: File,
+                         ugoira_metadata: dict) -> File:
+        @async_wrap
+        def extractUgoiraZip(ugoira_zip: File, to_path: str):
+            with zipfile.ZipFile(ugoira_zip.path, 'r') as zip_file:
+                zip_file.extractall(to_path)
+
+        @async_wrap
+        def convert(config: File, output: File):
+            cmd = f'ffmpeg -i {config.path} -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -y {output.path}'
+            logger.info('Calling FFmpeg with command: %s', cmd)
+            args = shlex.split(cmd)
+            try:
+                output = subprocess.check_output(args,
+                                                 stderr=subprocess.STDOUT)
+            except subprocess.CalledProcessError as error:
+                logger.error('FFmpeg failed with code %s, output:\n %s',
+                             error.returncode, error.output)
+                raise NazurinError(
+                    'Failed to convert ugoira to mp4.') from None
+
+        folder = ugoira_zip.name[:-4]
+        output_mp4 = File(folder + '.mp4')
+        if await output_mp4.exists():
+            return output_mp4
+
+        ffconcat = 'ffconcat version 1.0\n'
+        for frame in ugoira_metadata.frames:
+            frame.file = folder + '/' + frame.file
+            ffconcat += 'file ' + frame.file + '\n'
+            ffconcat += 'duration ' + str(float(frame.delay) / 1000) + '\n'
+        ffconcat += 'file ' + ugoira_metadata.frames[-1].file + '\n'
+        input_config = File(folder + '.ffconcat')
+        async with aiofiles.open(input_config.path, 'w') as f:
+            await f.write(ffconcat)
+
+        zip_path = ugoira_zip.path[:-4]
+        await extractUgoiraZip(ugoira_zip, zip_path)
+        await convert(input_config, output_mp4)
+
+        await async_wrap(shutil.rmtree)(zip_path)
+        await aiofiles.os.remove(input_config.path)
+        return output_mp4
 
     def getImages(self, illust) -> List[PixivImage]:
         """Get images from an artwork."""
