@@ -1,3 +1,5 @@
+import traceback
+
 import aiojobs
 from aiohttp import web
 
@@ -19,6 +21,7 @@ class NazurinServer(web.Application):
         try:
             await self.bot.updateCollection([url])
         except Exception as error:
+            traceback.print_exc()
             await self.bot.send_message(
                 config.ADMIN_ID, f'Error processing {url}: {str(error)}')
 

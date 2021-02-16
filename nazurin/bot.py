@@ -10,7 +10,7 @@ from nazurin.models import File, Illust, Image, Ugoira
 from nazurin.sites import SiteManager
 from nazurin.storage import Storage
 from nazurin.utils import logger
-from nazurin.utils.decorators import chat_action, retry_after
+from nazurin.utils.decorators import retry_after
 from nazurin.utils.exceptions import NazurinError
 from nazurin.utils.helpers import handleBadRequest, sanitizeCaption
 
@@ -26,13 +26,13 @@ class NazurinBot(Bot):
         self.sites.load()
         self.storage.load()
 
-    @chat_action(ChatActions.UPLOAD_PHOTO)
     @retry_after
     async def sendSingleGroup(self,
                               imgs: List[Image],
                               caption: str,
                               chat_id: int,
                               reply_to: Optional[int] = None):
+        await self.send_chat_action(chat_id, ChatActions.UPLOAD_PHOTO)
         media = list()
         for img in imgs:
             media.append(InputMediaPhoto(await img.display_url()))  # TODO
@@ -79,11 +79,11 @@ class NazurinBot(Bot):
 
     @retry_after
     async def sendDocument(self, file: File, chat_id, message_id=None):
+        await self.send_chat_action(chat_id, ChatActions.UPLOAD_DOCUMENT)
         await self.send_document(chat_id,
                                  InputFile(file.path),
                                  reply_to_message_id=message_id)
 
-    @chat_action(ChatActions.UPLOAD_DOCUMENT)
     async def sendDocuments(self,
                             illust: Illust,
                             message: Optional[Message] = None,
