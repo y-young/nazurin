@@ -21,8 +21,6 @@ async def pixiv_view(message: Message, regexp_command):
         await bot.sendIllust(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /pixiv <artwork_id>')
-    except NazurinError as error:
-        await message.reply(error.msg)
 
 @dp.message_handler(
     filters.RegexpCommandsFilter(regexp_commands=[r'/pixiv_download (\S+)']))
@@ -38,8 +36,6 @@ async def pixiv_download(message: Message, regexp_command):
         await bot.sendDocuments(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /pixiv_download <artwork_id>')
-    except NazurinError as error:
-        await message.reply(error.msg)
 
 @dp.message_handler(
     filters.RegexpCommandsFilter(regexp_commands=[r'/pixiv_bookmark (\S+)']))
@@ -54,5 +50,3 @@ async def pixiv_bookmark(message: Message, regexp_command):
         await message.reply('Done!')
     except (IndexError, ValueError):
         await message.reply('Usage: /bookmark <artwork_id>')
-    except NazurinError as error:
-        await message.reply(error.msg)

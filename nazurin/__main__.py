@@ -41,11 +41,8 @@ async def ping(message: Message):
 @dp.message_handler(URLFilter(),
                     content_types=[ContentType.TEXT, ContentType.PHOTO])
 async def update_collection(message: Message, urls: List[str]):
-    try:
-        await dp.bot.updateCollection(urls, message)
-        await message.reply('Done!')
-    except NazurinError as error:
-        await message.reply(error.msg)
+    await dp.bot.updateCollection(urls, message)
+    await message.reply('Done!')
 
 @dp.message_handler(commands=['clear_cache'])
 async def clear_cache(message: Message):
@@ -58,15 +55,17 @@ async def clear_cache(message: Message):
         await message.reply(error.strerror)
 
 @dp.errors_handler()
-async def on_error(update: Update, error: Exception):
+async def on_error(update: Update, exception: Exception):
     try:
-        raise error
+        raise exception
+    except NazurinError as error:
+        await update.message.reply(error.msg)
     except Exception as error:
         logger.error('Update %s caused %s: %s', update, type(error), error)
         traceback.print_exc()
         if not isinstance(error, TelegramAPIError):
             await update.message.reply('Error: ' + str(error))
-        return True
+    return True
 
 def main():
     dp.start()

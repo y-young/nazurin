@@ -20,8 +20,6 @@ async def yandere_view(message: Message, regexp_command):
         await bot.sendIllust(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /yandere <post_id>')
-    except NazurinError as error:
-        await message.reply(error.msg)
 
 @dp.message_handler(
     filters.RegexpCommandsFilter(regexp_commands=[r'/yandere_download (\S+)']))
@@ -36,8 +34,6 @@ async def yandere_download(message: Message, regexp_command):
         await bot.sendDocuments(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /yandere_download <post_id>')
-    except NazurinError as error:
-        await message.reply(error.msg)
 
 @dp.message_handler(
     filters.RegexpCommandsFilter(regexp_commands=[r'/konachan (\S+)']))
@@ -51,8 +47,6 @@ async def konachan_view(message: Message, regexp_command):
         await bot.sendIllust(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /konachan <post_id>')
-    except NazurinError as error:
-        await message.reply(error.msg)
 
 @dp.message_handler(
     filters.RegexpCommandsFilter(regexp_commands=[r'/konachan_download (\S+)'])
@@ -68,5 +62,3 @@ async def konachan_download(message: Message, regexp_command):
         await bot.sendDocuments(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /konachan_download <post_id>')
-    except NazurinError as error:
-        await message.reply(error.msg)

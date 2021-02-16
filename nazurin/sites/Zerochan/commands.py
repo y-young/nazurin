@@ -20,8 +20,6 @@ async def zerochan_view(message: Message, regexp_command):
         await bot.sendIllust(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /zerochan <post_id>')
-    except NazurinError as error:
-        await message.reply(error.msg)
 
 @dp.message_handler(
     filters.RegexpCommandsFilter(regexp_commands=[r'/zerochan_download (\S+)'])
@@ -37,5 +35,3 @@ async def zerochan_download(message: Message, regexp_command):
         await bot.sendDocuments(illust, message)
     except (IndexError, ValueError):
         await message.reply('Usage: /zerochan_download <post_id>')
-    except NazurinError as error:
-        await message.reply(error.msg)
