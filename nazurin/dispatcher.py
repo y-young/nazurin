@@ -18,7 +18,6 @@ class NazurinDispatcher(Dispatcher):
                                   event_handlers=[self.message_handlers])
         self.server = NazurinServer(bot)
         self.server.on_startup.append(self.on_startup)
-        self.server.on_shutdown.append(self.on_shutdown)
         self.executor = Executor(self)
 
     def register_message_handler(self, callback, *args, **kwargs):
@@ -29,12 +28,8 @@ class NazurinDispatcher(Dispatcher):
         await self.bot.set_webhook(config.WEBHOOK_URL + config.TOKEN,
                                    allowed_updates=AllowedUpdates.MESSAGE)
 
-    async def on_shutdown(self, dp):
-        await self.bot.delete_webhook()  # TODO
-
     def start(self):
         self.bot.init()
-        # TODO
         if config.ENV == 'production':
             logger.info('Set webhook')
             self.executor.set_webhook(webhook_path='/' + config.TOKEN,
