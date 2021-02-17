@@ -2,8 +2,7 @@ from os import environ
 
 PRIORITY = 10
 
-USER = environ.get('PIXIV_USER')
-PASSWORD = environ.get('PIXIV_PASS')
+REFRESH_TOKEN = environ.get('PIXIV_TOKEN', None)
 
 COLLECTION = 'pixiv'
 DOCUMENT = 'pixiv'
