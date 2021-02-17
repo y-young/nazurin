@@ -6,8 +6,7 @@ COLLECTION = 'pixiv'
 DOCUMENT = 'pixiv'
 
 with env.prefixed('PIXIV_'):
-    USER = env.str('USER')
-    PASSWORD = env.str('PASS')
+    REFRESH_TOKEN = env.str('TOKEN', default=None)
 
     IMG_PROXY = env.str('MIRROR', default='i.pximg.net')
     TRANSLATION = env.str('TRANSLATION', default=None)
