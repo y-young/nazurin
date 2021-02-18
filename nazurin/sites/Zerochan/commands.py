@@ -2,7 +2,6 @@ from aiogram.dispatcher import filters
 from aiogram.types import Message
 
 from nazurin import bot, dp
-from nazurin.utils.exceptions import NazurinError
 
 from .api import Zerochan
 
