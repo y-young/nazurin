@@ -22,8 +22,13 @@ class Mega(object):
     document = collection.document(MEGA_DOCUMENT)
     destination = None
 
+    api_login = async_wrap(api.login)
+    api_upload = async_wrap(api.upload)
+    create_folder = async_wrap(api.create_folder)
+    find_folder = async_wrap(api.find)
+
     async def login(self, initialize=False):
-        Mega.api.login(MEGA_USER, MEGA_PASS)  #TODO
+        await Mega.api_login(MEGA_USER, MEGA_PASS)
         if initialize:
             await Mega.collection.insert(
                 MEGA_DOCUMENT, {
@@ -56,27 +61,26 @@ class Mega(object):
             await self.getDestination()
 
     async def getDestination(self):
-        result = Mega.api.find(STORAGE_DIR, exclude_deleted=True)  #TODO
+        result = await Mega.find_folder(STORAGE_DIR, exclude_deleted=True)
         if result:
             Mega.destination = result[0]
         else:
-            result = Mega.api.create_folder(STORAGE_DIR)  #TODO
+            result = await Mega.create_folder(STORAGE_DIR)
             Mega.destination = result[STORAGE_DIR]
         await Mega.document.update({'destination': Mega.destination})
         logger.info('MEGA destination cached')
 
-    @async_wrap
-    def upload(self, file: File):
+    async def upload(self, file: File):
         while True:
             try:
-                Mega.api.upload(file.path, Mega.destination)
+                await Mega.api_upload(file.path, Mega.destination)
                 break
             except RequestError as error:
                 # mega.errors.RequestError: ESID, Invalid or expired user session, please relogin
                 if 'relogin' in error.message:
                     logger.info(error)
                     Mega.api.sid = None
-                    self.login()
+                    await self.login()
 
     async def store(self, files: List[File]):
         await self.requireAuth()
