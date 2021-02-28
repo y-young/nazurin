@@ -1,5 +1,7 @@
+from typing import List
+
 from aiogram import Dispatcher, executor
-from aiogram.types import AllowedUpdates
+from aiogram.types import AllowedUpdates, ContentType, Message
 from aiogram.utils.executor import Executor
 
 from nazurin import config
@@ -20,6 +22,13 @@ class NazurinDispatcher(Dispatcher):
         self.server.on_startup.append(self.on_startup)
         self.executor = Executor(self)
 
+    def init(self):
+        self.bot.init()
+        self.register_message_handler(
+            self.update_collection,
+            URLFilter(),
+            content_types=[ContentType.TEXT, ContentType.PHOTO])
+
     def register_message_handler(self, callback, *args, **kwargs):
         return super().register_message_handler(self.async_task(callback),
                                                 *args, **kwargs)
@@ -29,7 +38,7 @@ class NazurinDispatcher(Dispatcher):
                                    allowed_updates=AllowedUpdates.MESSAGE)
 
     def start(self):
-        self.bot.init()
+        self.init()
         if config.ENV == 'production':
             logger.info('Set webhook')
             self.executor.set_webhook(webhook_path='/' + config.TOKEN,
@@ -38,3 +47,7 @@ class NazurinDispatcher(Dispatcher):
         else:
             # self.server.start()
             executor.start_polling(self, skip_updates=True)
+
+    async def update_collection(self, message: Message, urls: List[str]):
+        await self.bot.updateCollection(urls, message)
+        await message.reply('Done!')

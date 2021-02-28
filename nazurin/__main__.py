@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 import shutil
 import traceback
-from typing import List
 
 from aiogram.dispatcher.filters import IDFilter
-from aiogram.types import ChatActions, ContentType, Message, Update
+from aiogram.types import ChatActions, Message, Update
 from aiogram.utils.exceptions import TelegramAPIError
 
 from nazurin import config, dp
 from nazurin.utils import logger
 from nazurin.utils.decorators import chat_action
 from nazurin.utils.exceptions import NazurinError
-from nazurin.utils.filters import URLFilter
 
 @dp.message_handler(commands=['start', 'help'])
 @chat_action(ChatActions.TYPING)
@@ -38,12 +36,6 @@ async def show_help(message: Message):
 @chat_action(ChatActions.TYPING)
 async def ping(message: Message):
     await message.reply('pong!')
-
-@dp.message_handler(URLFilter(),
-                    content_types=[ContentType.TEXT, ContentType.PHOTO])
-async def update_collection(message: Message, urls: List[str]):
-    await dp.bot.updateCollection(urls, message)
-    await message.reply('Done!')
 
 @dp.message_handler(IDFilter(config.ADMIN_ID), commands=['clear_cache'])
 async def clear_cache(message: Message):
