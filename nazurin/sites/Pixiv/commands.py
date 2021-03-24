@@ -1,3 +1,5 @@
+from re import Match
+
 from aiogram.dispatcher import filters
 from aiogram.types import Message
 
@@ -49,3 +51,9 @@ async def pixiv_bookmark(message: Message, regexp_command):
         await message.reply('Done!')
     except (IndexError, ValueError):
         await message.reply('Usage: /bookmark <artwork_id>')
+
+@dp.message_handler(filters.Regexp(r'(?:www\.)?pixiv\.net/(?:users|u)/(\d+)'))
+async def pixiv_follow(message: Message, regexp: Match):
+    user_id = int(regexp.group(1))
+    await pixiv.followUser(user_id)
+    await message.reply(f'Successfully followed user {user_id}.')

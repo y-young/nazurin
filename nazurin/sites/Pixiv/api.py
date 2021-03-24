@@ -32,6 +32,7 @@ class Pixiv(object):
     illust_detail = async_wrap(api.illust_detail)
     ugoira_metadata = async_wrap(api.ugoira_metadata)
     illust_bookmark_add = async_wrap(api.illust_bookmark_add)
+    user_follow_add = async_wrap(api.user_follow_add)
     api_auth = async_wrap(api.auth)
 
     def __init__(self):
@@ -124,6 +125,9 @@ class Pixiv(object):
         else:
             logger.info('Bookmarked artwork %s', artwork_id)
             return True
+
+    async def followUser(self, user_id: int):
+        await self.call(Pixiv.user_follow_add, user_id)
 
     async def refreshToken(self):
         """Refresh tokens and cache in database."""

@@ -5,7 +5,7 @@ aiojobs
 tenacity
 environs
 
-pixivpy>=3.5.10
+pixivpy~=3.5.11
 beautifulsoup4
 Pybooru
 
