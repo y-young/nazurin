@@ -15,7 +15,7 @@ TOKEN = env.str('TOKEN')
 
 # Webhook url, eg: https://xxx.herokuapp.com/, should end with '/'
 WEBHOOK_URL = env.str('WEBHOOK_URL', default=None)
-# Port is given by Heroku
+# Port is automatically set if on Heroku
 PORT = env.int('PORT', default=8443)
 
 TEMP_DIR = './temp/'
@@ -30,9 +30,9 @@ CAPTION_IGNORE = env.list('CAPTION_IGNORE', subcast=str, default=[])
 
 GALLERY_ID = env.int('GALLERY_ID')
 
+ADMIN_ID = env.int('ADMIN_ID')
 IS_PUBLIC = env.bool('IS_PUBLIC', default=False)
 # If IS_PUBLIC is True, the following items will be ignored
-ADMIN_ID = env.int('ADMIN_ID')
 ALLOW_ID = env.list('ALLOW_ID', subcast=int, default=[])
 ALLOW_USERNAME = env.list('ALLOW_USERNAME', default=[])
 ALLOW_GROUP = env.list('ALLOW_GROUP', subcast=int, default=[])
