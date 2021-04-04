@@ -11,24 +11,29 @@
       "description": "Webhook URL. eg: https://xxx.herokuapp.com/"
     },
     "STORAGE": {
-      "description": "Type of storage, separated by a comma.",
+      "description": "Type of storage, separated by a comma. Don't use local storage on Heroku.",
       "value": "Mega",
       "required": false
+    },
+    "DATABASE": {
+      "description": "Type of database. Don't use local database on Heroku.",
+      "value": "Firebase",
+      "required": false
+    },
+    "ADMIN_ID": {
+      "description": "ID of admin user",
+      "required": true
+    },
+    "ALBUM_ID": {
+      "description": "ID of Telegram album channel.",
+      "required": false
+    },
+    "GALLERY_ID": {
+      "description": "ID of Telegram gallery channel."
     },
     "STORAGE_DIR": {
       "description": "Storage directory.",
       "required": false
-    },
-    "DATABASE": {
-      "description": "Type of database.",
-      "value": "Firebase",
-      "required": false
-    },
-    "ALBUM_ID": {
-      "description": "ID of Telegram album channel."
-    },
-    "GALLERY_ID": {
-      "description": "ID of Telegram gallery channel."
     },
     "IS_PUBLIC": {
       "description": "Whether this bot is public, default is false.",
@@ -46,12 +51,8 @@
       "description": "ID of allowed group(s), separated by a comma.",
       "required": false
     },
-    "PIXIV_USER": {
-      "description": "Pixiv email or user id.",
-      "required": false
-    },
-    "PIXIV_PASS": {
-      "description": "Pixiv password.",
+    "PIXIV_TOKEN": {
+      "description": "Pixiv refresh token. See more information at https://github.com/y-young/nazurin/wiki/Pixiv .",
       "required": false
     },
     "MEGA_USER": {
@@ -60,6 +61,10 @@
     },
     "MEGA_PASS": {
       "description": "MEGA password.",
+      "required": false
+    },
+    "MONGO_URI": {
+      "description": "MongoDB connection string.",
       "required": false
     },
     "GOOGLE_APPLICATION_CREDENTIALS": {
