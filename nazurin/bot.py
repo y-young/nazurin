@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from aiogram import Bot
 from aiogram.types import ChatActions, InputFile, InputMediaPhoto, Message
+from aiogram.types.message import ParseMode
 from aiogram.utils.exceptions import BadRequest
 
 from nazurin import config
@@ -18,7 +19,7 @@ class NazurinBot(Bot):
     send_message = retry_after(Bot.send_message)
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(parse_mode=ParseMode.HTML, *args, **kwargs)
         self.sites = SiteManager()
         self.storage = Storage()
 
