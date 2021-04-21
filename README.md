@@ -14,46 +14,46 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 
 ## Features
 
-- View/Download artwork from [various sites](#supported-sites)
-- Add images to your collection via Telegram
-- Store your collection in Telegram channels
-- Store images on [multiple types](#supported-storage) of storage
-- Store image metadata in [multiple types](#supported-databases) of database
+-   View/Download artwork from [various sites](#supported-sites)
+-   Add images to your collection via Telegram
+-   Store your collection in Telegram channels
+-   Store images on [multiple types](#supported-storage) of storage
+-   Store image metadata in [multiple types](#supported-databases) of database
 
 ### Supported Sites
 
-|       Name        |              URL               | Commands | Collection |
+|        Name       |               URL              | Commands | Collection |
 | :---------------: | :----------------------------: | :------: | :--------: |
-|       Pixiv       |    <https://www.pixiv.net/>    |    ✔     |     ✔      |
-|     Danbooru      | <https://danbooru.donmai.us/>  |    ✔     |     ✔      |
-|     Safebooru     | <https://safebooru.donmai.us/> |          |     ✔      |
-|      yandere      |      <https://yande.re/>       |    ✔     |     ✔      |
-|     Konachan      |    <https://konachan.com/>     |    ✔     |     ✔      |
-|     Lolibooru     |    <https://lolibooru.moe/>    |          |     ✔      |
-|     Zerochan      |  <https://www.zerochan.net/>   |    ✔     |     ✔      |
-|     Gelbooru      |    <https://gelbooru.com/>     |          |     ✔      |
-|      Twitter      |     <https://twitter.com/>     |          |     ✔      |
-| Bilibili Dynamics |   <https://t.bilibili.com/>    |          |     ✔      |
+|       Pixiv       |    <https://www.pixiv.net/>    |     ✔    |      ✔     |
+|      Danbooru     |  <https://danbooru.donmai.us/> |     ✔    |      ✔     |
+|     Safebooru     | <https://safebooru.donmai.us/> |          |      ✔     |
+|      yandere      |       <https://yande.re/>      |     ✔    |      ✔     |
+|      Konachan     |     <https://konachan.com/>    |     ✔    |      ✔     |
+|     Lolibooru     |    <https://lolibooru.moe/>    |          |      ✔     |
+|      Zerochan     |   <https://www.zerochan.net/>  |     ✔    |      ✔     |
+|      Gelbooru     |     <https://gelbooru.com/>    |          |      ✔     |
+|      Twitter      |     <https://twitter.com/>     |          |      ✔     |
+| Bilibili Dynamics |    <https://t.bilibili.com/>   |          |      ✔     |
 
 ### Supported Databases
 
-|  Driver   |                         URL                          |                           Usage                           |          Note           |
+|   Driver  |                          URL                         |                           Usage                           |           Note          |
 | :-------: | :--------------------------------------------------: | :-------------------------------------------------------: | :---------------------: |
-|  TinyDB   | <https://tinydb.readthedocs.io/en/stable/index.html> |  [Wiki](https://github.com/y-young/nazurin/wiki/TinyDB)   |         Default         |
+|   TinyDB  | <https://tinydb.readthedocs.io/en/stable/index.html> |   [Wiki](https://github.com/y-young/nazurin/wiki/TinyDB)  |         Default         |
 | Firestore |   <https://firebase.google.com/products/firestore>   | [Wiki](https://github.com/y-young/nazurin/wiki/Firestore) |                         |
 |  MongoDB  |              <https://www.mongodb.com/>              |  [Wiki](https://github.com/y-young/nazurin/wiki/MongoDB)  | MongoDB Atlas supported |
-| Cloudant  |         <https://www.ibm.com/cloud/cloudant>         | [Wiki](https://github.com/y-young/nazurin/wiki/Cloudant)  |                         |
+|  Cloudant |         <https://www.ibm.com/cloud/cloudant>         |  [Wiki](https://github.com/y-young/nazurin/wiki/Cloudant) |                         |
 
 You can also implement your own database driver by creating a file under `database` folder, and set this option to the name of driver class.
 
 ### Supported Storage
 
-|     Name     |             URL              |                            Usage                             |    Note     |
+|     Name     |              URL             |                             Usage                            |     Note    |
 | :----------: | :--------------------------: | :----------------------------------------------------------: | :---------: |
-|    Local     |                              |                    Set `STORAGE = Local`                     |   Default   |
-|   Telegram   |   <https://telegram.org/>    |   [Wiki](https://github.com/y-young/nazurin/wiki/Telegram)   | Added in v2 |
+|     Local    |                              |                     Set `STORAGE = Local`                    |   Default   |
+|   Telegram   |    <https://telegram.org/>   |   [Wiki](https://github.com/y-young/nazurin/wiki/Telegram)   | Added in v2 |
 |     MEGA     |      <https://mega.nz/>      |     [Wiki](https://github.com/y-young/nazurin/wiki/MEGA)     |             |
-| Google Drive | <https://drive.google.com/>  | [Wiki](https://github.com/y-young/nazurin/wiki/Google-Drive) |             |
+| Google Drive |  <https://drive.google.com/> | [Wiki](https://github.com/y-young/nazurin/wiki/Google-Drive) |             |
 |   OneDrive   | <https://onedrive.live.com/> |   [Wiki](https://github.com/y-young/nazurin/wiki/OneDrive)   |             |
 
 ## Configuration
@@ -86,20 +86,20 @@ For more information, see [Wiki](https://github.com/y-young/nazurin/wiki/Configu
 
 Commands:
 
-- `/ping` - pong
-- `/pixiv <id>` - view pixiv artwork
-- `/pixiv_download <id>` - download pixiv artwork
-- `/danbooru <id>` - view danbooru post
-- `/danbooru_download <id>` - download danbooru post
-- `/yandere <id>` - view yandere post
-- `/yandere_download <id>` - download yandere post
-- `/konachan <id>` - view konachan post
-- `/konachan_download <id>` - download konachan post
-- `/zerochan <id>` - view zerochan post
-- `/zerochan_download <id>` - download zerochan post
-- `/bookmark <id>` - bookmark pixiv artwork
-- `/clear_cache` - clear download cache
-- `/help` - get help text
+-   `/ping` - pong
+-   `/pixiv <id>` - view pixiv artwork
+-   `/pixiv_download <id>` - download pixiv artwork
+-   `/danbooru <id>` - view danbooru post
+-   `/danbooru_download <id>` - download danbooru post
+-   `/yandere <id>` - view yandere post
+-   `/yandere_download <id>` - download yandere post
+-   `/konachan <id>` - view konachan post
+-   `/konachan_download <id>` - download konachan post
+-   `/zerochan <id>` - view zerochan post
+-   `/zerochan_download <id>` - download zerochan post
+-   `/bookmark <id>` - bookmark pixiv artwork
+-   `/clear_cache` - clear download cache
+-   `/help` - get help text
 
 ### How to update your collection
 
