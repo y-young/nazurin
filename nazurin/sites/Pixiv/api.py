@@ -164,7 +164,8 @@ class Pixiv(object):
             args = shlex.split(cmd)
             try:
                 output = subprocess.check_output(args,
-                                                 stderr=subprocess.STDOUT)
+                                                 stderr=subprocess.STDOUT,
+                                                 shell=False)
             except subprocess.CalledProcessError as error:
                 logger.error('FFmpeg failed with code %s, output:\n %s',
                              error.returncode, error.output)
