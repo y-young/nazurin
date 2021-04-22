@@ -1,4 +1,5 @@
 import logging
+from os import path
 
 from environs import Env
 
@@ -18,7 +19,6 @@ WEBHOOK_URL = env.str('WEBHOOK_URL', default=None)
 # Port is automatically set if on Heroku
 PORT = env.int('PORT', default=80)
 
-TEMP_DIR = './temp/'
 STORAGE = env.list('STORAGE', subcast=str, default=['Local'])
 STORAGE_DIR = env.str('STORAGE_DIR', default='Pictures')
 
@@ -37,10 +37,13 @@ ALLOW_ID = env.list('ALLOW_ID', subcast=int, default=[])
 ALLOW_USERNAME = env.list('ALLOW_USERNAME', default=[])
 ALLOW_GROUP = env.list('ALLOW_GROUP', subcast=int, default=[])
 
+RETRIES = env.int('RETRIES', default=5)
+PROXY = env.str('HTTP_PROXY', default=None)
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
     AppleWebKit/537.36 (KHTML, like Gecko) \
     Chrome/90.0.4430.85 \
     Safari/537.36"
 
-RETRIES = env.int('RETRIES', default=5)
-PROXY = env.str('HTTP_PROXY', default=None)
+# Local directory to store database and temporary files
+DATA_DIR = 'data'
+TEMP_DIR = path.join(DATA_DIR, 'temp')

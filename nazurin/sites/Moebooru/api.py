@@ -73,7 +73,7 @@ class Moebooru(object):
     async def download_pool(self, pool_id, jpeg=False):
         imgs, caption = self.pool(pool_id, jpeg)
         pool_name = caption['name']
-        ensureExistence(TEMP_DIR + pool_name)
+        ensureExistence(os.path.join(TEMP_DIR, pool_name))
         for key, img in enumerate(imgs):
             filename = str(key + 1)
             filename = '0' * (3 - len(filename)) + filename

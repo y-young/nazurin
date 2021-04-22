@@ -1,9 +1,13 @@
+from os import path
+
 from tinydb import Query, TinyDB
+
+from nazurin.config import DATA_DIR
 
 class Local(object):
     """Local database driver using TinyDB."""
     def collection(self, key):
-        self.db = TinyDB(key + '.json')
+        self.db = TinyDB(path.join(DATA_DIR, key + '.json'))
         return self
 
     def document(self, key):

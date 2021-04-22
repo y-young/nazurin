@@ -61,9 +61,7 @@ target/
 .vscode/
 .env
 
-nazurin.json
-firebase.json
-temp/
+data/*
 
 # Filesystem file
 .DS_Store
