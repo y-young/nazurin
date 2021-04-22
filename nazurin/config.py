@@ -16,7 +16,7 @@ TOKEN = env.str('TOKEN')
 # Webhook url, eg: https://xxx.herokuapp.com/, should end with '/'
 WEBHOOK_URL = env.str('WEBHOOK_URL', default=None)
 # Port is automatically set if on Heroku
-PORT = env.int('PORT', default=8443)
+PORT = env.int('PORT', default=80)
 
 TEMP_DIR = './temp/'
 STORAGE = env.list('STORAGE', subcast=str, default=['Local'])
@@ -37,6 +37,10 @@ ALLOW_ID = env.list('ALLOW_ID', subcast=int, default=[])
 ALLOW_USERNAME = env.list('ALLOW_USERNAME', default=[])
 ALLOW_GROUP = env.list('ALLOW_GROUP', subcast=int, default=[])
 
-UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"
-RETRIES = 5
+UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
+    AppleWebKit/537.36 (KHTML, like Gecko) \
+    Chrome/90.0.4430.85 \
+    Safari/537.36"
+
+RETRIES = env.int('RETRIES', default=5)
 PROXY = env.str('HTTP_PROXY', default=None)

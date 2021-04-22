@@ -4,9 +4,10 @@ from requests.adapters import HTTPAdapter
 from nazurin.config import RETRIES, env
 from nazurin.utils.decorators import async_wrap
 
-USERNAME = env.str('CLOUDANT_USER')
-APIKEY = env.str('CLOUDANT_APIKEY')
-DATABASE = env.str('CLOUDANT_DB', default='nazurin')
+with env.prefixed('CLOUDANT_'):
+    USERNAME = env.str('USER')
+    APIKEY = env.str('APIKEY')
+    DATABASE = env.str('DB', default='nazurin')
 
 class Cloudant(object):
     """Cloudant driver of IBM Cloud."""
