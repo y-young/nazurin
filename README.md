@@ -64,23 +64,30 @@ For more information, see [Wiki](https://github.com/y-young/nazurin/wiki/Configu
 
 ### Deploy on Heroku
 
-1.  'Deploy to Heroku' Button:
+#### 'Deploy to Heroku' Button
 
     [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 > Tips: You can fork this repository, modify it to your needs, and use this button to deploy your own version.
 
-2.  Manual deployment:
+#### Manual
 
     Set all required environment variables on Heroku according to [Configuration Guide](https://github.com/y-young/nazurin/wiki/Configuration), clone this repository and push to Heroku, everything should be working properly.
 
 ### Deploy on your own server
 
+#### Manual
+
 > Tips: You may comment out unused dependencies in `requirements.txt` before installation.
 
 1.  Install dependencies: `pip install -r requirements.txt`
-2.  Set the required environment variables or place them in a `.env` file located in `/nazurin`
+2.  Set the required environment variables or place them in `.env` file, you may refer to `.env.example` as an example
 3.  Start the bot: `python -m nazurin`
+
+#### Docker
+
+1.  Configure the options in `.env`
+2.  Run `docker-compose up -d --build`
 
 ## Usage
 
