@@ -1,2 +1,0 @@
-PRIORITY = 9
-COLLECTION = 'zerochan'

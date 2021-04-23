@@ -1,0 +1,40 @@
+import os
+from dataclasses import dataclass
+
+import aiofiles
+import aiofiles.os
+import aiohttp
+
+from nazurin.config import TEMP_DIR
+from nazurin.utils.helpers import ensureExistence, sanitizeFilename
+
+@dataclass
+class File:
+    name: str
+    url: str = None
+
+    def __post_init__(self):
+        self.name = sanitizeFilename(self.name)
+
+    @property
+    def path(self) -> str:
+        return os.path.join(TEMP_DIR, self.name)
+
+    async def size(self):
+        if os.path.exists(self.path):
+            stat = await aiofiles.os.stat(self.path)
+            return stat.st_size
+
+    async def exists(self) -> bool:
+        if os.path.exists(self.path) and (await aiofiles.os.stat(
+                self.path)).st_size != 0:
+            return True
+        return False
+
+    async def download(self, session: aiohttp.ClientSession):
+        if await self.exists():
+            return True
+        ensureExistence(TEMP_DIR)
+        async with session.get(self.url) as response:
+            async with aiofiles.open(self.path, 'wb') as f:
+                await f.write(await response.read())

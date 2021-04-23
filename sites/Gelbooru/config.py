@@ -1,2 +1,0 @@
-PRIORITY = 8
-COLLECTION = 'gelbooru'

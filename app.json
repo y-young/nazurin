@@ -1,68 +1,83 @@
 {
-    "name": "nazurin",
-    "description": "Images collection done right.",
-    "keywords": [
-      "nazurin",
-      "Telegram Bot",
-      "Pixiv",
-      "Danbooru",
-      "Moebooru"
-    ],
-    "repository": "https://github.com/y-young/nazurin",
-    "env": {
-      "TOKEN": {
-        "description": "API token of Telegram bot."
-      },
-      "WEBHOOK_URL": {
-        "description": "Webhook URL. eg: https://xxx.herokuapp.com/"
-      },
-      "STORAGE": {
-        "description": "Type of storage.",
-        "value": "['Mega']",
-        "required": false
-      },
-      "STORAGE_DIR": {
-        "description": "Storage directory.",
-        "required": false
-      },
-      "DATABASE": {
-        "description": "Type of database.",
-        "value": "Firebase",
-        "required": false
-      },
-      "ALBUM_ID": {
-        "description": "ID of Telegram album channel."
-      },
-      "GALLERY_ID": {
-        "description": "ID of Telegram gallery channel."
-      },
-      "ADMIN_ID": {
-        "description": "ID of Telegram admin user."
-      },
-      "PIXIV_USER": {
-        "description": "Pixiv email or user id.",
-        "required": false
-      },
-      "PIXIV_PASS": {
-        "description": "Pixiv password.",
-        "required": false
-      },
-      "MEGA_USER": {
-        "description": "MEGA login email.",
-        "required": false
-      },
-      "MEGA_PASS": {
-        "description": "MEGA password.",
-        "required": false
-      },
-      "GOOGLE_APPLICATION_CREDENTIALS": {
-        "description": "Firebase SDK credentials.",
-        "required": false
-      }
+  "name": "nazurin",
+  "description": "Images collection done right.",
+  "keywords": ["nazurin", "Telegram Bot", "Pixiv", "Danbooru", "Moebooru"],
+  "repository": "https://github.com/y-young/nazurin",
+  "env": {
+    "TOKEN": {
+      "description": "API token of Telegram bot."
     },
-    "buildpacks": [
-      {
-        "url": "heroku/python"
-      }
-    ]
+    "WEBHOOK_URL": {
+      "description": "Webhook URL. eg: https://xxx.herokuapp.com/"
+    },
+    "STORAGE": {
+      "description": "Type of storage, separated by a comma. Don't use local storage on Heroku.",
+      "value": "Mega",
+      "required": false
+    },
+    "DATABASE": {
+      "description": "Type of database. Don't use local database on Heroku.",
+      "value": "Firebase",
+      "required": false
+    },
+    "ADMIN_ID": {
+      "description": "ID of admin user",
+      "required": true
+    },
+    "ALBUM_ID": {
+      "description": "ID of Telegram album channel.",
+      "required": false
+    },
+    "GALLERY_ID": {
+      "description": "ID of Telegram gallery channel."
+    },
+    "STORAGE_DIR": {
+      "description": "Storage directory.",
+      "required": false
+    },
+    "IS_PUBLIC": {
+      "description": "Whether this bot is public, default is false.",
+      "required": false
+    },
+    "ALLOW_ID": {
+      "description": "ID of allowed user(s), separated by a comma.",
+      "required": false
+    },
+    "ALLOW_USERNAME": {
+      "description": "Username of allowed user(s), separated by a comma.",
+      "required": false
+    },
+    "ALLOW_GROUP": {
+      "description": "ID of allowed group(s), separated by a comma.",
+      "required": false
+    },
+    "PIXIV_TOKEN": {
+      "description": "Pixiv refresh token. See more information at https://github.com/y-young/nazurin/wiki/Pixiv .",
+      "required": false
+    },
+    "MEGA_USER": {
+      "description": "MEGA login email.",
+      "required": false
+    },
+    "MEGA_PASS": {
+      "description": "MEGA password.",
+      "required": false
+    },
+    "MONGO_URI": {
+      "description": "MongoDB connection string.",
+      "required": false
+    },
+    "GOOGLE_APPLICATION_CREDENTIALS": {
+      "description": "Firebase SDK credentials.",
+      "required": false
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest"
+    },
+    {
+      "url": "heroku/python"
+    }
+  ]
 }

@@ -1,2 +1,0 @@
-PRIORITY = 5
-COLLECTION = 'twitter'

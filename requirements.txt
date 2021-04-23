@@ -1,5 +1,11 @@
-python-telegram-bot~=13.4.1
-pixivpy>=3.5.10
+aiogram
+aiohttp
+aiofiles
+aiojobs
+tenacity
+environs
+
+pixivpy~=3.5.11
 beautifulsoup4
 Pybooru
 
@@ -9,7 +15,7 @@ tinydb
 # Firebase:
 firebase-admin
 # Mongo:
-pymongo
+motor
 dnspython
 # Cloudant:
 cloudant

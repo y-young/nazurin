@@ -48,12 +48,13 @@ You can also implement your own database driver by creating a file under `databa
 
 ### Supported Storage
 
-|     Name     |              URL             |                             Usage                            |   Note  |
-| :----------: | :--------------------------: | :----------------------------------------------------------: | :-----: |
-|     Local    |                              |                      Set `STORAGE = []`                      | Default |
-|     MEGA     |      <https://mega.nz/>      |     [Wiki](https://github.com/y-young/nazurin/wiki/MEGA)     |         |
-| Google Drive |  <https://drive.google.com/> | [Wiki](https://github.com/y-young/nazurin/wiki/Google-Drive) |         |
-|   OneDrive   | <https://onedrive.live.com/> |   [Wiki](https://github.com/y-young/nazurin/wiki/OneDrive)   |         |
+|     Name     |              URL             |                             Usage                            |     Note    |
+| :----------: | :--------------------------: | :----------------------------------------------------------: | :---------: |
+|     Local    |                              |                     Set `STORAGE = Local`                    |   Default   |
+|   Telegram   |    <https://telegram.org/>   |   [Wiki](https://github.com/y-young/nazurin/wiki/Telegram)   | Added in v2 |
+|     MEGA     |      <https://mega.nz/>      |     [Wiki](https://github.com/y-young/nazurin/wiki/MEGA)     |             |
+| Google Drive |  <https://drive.google.com/> | [Wiki](https://github.com/y-young/nazurin/wiki/Google-Drive) |             |
+|   OneDrive   | <https://onedrive.live.com/> |   [Wiki](https://github.com/y-young/nazurin/wiki/OneDrive)   |             |
 
 ## Configuration
 
@@ -63,23 +64,30 @@ For more information, see [Wiki](https://github.com/y-young/nazurin/wiki/Configu
 
 ### Deploy on Heroku
 
-1.  'Deploy to Heroku' Button:
+#### 'Deploy to Heroku' Button
 
     [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 > Tips: You can fork this repository, modify it to your needs, and use this button to deploy your own version.
 
-2.  Manual deploy:
+#### Manual
 
-    Set all required environment variables on Heroku according to `config.py`(root directory & `/sites`), clone this repository and push to Heroku, everything should be working properly.
+    Set all required environment variables on Heroku according to [Configuration Guide](https://github.com/y-young/nazurin/wiki/Configuration), clone this repository and push to Heroku, everything should be working properly.
 
 ### Deploy on your own server
+
+#### Manual
 
 > Tips: You may comment out unused dependencies in `requirements.txt` before installation.
 
 1.  Install dependencies: `pip install -r requirements.txt`
-2.  Set the required environment variables
-3.  Start the bot: `python bot.py`
+2.  Set the required environment variables or place them in `.env` file, you may refer to `.env.example` as an example
+3.  Start the bot: `python -m nazurin`
+
+#### Docker
+
+1.  Configure the options in `.env`
+2.  Run `docker-compose up -d --build`
 
 ## Usage
 
@@ -97,22 +105,11 @@ Commands:
 -   `/zerochan <id>` - view zerochan post
 -   `/zerochan_download <id>` - download zerochan post
 -   `/bookmark <id>` - bookmark pixiv artwork
--   `/clear_downloads` - clear download cache
+-   `/clear_cache` - clear download cache
 -   `/help` - get help text
 
 ### How to update your collection
 
-Send the bot a message with a link of [supported sites](#supported-sites), this message will be forwarded to `GALLERY` channel, the bot will then download the original images from the site, send the files to `ALBUM` channel, and finally store to your custom destination.
+Send the bot a message with a link of [supported sites](#supported-sites), this message will be forwarded to `GALLERY` channel, the bot will then download the original images from the site, send the files to `ALBUM` channel, and finally store to your custom destinations.
 
 > Tips: On mobile you can use the _share_ button in apps, as long as the final message contains a link.
-
-## Roadmap
-
--   [x] Introduce plugin system and extract some functions
--   [x] Support local database
--   [ ] Thorough error handling
--   [ ] Support more sites
--   [x] Support Pixiv ugoira
--   [ ] Support Moebooru pools
--   [ ] Reverse Image Search
--   [ ] Provide more configurable options
