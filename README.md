@@ -66,13 +66,13 @@ For more information, see [Wiki](https://github.com/y-young/nazurin/wiki/Configu
 
 #### 'Deploy to Heroku' Button
 
-    [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 > Tips: You can fork this repository, modify it to your needs, and use this button to deploy your own version.
 
 #### Manual
 
-    Set all required environment variables on Heroku according to [Configuration Guide](https://github.com/y-young/nazurin/wiki/Configuration), clone this repository and push to Heroku, everything should be working properly.
+Set all required environment variables on Heroku according to [Configuration Guide](https://github.com/y-young/nazurin/wiki/Configuration), clone this repository and push to Heroku, everything should be working properly.
 
 ### Deploy on your own server
 
