@@ -1,4 +1,4 @@
-aiogram
+aiogram~=2.13
 aiohttp
 aiofiles
 aiojobs
