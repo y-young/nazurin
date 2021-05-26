@@ -18,15 +18,15 @@ async def show_help(message: Message):
     小さな小さな賢将, can help you collect images from various sites.
     Commands:
     /ping - pong
-    /pixiv <id> - view pixiv artwork
-    /pixiv_download <id> - download pixiv artwork
-    /danbooru <id> - view danbooru post
-    /danbooru_download <id> - download danbooru post
-    /yandere <id> - view yandere post
-    /yandere_download <id> - download yandere post
-    /konachan <id> - view konachan post
-    /konachan_download <id> - download konachan post
-    /bookmark <id> - bookmark pixiv artwork
+    /pixiv ARTWORK_ID - view pixiv artwork
+    /pixiv_download ARTWORK_ID - download pixiv artwork
+    /danbooru POST_ID - view danbooru post
+    /danbooru_download POST_ID - download danbooru post
+    /yandere POST_ID - view yandere post
+    /yandere_download POST_ID - download yandere post
+    /konachan POST_ID - view konachan post
+    /konachan_download POST_ID - download konachan post
+    /pixiv_bookmark ARTWORK_ID - bookmark pixiv artwork
     /clear_cache - clear download cache
     /help - get this help text
     PS: Send Pixiv/Danbooru/Yandere/Konachan/Twitter URL to download image(s)
