@@ -22,6 +22,9 @@ class Illust:
     def has_image(self) -> bool:
         return len(self.images) != 0
 
+    def has_multiple_images(self) -> bool:
+        return len(self.images) > 1
+
     async def download(self, **kwargs):
         async with Request(**kwargs) as session:
             tasks = []
