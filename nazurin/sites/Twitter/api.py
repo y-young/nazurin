@@ -44,7 +44,7 @@ class Twitter(object):
     def buildCaption(self, tweet) -> Caption:
         return Caption({
             'url': f"https://twitter.com/{tweet['user']['screen_name']}/status/{tweet['id_str']}",
-            'author:': f"{tweet['user']['name']} #{tweet['user']['screen_name']}",
+            'author': f"{tweet['user']['name']} #{tweet['user']['screen_name']}",
             'text': tweet['text']
         })
 
