@@ -12,16 +12,15 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+1. Send '...' / Invoke '...' command
+2. See error
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**Error output / Logs**
+Logs are usually critical to identify the cause of a bug, please paste the complete log from start to end.
+**Make sure to remove or mask all secrets, such as bot token and personal information!**
 
 **Environment (please complete the following information):**
  - OS: [e.g. Ubuntu]
