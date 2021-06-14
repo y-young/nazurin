@@ -15,6 +15,8 @@ from . import logger
 
 async def handleBadRequest(message: Message, error: BadRequest):
     logger.error('BadRequest exception: %s', error)
+    if not message:
+        return
     if isinstance(error, (WrongFileIdentifier, InvalidHTTPUrlContent)):
         await message.reply(
             'Failed to send image as photo, maybe the size is too big, '
