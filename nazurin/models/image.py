@@ -26,17 +26,20 @@ class Image(File):
             )
         self._chosen_url = self.url
         if self.thumbnail:
-            if self.width + self.height > 10000:
+            # For safety reasons, use thumbnail when image size is unkown
+            if (not self.width) or (
+                    not self.height) or self.width + self.height > 10000:
                 self._chosen_url = self.thumbnail
-                logger.info('Use thumbnail (width + height > 10000): %s',
-                            self._chosen_url)
+                logger.info(
+                    'Use thumbnail (Unkown image size or width + height > 10000 [%s, %s]): %s',
+                    self.width, self.height, self._chosen_url)
             else:
                 size = await self.size()
                 if (not size) or size > 5 * 1024 * 1024:
                     self._chosen_url = self.thumbnail
                     logger.info(
-                        'Use thumbnail (Unknown size or size > 5MB): %s',
-                        self._chosen_url)
+                        'Use thumbnail (Unknown size or size > 5MB [%s]): %s',
+                        size, self._chosen_url)
         return self._chosen_url
 
     async def size(self) -> int:

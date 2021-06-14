@@ -205,13 +205,15 @@ class Pixiv(object):
             for page in pages:
                 url = page.image_urls.original
                 name = self.getFilename(url, illust)
-                # For multi-page illusts, width & height will be the size of the first page
                 imgs.append(
                     PixivImage(name,
                                url,
                                self.getThumbnail(url),
                                width=width,
                                height=height))
+                # For multi-page illusts, width & height will be the size of the first page,
+                # we shouldn't guess the sizes of images after
+                width = height = 0
         else:
             url = illust.meta_single_page.original_image_url
             name = self.getFilename(url, illust)
