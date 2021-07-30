@@ -11,7 +11,10 @@ patterns = [
     # https://twitter.com/abcdefg/status/1234567890123456789
     # https://www.twitter.com/abcdefg/status/1234567890123456789
     # https://mobile.twitter.com/abcdefg/status/1234567890123456789
-    r'(?:mobile\.|www\.)?twitter\.com/[^.]+/status/(\d+)'
+    r'(?:mobile\.|www\.)?twitter\.com/[^.]+/status/(\d+)',
+
+    # https://nitter.anywhere.com/abcdefg/status/1234567890123456789
+    r'nitter\.[\w.]+/[^.]+/status/(\d+)'
 ]
 
 async def handle(match, **kwargs) -> Illust:
