@@ -6,6 +6,11 @@ from aiogram.dispatcher.filters import IDFilter
 from aiogram.types import ChatActions, Message, Update
 from aiogram.utils.exceptions import TelegramAPIError
 
+import sys
+import os
+path = os.path.dirname(sys.modules[__name__].__file__)
+path = os.path.join(path, '..')
+sys.path.insert(0, path)
 from nazurin import config, dp
 from nazurin.utils import logger
 from nazurin.utils.decorators import chat_action
