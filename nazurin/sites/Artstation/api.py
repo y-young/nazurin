@@ -6,17 +6,17 @@ from nazurin.utils import Request
 from nazurin.utils.exceptions import NazurinError
 
 class Artstation(object):
-    async def getPost(self, post_id: int):
+    async def getPost(self, post_id: str):
         """Fetch an post."""
         api = f"https://www.artstation.com/projects/{post_id}.json"
         async with Request() as request:
             async with request.get(api) as response:
-                if not response.text:
+                if not response.status == 200:
                     raise NazurinError('Post not found')
                 post = await response.json()
                 return post
 
-    async def fetch(self, post_id: int) -> Illust:
+    async def fetch(self, post_id: str) -> Illust:
         post = await self.getPost(post_id)
         imgs = self.getImages(post)
         caption = self.buildCaption(post)
@@ -64,11 +64,12 @@ class Artstation(object):
 
             return:
                 '_z-ed_-da.jpg',
-                'https://cdnb.artstation.com/p/assets/images/images/042/908/363/large/_z-ed_-da.jpg',
-                'https://cdnb.artstation.com/p/assets/images/images/042/908/363/small_square/_z-ed_-da.jpg'
+                'https://cdnb.artstation.com/p/assets/images/images/042/908/363/4k/_z-ed_-da.jpg',
+                'https://cdnb.artstation.com/p/assets/images/images/042/908/363/medium/_z-ed_-da.jpg'
 
         """
         baseurl = src.split('?')[0]
         basename = os.path.basename(baseurl)
-        thumbnail = baseurl.replace('/large/', '/small_square/')
-        return basename, baseurl, thumbnail
+        url = baseurl.replace('/large/', '/4k/')
+        thumbnail = baseurl.replace('/large/', '/medium/')
+        return basename, url, thumbnail

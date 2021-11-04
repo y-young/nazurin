@@ -1,2 +1,2 @@
-PRIORITY = 11
+PRIORITY = 10
 COLLECTION = 'artstation'

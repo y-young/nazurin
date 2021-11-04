@@ -8,7 +8,8 @@ from .config import COLLECTION
 
 patterns = [
     # https://www.artstation.com/artwork/2x3LaB
-    r'artstation\.com/artwork/([0-9a-zA-Z]+)'
+    # https://catzz.artstation.com/projects/A9ELeq
+    r'artstation\.com/(?:artwork|projects)/([0-9a-zA-Z]+)'
 ]
 
 async def handle(match, **kwargs) -> Illust:
