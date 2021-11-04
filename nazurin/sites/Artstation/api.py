@@ -27,6 +27,7 @@ class Artstation(object):
         if 'assets' not in post.keys():
             raise NazurinError('No asset found.')
         assets = sorted(post['assets'], key=lambda x: x['position'])
+        hash_id = post['hash_id']
         imgs = list()
         for asset in assets:
             if asset['asset_type'] != 'image':
@@ -34,7 +35,7 @@ class Artstation(object):
             # https://cdnb.artstation.com/p/assets/images/images/042/908/363/large/_z-ed_-da.jpg?1635784439
             filename, url, thumbnail = self.parseUrl(asset['image_url'])
             imgs.append(
-                Image(filename,
+                Image(f"ArtStation - {hash_id} - {filename}",
                       url,
                       thumbnail,
                       width=asset['width'],
