@@ -1,27 +1,27 @@
-aiogram~=2.13
-aiohttp
-aiofiles
-aiojobs
-tenacity
-environs
+aiogram~=2.16.0
+aiohttp~=3.8.0
+aiofiles~=0.7.0
+aiojobs~=0.3.0
+tenacity~=5.1.5
+environs~=9.3.4
 
 pixivpy~=3.5.11
-beautifulsoup4
-Pybooru
+beautifulsoup4~=4.10.0
+Pybooru~=4.2.2
 
 # DATABASE
 # Local:
-tinydb
+tinydb~=4.5.2
 # Firebase:
-firebase-admin
+firebase-admin~=5.1.0
 # Mongo:
-motor
-dnspython
+motor~=2.5.1
+dnspython~=2.1.0
 # Cloudant:
-cloudant
+cloudant~=2.15.0
 
 # STORAGE
 # Mega:
-mega.py
+mega.py~=1.0.8
 # Google Drive:
-PyDrive2
+PyDrive2~=1.10.0

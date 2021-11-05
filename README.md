@@ -1,7 +1,7 @@
 # Nazurin
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/5cbfed1b51a644b187ed5d9521a4ea95)](https://www.codacy.com/manual/y-young/nazurin?utm_source=github.com&utm_medium=referral&utm_content=y-young/nazurin&utm_campaign=Badge_Grade)
-![](https://img.shields.io/badge/python->%3D%203.6-blue)
+![](https://img.shields.io/badge/python->%3D%203.7-blue)
 ![](https://img.shields.io/badge/-Telegram-blue.svg?logo=telegram)
 
 English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
@@ -34,7 +34,7 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 |      Gelbooru     |     <https://gelbooru.com/>    |          |      ✔     |
 |      Twitter      |     <https://twitter.com/>     |          |      ✔     |
 | Bilibili Dynamics |    <https://t.bilibili.com/>   |          |      ✔     |
-|     ArtStation    | <https://www.artstation.com/>  |          |      ✔     |
+|     ArtStation    |  <https://www.artstation.com/> |          |      ✔     |
 |       Weibo       |      <https://weibo.com/>      |          |      ✔     |
 
 ### Supported Databases
