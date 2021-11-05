@@ -35,6 +35,7 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 |      Twitter      |     <https://twitter.com/>     |          |      ✔     |
 | Bilibili Dynamics |    <https://t.bilibili.com/>   |          |      ✔     |
 |     ArtStation    | <https://www.artstation.com/>  |          |      ✔     |
+|       Weibo       |      <https://weibo.com/>      |          |      ✔     |
 
 ### Supported Databases
 
