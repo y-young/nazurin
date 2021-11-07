@@ -1,15 +1,8 @@
-import asyncio
-import os
-
 from aiohttp import ClientSession, TCPConnector
 
 from nazurin.config import PROXY, UA
 
 from .decorators import retry
-
-# https://github.com/aio-libs/aiohttp/issues/4536
-if os.name == 'nt':
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 class Request(ClientSession):
     get = retry(ClientSession.get)
