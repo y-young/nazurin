@@ -1,3 +1,4 @@
+import asyncio
 from typing import List
 
 from aiogram import Dispatcher, executor
@@ -43,7 +44,13 @@ class NazurinDispatcher(Dispatcher):
             logger.info('Set webhook')
             self.executor.set_webhook(webhook_path='/' + config.TOKEN,
                                       web_app=self.server)
-            self.executor.run_app(host="0.0.0.0", port=config.PORT)
+            # Tell aiohttp to use main thread event loop instead of creating a new one
+            # otherwise bot commands will run in a different loop
+            # from main thread functions and classes like Mongo and Mega.api_upload,
+            # resulting in RuntimeError: Task attached to different loop
+            self.executor.run_app(host="0.0.0.0",
+                                  port=config.PORT,
+                                  loop=asyncio.get_event_loop())
         else:
             # self.server.start()
             executor.start_polling(self, skip_updates=True)

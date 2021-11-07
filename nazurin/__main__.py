@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import shutil
 import traceback
+from html import escape
 
 from aiogram.dispatcher.filters import IDFilter
 from aiogram.types import ChatActions, Message, Update
@@ -57,7 +58,8 @@ async def on_error(update: Update, exception: Exception):
         logger.error('Update %s caused %s: %s', update, type(error), error)
         traceback.print_exc()
         if not isinstance(error, TelegramAPIError):
-            await update.message.reply('Error: ' + str(error))
+            await update.message.reply('Error: ' +
+                                       escape(str(error), quote=False))
     return True
 
 def main():
