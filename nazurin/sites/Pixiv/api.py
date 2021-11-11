@@ -159,7 +159,7 @@ class Pixiv(object):
 
         @async_wrap
         def convert(config: File, output: File):
-            cmd = f'ffmpeg -i {config.path} -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -y {output.path}'
+            cmd = f'ffmpeg -i "{config.path}" -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -y "{output.path}"'
             logger.info('Calling FFmpeg with command: %s', cmd)
             args = shlex.split(cmd)
             try:
@@ -168,7 +168,7 @@ class Pixiv(object):
                                                  shell=False)
             except subprocess.CalledProcessError as error:
                 logger.error('FFmpeg failed with code %s, output:\n %s',
-                             error.returncode, error.output)
+                             error.returncode, error.output.decode())
                 raise NazurinError(
                     'Failed to convert ugoira to mp4.') from None
 
