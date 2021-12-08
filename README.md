@@ -33,8 +33,9 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 |      Zerochan     |   <https://www.zerochan.net/>  |     ✔    |      ✔     |
 |      Gelbooru     |     <https://gelbooru.com/>    |          |      ✔     |
 |      Twitter      |     <https://twitter.com/>     |          |      ✔     |
-| Bilibili Dynamics |    <https://t.bilibili.com/>   |          |      ✔     |
 |     ArtStation    |  <https://www.artstation.com/> |          |      ✔     |
+|     Wallhaven     |     <https://wallhaven.cc/>    |          |      ✔     |
+| Bilibili Dynamics |    <https://t.bilibili.com/>   |          |      ✔     |
 |       Weibo       |      <https://weibo.com/>      |          |      ✔     |
 
 ### Supported Databases

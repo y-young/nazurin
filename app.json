@@ -55,6 +55,10 @@
       "description": "Pixiv refresh token. See more information at https://github.com/y-young/nazurin/wiki/Pixiv .",
       "required": false
     },
+    "WALLHAVEN_API_KEY": {
+      "description": "Wallhaven API key. See more information at https://github.com/y-young/nazurin/wiki/Wallhaven .",
+      "required": false
+    },
     "MEGA_USER": {
       "description": "MEGA login email.",
       "required": false
