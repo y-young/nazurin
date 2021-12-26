@@ -36,9 +36,8 @@ class Zerochan(object):
         size = int(info['contentSize'][:-2]) * 1024
         tags = dict()
         for tag in soup.find('ul', id='tags').find_all('li'):
-            tag_name, tag_type = tag.contents
-            tag_name = unquote(tag_name['href'][1:]).replace('+', '_')
-            tag_type = tag_type[1:]
+            tag_type = ' '.join(tag['class']).title()
+            tag_name = unquote(tag.find('a')['href'][1:]).replace('+', '_')
             tags[tag_name] = tag_type
         post = {
             'id': int(post_id),
