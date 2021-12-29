@@ -159,7 +159,10 @@ class Pixiv(object):
 
         @async_wrap
         def convert(config: File, output: File):
-            cmd = f'ffmpeg -i "{config.path}" -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -y "{output.path}"'
+            # For some illustrations like https://www.pixiv.net/artworks/44298467,
+            # the output video is in YUV444P colorspace, which can't be played on some devices,
+            # thus we convert to YUV420P colorspace for better compatibility.
+            cmd = f'ffmpeg -i "{config.path}" -vcodec libx264 -pix_fmt yuv420p -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -y "{output.path}"'
             logger.info('Calling FFmpeg with command: %s', cmd)
             args = shlex.split(cmd)
             try:
@@ -178,11 +181,13 @@ class Pixiv(object):
             return output_mp4
 
         ffconcat = 'ffconcat version 1.0\n'
-        for frame in ugoira_metadata.frames:
+        # no need to specify duration for the last frame
+        for frame in ugoira_metadata.frames[:-1]:
             frame.file = folder + '/' + frame.file
             ffconcat += 'file ' + frame.file + '\n'
             ffconcat += 'duration ' + str(float(frame.delay) / 1000) + '\n'
-        ffconcat += 'file ' + ugoira_metadata.frames[-1].file + '\n'
+        ffconcat += 'file ' + folder + '/' + ugoira_metadata.frames[
+            -1].file + '\n'
         input_config = File(folder + '.ffconcat')
         async with aiofiles.open(input_config.path, 'w') as f:
             await f.write(ffconcat)
