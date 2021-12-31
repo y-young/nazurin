@@ -19,7 +19,7 @@ from nazurin.utils import Request, logger
 from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
 
-from .config import DOCUMENT, HEADERS, REFRESH_TOKEN, TRANSLATION
+from .config import DOCUMENT, HEADERS, REFRESH_TOKEN, TRANSLATION, PixivPrivacy
 from .models import PixivIllust, PixivImage
 
 class Pixiv(object):
@@ -117,14 +117,18 @@ class Pixiv(object):
         caption = self.buildCaption(illust)
         return Ugoira(video, caption, illust, files)
 
-    async def bookmark(self, artwork_id: int):
-        response = await self.call(Pixiv.illust_bookmark_add, artwork_id)
+    async def bookmark(self,
+                       artwork_id: int,
+                       privacy: PixivPrivacy = PixivPrivacy.PUBLIC):
+        response = await self.call(Pixiv.illust_bookmark_add, artwork_id,
+                                   privacy.value)
         if 'error' in response.keys():
             logger.error(response)
-            raise NazurinError(response['error']['user_message'])
-        else:
-            logger.info('Bookmarked artwork %s', artwork_id)
-            return True
+            raise NazurinError(response.error.user_message
+                               or response.error.message)
+        logger.info('Bookmarked artwork %s, privacy = %s', artwork_id,
+                    privacy.value)
+        return True
 
     async def followUser(self, user_id: int):
         await self.call(Pixiv.user_follow_add, user_id)

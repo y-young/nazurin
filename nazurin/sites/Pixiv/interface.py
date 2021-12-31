@@ -4,7 +4,7 @@ from nazurin.database import Database
 from nazurin.models import Illust
 
 from .api import Pixiv
-from .config import COLLECTION
+from .config import BOOKMARK_PRIVACY, COLLECTION
 
 patterns = [
     # https://pixiv.net/i/123456
@@ -34,7 +34,7 @@ async def handle(match, **kwargs) -> Illust:
     db = Database().driver()
     collection = db.collection(COLLECTION)
 
-    await api.bookmark(artwork_id)
+    await api.bookmark(artwork_id, BOOKMARK_PRIVACY)
     illust = await api.view(artwork_id)
     illust.metadata['collected_at'] = time()
     await collection.insert(int(artwork_id), illust.metadata)

@@ -6,6 +6,7 @@ from aiogram.types import Message
 from nazurin import bot, dp
 
 from .api import Pixiv
+from .config import PixivPrivacy
 
 pixiv = Pixiv()
 
@@ -36,7 +37,7 @@ async def pixiv_download(message: Message, command: Command.CommandObj):
     await illust.download()
     await bot.sendDocuments(illust, message)
 
-@dp.message_handler(Command(['pixiv_bookmark']))
+@dp.message_handler(Command(['pixiv_bookmark', 'pixiv_bookmark_private']))
 async def pixiv_bookmark(message: Message, command: Command.CommandObj):
     try:
         artwork_id = int(command.args)
@@ -46,7 +47,10 @@ async def pixiv_bookmark(message: Message, command: Command.CommandObj):
     if artwork_id < 0:
         await message.reply('Invalid artwork id!')
         return
-    await pixiv.bookmark(artwork_id)
+    privacy = PixivPrivacy.PUBLIC
+    if command.command == 'pixiv_bookmark_private':
+        privacy = PixivPrivacy.PRIVATE
+    await pixiv.bookmark(artwork_id, privacy)
     await message.reply('Done!')
 
 @dp.message_handler(Regexp(r'(?:www\.)?pixiv\.net/(?:users|u)/(\d+)'))
