@@ -35,6 +35,20 @@ class NazurinDispatcher(Dispatcher):
                                                 *args, **kwargs)
 
     async def on_startup(self, dp):
+        await self.bot.set_my_commands([
+                    {'command': 'pixiv', 'description': 'view pixiv artwork'},
+                    {'command': 'pixiv_download', 'description': 'download pixiv artwork'},
+                    {'command': 'pixiv_bookmark', 'description': 'bookmark pixiv artwork'},
+                    {'command': 'pixiv_bookmark_private', 'description': 'bookmark private pixiv artwork'},
+                    {'command': 'danbooru', 'description': 'view danbooru post'},
+                    {'command': 'danbooru_download', 'description': 'download danbooru post'},
+                    {'command': 'yandere', 'description': 'view yandere post'},
+                    {'command': 'yandere_download', 'description': 'download yandere post'},
+                    {'command': 'konachan', 'description': 'view konachan post'},
+                    {'command': 'konachan_download', 'description': 'download konachan post'},
+                    {'command': 'clear_cache', 'description': 'clear download cache'},
+                    {'command': 'help', 'description': 'get this help text'},
+                ])
         await self.bot.set_webhook(config.WEBHOOK_URL + config.TOKEN,
                                    allowed_updates=AllowedUpdates.MESSAGE)
 
