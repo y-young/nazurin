@@ -1,5 +1,6 @@
 import traceback
 
+import aiohttp_cors
 import aiojobs
 from aiohttp import web
 
@@ -9,8 +10,14 @@ class NazurinServer(web.Application):
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
-        self.add_routes(
-            [web.post(f'/{config.TOKEN}/api', self.update_handler)])
+        cors = aiohttp_cors.setup(self)
+        resource = cors.add(self.router.add_resource(f"/{config.TOKEN}/api"))
+        cors.add(
+            resource.add_route("POST", self.update_handler), {
+                "*": aiohttp_cors.ResourceOptions(
+                    allow_headers=("Content-Type", ),
+                    allow_methods=["POST", "OPTIONS"])
+            })
         self.on_startup.append(self.init_jobs)
         self.on_shutdown.append(self.shutdown_jobs)
 
