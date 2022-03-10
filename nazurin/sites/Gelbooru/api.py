@@ -12,10 +12,10 @@ class Gelbooru(object):
             post_id)
         async with Request() as request:
             async with request.get(api) as response:
-                if not response.text:
-                    raise NazurinError('Post not found')
                 response = await response.json()
-                post = response[0]
+                if 'post' not in response.keys():
+                    raise NazurinError('Post not found')
+                post = response['post'][0]
                 return post
 
     async def fetch(self, post_id: int) -> Illust:
