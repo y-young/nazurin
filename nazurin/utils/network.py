@@ -1,19 +1,14 @@
-from aiohttp import ClientSession, TCPConnector
+from aiohttp import ClientSession, ClientTimeout, TCPConnector
 
-from nazurin.config import PROXY, UA
-
-from .decorators import retry
+from nazurin.config import PROXY, TIMEOUT, UA
 
 class Request(ClientSession):
-    get = retry(ClientSession.get)
-    post = retry(ClientSession.post)
-    put = retry(ClientSession.put)
-    patch = retry(ClientSession.patch)
-    delete = retry(ClientSession.delete)
-    head = retry(ClientSession.head)
-    request = retry(ClientSession.request)
-
-    def __init__(self, cookies=None, headers=None, **kwargs):
+    """Wrapped ClientSession with default user agent, timeout and proxy support."""
+    def __init__(self,
+                 cookies=None,
+                 headers=None,
+                 timeout=ClientTimeout(total=TIMEOUT),
+                 **kwargs):
         if not headers:
             headers = dict()
         headers.update({'User-Agent': UA})
@@ -24,4 +19,5 @@ class Request(ClientSession):
                          cookies=cookies,
                          headers=headers,
                          trust_env=True,
+                         timeout=timeout,
                          **kwargs)

@@ -5,6 +5,8 @@ from functools import partial, wraps
 import tenacity
 from aiogram.types import ChatActions, Message
 from aiogram.utils.exceptions import RetryAfter
+from aiohttp import ClientError, ClientResponseError
+from tenacity import retry_if_exception, stop_after_attempt, wait_exponential
 
 from nazurin import config
 
@@ -15,9 +17,20 @@ def after_log(retry_state):
         tenacity._utils.get_callback_name(retry_state.fn),
         retry_state.attempt_number, config.RETRIES)
 
-retry = tenacity.retry(reraise=True,
-                       stop=tenacity.stop_after_attempt(config.RETRIES),
-                       after=after_log)
+def exception_predicate(exception):
+    """Predicate to check if we should retry when an exception occurs."""
+    if not isinstance(exception,
+                      (ClientError, asyncio.exceptions.TimeoutError)):
+        return False
+    if isinstance(exception, ClientResponseError):
+        return exception.status in [408, 429, 500, 502, 503, 504]
+    return True
+
+network_retry = tenacity.retry(reraise=True,
+                               stop=stop_after_attempt(config.RETRIES),
+                               after=after_log,
+                               retry=retry_if_exception(exception_predicate),
+                               wait=wait_exponential(multiplier=1, max=8))
 
 def chat_action(action: str):
     """Sends `action` while processing."""
@@ -33,6 +46,7 @@ def chat_action(action: str):
     return decorator
 
 def async_wrap(func):
+    """Transform a synchronous function to an asynchronous one."""
     @wraps(func)
     async def run(*args, loop=None, executor=None, **kwargs):
         if loop is None:

@@ -12,6 +12,7 @@ class Gelbooru(object):
             post_id)
         async with Request() as request:
             async with request.get(api) as response:
+                response.raise_for_status()
                 response = await response.json()
                 if 'post' not in response.keys():
                     raise NazurinError('Post not found')

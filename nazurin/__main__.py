@@ -6,6 +6,7 @@ from html import escape
 from aiogram.dispatcher.filters import IDFilter
 from aiogram.types import ChatActions, Message, Update
 from aiogram.utils.exceptions import TelegramAPIError
+from aiohttp import ClientResponseError
 
 from nazurin import config, dp
 from nazurin.utils import logger
@@ -52,6 +53,9 @@ async def clear_cache(message: Message):
 async def on_error(update: Update, exception: Exception):
     try:
         raise exception
+    except ClientResponseError as error:
+        await update.message.reply(
+            f'Response Error: {error.status} {error.message}')
     except NazurinError as error:
         await update.message.reply(error.msg)
     except Exception as error:

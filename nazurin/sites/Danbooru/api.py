@@ -21,7 +21,7 @@ class Danbooru(object):
     async def getPost(self,
                       post_id: Optional[int] = None,
                       md5: Optional[str] = None):
-        """Fetch an post."""
+        """Fetch a post."""
         try:
             if post_id:
                 post = await self.post_show(post_id)
