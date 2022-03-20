@@ -74,7 +74,7 @@ class Moebooru(object):
         if not post_ma:
             raise NazurinError("No post find in parent collection")
         posts = []
-        for i, match in enumerate(post_ma, start=1):
+        for _, match in enumerate(post_ma, start=1):
             post = "{" + match.group(1) + "}"
             try:
                 post = json.loads(post)
@@ -130,8 +130,7 @@ class Moebooru(object):
 
     def getImages(self, posts) -> List[Image]:
         imgs = []
-        for i in range(len(posts)):
-            post = posts[i]
+        for post in posts:
             file_url = post["file_url"]
             name = unquote(os.path.basename(file_url))
             imgs.append(
