@@ -8,6 +8,7 @@ from nazurin.config import NAZURIN_DATA, STORAGE_DIR, env
 from nazurin.database import Database
 from nazurin.models import File
 from nazurin.utils import Request, logger
+from nazurin.utils.exceptions import NazurinError
 
 OD_FOLDER = STORAGE_DIR
 OD_CLIENT = env.str('OD_CLIENT')
@@ -109,18 +110,23 @@ class OneDrive(object):
         data = {
             'client_id': OD_CLIENT,
             'client_secret': OD_SECRET,
-            'refresh_token': self.refresh_token,
+            'refresh_token': self.refresh_token or OD_RF_TOKEN,
             'grant_type': 'refresh_token'
         }
         async with Request() as request:
             async with request.post(url, data=data) as response:
                 response = await response.json()
-        self.access_token = response['access_token']
-        self.refresh_token = response['refresh_token']
-        self.expires_at = time.time() + response['expires_in']
+                if 'error' in response.keys():
+                    logger.error(response)
+                    raise NazurinError(
+                        f"OneDrive authorization error: {response['error_description']}"
+                    )
+                self.access_token = response['access_token']
+                self.refresh_token = response['refresh_token']
+                self.expires_at = time.time() + response['expires_in']
         credentials = {
-            'access_token': response['access_token'],
-            'refresh_token': response['refresh_token'],
+            'access_token': self.access_token,
+            'refresh_token': self.refresh_token,
             'expires_at': self.expires_at
         }
         if initialize:
