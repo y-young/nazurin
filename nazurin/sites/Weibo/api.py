@@ -5,16 +5,17 @@ from typing import List, Tuple
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
+from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
 class Weibo(object):
+    @network_retry
     async def getPost(self, post_id: str):
-        """Fetch an post."""
+        """Fetch a post."""
         api = f"https://m.weibo.cn/detail/{post_id}"
         async with Request() as request:
             async with request.get(api) as response:
-                if not response.status == 200:
-                    raise NazurinError('Post not found')
+                response.raise_for_status()
                 html = await response.text()
                 post = self.parseHtml(html)
                 return post

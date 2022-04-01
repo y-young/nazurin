@@ -3,22 +3,19 @@ from datetime import datetime, timezone
 from typing import List
 from urllib.parse import unquote
 
-from aiohttp.client_exceptions import ClientResponseError
 from bs4 import BeautifulSoup
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
-from nazurin.utils.exceptions import NazurinError
+from nazurin.utils.decorators import network_retry
 
 class Zerochan(object):
+    @network_retry
     async def getPost(self, post_id: int):
         async with Request() as request:
             async with request.get('https://www.zerochan.net/' +
                                    str(post_id)) as response:
-                try:
-                    response.raise_for_status()
-                except ClientResponseError as err:
-                    raise NazurinError(err) from None
+                response.raise_for_status()
 
                 # Override post_id if there's a redirection TODO: Check
                 if response.history:

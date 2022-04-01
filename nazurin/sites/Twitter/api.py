@@ -3,9 +3,11 @@ from typing import List, Tuple
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
+from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
 class Twitter(object):
+    @network_retry
     async def getTweet(self, status_id: int):
         """Get a tweet from API."""
         # Old: 'https://syndication.twitter.com/tweets.json?ids='+ status_id +'&lang=en'
@@ -15,6 +17,7 @@ class Twitter(object):
             async with request.get(api) as response:
                 if response.status == 404:
                     raise NazurinError('Tweet not found or unavailable.')
+                response.raise_for_status()
                 tweet = await response.json()
                 return tweet
 

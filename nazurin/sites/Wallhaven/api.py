@@ -3,11 +3,13 @@ from typing import List
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
+from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
 from .config import API_KEY
 
 class Wallhaven(object):
+    @network_retry
     async def getWallpaper(self, wallpaperId: str):
         """Get wallpaper information from API."""
         api = 'https://wallhaven.cc/api/v1/w/' + wallpaperId
@@ -21,9 +23,7 @@ class Wallhaven(object):
                     raise NazurinError(
                         'You need to log in to view this wallpaper. ' +
                         'Please ensure that you have set a valid API key.')
-                if response.status == 429:
-                    raise NazurinError(
-                        'Hit API rate limit, please try again later.')
+                response.raise_for_status()
                 wallpaper = await response.json()
                 if 'error' in wallpaper.keys():
                     raise NazurinError(wallpaper['error'])

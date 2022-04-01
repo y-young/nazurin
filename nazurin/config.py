@@ -38,6 +38,7 @@ ALLOW_USERNAME = env.list('ALLOW_USERNAME', default=[])
 ALLOW_GROUP = env.list('ALLOW_GROUP', subcast=int, default=[])
 
 RETRIES = env.int('RETRIES', default=5)
+TIMEOUT = env.int('TIMEOUT', default=10)
 PROXY = env.str('HTTP_PROXY', default=None)
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
     AppleWebKit/537.36 (KHTML, like Gecko) \

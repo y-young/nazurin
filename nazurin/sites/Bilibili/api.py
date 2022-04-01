@@ -4,16 +4,27 @@ from typing import List
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
+from nazurin.utils.decorators import network_retry
+from nazurin.utils.exceptions import NazurinError
 
 class Bilibili(object):
+    @network_retry
     async def getDynamic(self, dynamic_id: int):
         """Get dynamic data from API."""
         api = 'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail?dynamic_id=' + str(
             dynamic_id)
         async with Request() as request:
             async with request.get(api) as response:
-                source = await response.json()
-        card = json.loads(source['data']['card']['card'])
+                response.raise_for_status()
+                data = await response.json()
+                # For some IDs, the API returns code 0 but empty content
+                if data['code'] == 500207 or (data['code'] == 0 and 'card'
+                                              not in data['data'].keys()):
+                    raise NazurinError('Dynamic not found')
+                if data['code'] != 0:
+                    raise NazurinError('Failed to get dynamic: ' +
+                                       data['message'])
+        card = json.loads(data['data']['card']['card'])
         return card
 
     async def fetch(self, dynamic_id: int) -> Illust:
@@ -26,6 +37,8 @@ class Bilibili(object):
 
     def getImages(self, card, dynamic_id: int) -> List[Image]:
         """Get all images in a dynamic card."""
+        if 'item' not in card.keys() or 'pictures' not in card['item'].keys():
+            raise NazurinError("No image found")
         pics = card['item']['pictures']
         imgs = list()
         for index, pic in enumerate(pics):
