@@ -1,10 +1,12 @@
 import binascii
 import json
 import os
-from typing import List, Tuple
+from typing import List, Optional, Tuple
+from urllib.parse import urlparse
 
 from nazurin.models import Caption, Illust, Image
-from nazurin.utils import Request
+from nazurin.models.file import File
+from nazurin.utils import Request, logger
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
@@ -33,7 +35,8 @@ class DeviantArt(object):
         deviation = await self.get_deviation(deviation_id)
         imgs = self.get_images(deviation)
         caption = self.build_caption(deviation)
-        return Illust(imgs, caption, deviation)
+        file = await self.get_download(deviation)
+        return Illust(imgs, caption, deviation, [file] if file else [])
 
     def get_images(self, deviation: dict) -> List[Image]:
         """Get images from deviation."""
@@ -45,6 +48,32 @@ class DeviantArt(object):
                   original_file['height'])
         ]
         return imgs
+
+    async def get_download(self, deviation: dict) -> Optional[File]:
+        if not deviation['isDownloadable']:
+            return None
+        download = deviation['extended']['download']
+        originalFile = deviation['extended']['originalFile']
+
+        if download['width'] and \
+            download['filesize'] == originalFile['filesize'] and \
+            download['width'] == originalFile['width'] and \
+            download['height'] == originalFile['height']:
+            logger.info(
+                "No need to download since it's the same as the original image"
+            )
+            return None
+
+        authorUuid = deviation['author']['useridUuid']
+        url = urlparse(deviation['media']['baseUri'])
+        filename = os.path.basename(download['url']).split('?')[0]
+        url = url._replace(netloc=url.netloc.replace('images-wixmp-',
+                                                     'wixmp-'),
+                           path=f"/f/{authorUuid}/{filename}")
+        pretty_name = deviation['media']['prettyName'] + os.path.splitext(
+            filename)[1]
+        token = self.generate_token(url.path)
+        return File(pretty_name, f"{url.geturl()}?token={token}")
 
     def build_caption(self, deviation: dict) -> Caption:
         caption = Caption({
@@ -64,31 +93,36 @@ class DeviantArt(object):
 
         media = deviation['media']
         base_uri = media['baseUri']
-        filename = f"{deviation['title']} - {deviation['deviationId']}"
-        filename += os.path.splitext(base_uri)[1]
-
-        tokens = media['token']
+        tokens = media['token'] if 'token' in media.keys() else []
         types = dict()
         for type_ in media['types']:
             types[type_['t']] = type_
 
-        path = '/f/' + base_uri.split('/f/')[1]
-        url = base_uri + '?token=' + self.generate_token(path)
+        filename = f"{deviation['title']} - {deviation['deviationId']}"
+        filename += os.path.splitext(base_uri)[1]
 
-        token = tokens[0]
-        if 'fullview' in types.keys():
-            thumbnail = types['fullview']
-            # Sometimes fullview has no subpath but there're two tokens,
-            # in that case the base_uri should be used along with the second token
-            # e.g. https://www.deviantart.com/exitmothership/art/Unfold-879580475
-            if 'c' not in thumbnail.keys() and len(tokens) > 1:
-                thumbnail['c'] = ''
-                token = tokens[1]
+        path = urlparse(base_uri).path
+
+        token = tokens[0] if len(tokens) > 0 else ''
+        if path.startswith('/f/'):
+            url = f"{base_uri}?token={self.generate_token(path)}"
+            if 'fullview' in types.keys():
+                thumbnail = types['fullview']
+                # Sometimes fullview has no subpath but there're two tokens,
+                # in that case the base_uri should be used along with the second token
+                # e.g. https://www.deviantart.com/exitmothership/art/Unfold-879580475
+                if 'c' not in thumbnail.keys() and len(tokens) > 1:
+                    thumbnail['c'] = ''
+                    token = tokens[1]
+            else:
+                thumbnail = types['preview']
+            thumbnail = base_uri + thumbnail['c'].replace(
+                '<prettyName>', media['prettyName'])
+            thumbnail = f"{thumbnail}?token={token}"
+        elif base_uri.endswith('.gif'):  # TODO: Send GIFs properly
+            thumbnail = url = f"{types['gif']['b']}?token={token}"
         else:
-            thumbnail = types['preview']
-        thumbnail = base_uri + thumbnail['c'].replace('<prettyName>',
-                                                      media['prettyName'])
-        thumbnail = f"{thumbnail}?token={token}"
+            thumbnail = url = base_uri
 
         return filename, url, thumbnail
 
