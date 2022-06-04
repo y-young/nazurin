@@ -20,6 +20,9 @@ patterns = [
 
     # sinaweibo://detail?mblogid=4696149640611470&luicode=20000061&lfid=4696149640611470
     r'sinaweibo\://detail\?[\w\%\&=]*mblogid=(\d+)'
+
+    # https://share.api.weibo.cn/share/310744244,4776731619099115.html?weibo_id=4776731619099115
+    r'share\.api\.weibo\.cn/share/\d+,\d+\.html\?weibo_id=(\d+)'
 ]
 
 async def handle(match, **kwargs) -> Illust:
