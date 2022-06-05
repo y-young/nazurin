@@ -16,10 +16,13 @@ patterns = [
     r'm\.weibo\.cn/(?:detail|status)/([0-9a-zA-Z]+)',
 
     # https://weibo.cn/appurl?scheme=sinaweibo%3A%2F%2Fdetail%3Fmblogid%3D4696149640611470%26luicode%3D20000061%26lfid%3D4696149640611470&luicode=20000061&lfid=4696149640611470
-    r'weibo\.cn/appurl\?[\w\%\&=]*lfid=(\d+)'
+    r'weibo\.cn/appurl\?[\w\%\&=]*lfid=(\d+)',
 
     # sinaweibo://detail?mblogid=4696149640611470&luicode=20000061&lfid=4696149640611470
-    r'sinaweibo\://detail\?[\w\%\&=]*mblogid=(\d+)'
+    r'sinaweibo\://detail\?[\w\%\&=]*mblogid=(\d+)',
+
+    # https://share.api.weibo.cn/share/310744244,4776731619099115.html?weibo_id=4776731619099115
+    r'share\.api\.weibo\.cn/share/\d+,\d+\.html\?weibo_id=(\d+)'
 ]
 
 async def handle(match, **kwargs) -> Illust:
