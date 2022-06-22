@@ -22,7 +22,7 @@ from pixivpy3 import AppPixivAPI, PixivError
 from .config import DOCUMENT, HEADERS, REFRESH_TOKEN, TRANSLATION, PixivPrivacy
 from .models import PixivIllust, PixivImage
 
-class Pixiv(object):
+class Pixiv:
     api = AppPixivAPI()
     db = Database().driver()
     collection = db.collection(NAZURIN_DATA)

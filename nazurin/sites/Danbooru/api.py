@@ -10,7 +10,7 @@ from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
 from nazurin.utils.helpers import is_image
 
-class Danbooru(object):
+class Danbooru:
     def __init__(self, site='danbooru'):
         """Set Danbooru site."""
         self.site = site

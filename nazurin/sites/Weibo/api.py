@@ -8,7 +8,7 @@ from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
-class Weibo(object):
+class Weibo:
     @network_retry
     async def get_post(self, post_id: str):
         """Fetch a post."""

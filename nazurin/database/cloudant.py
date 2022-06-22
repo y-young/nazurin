@@ -9,7 +9,7 @@ with env.prefixed('CLOUDANT_'):
     APIKEY = env.str('APIKEY')
     DATABASE = env.str('DB', default='nazurin')
 
-class Cloudant(object):
+class Cloudant:
     """Cloudant driver of IBM Cloud."""
     def __init__(self):
         """Connect to database."""

@@ -5,7 +5,7 @@ from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
 from nazurin.utils.exceptions import NazurinError
 
-class Gelbooru(object):
+class Gelbooru:
     async def get_post(self, post_id: int):
         """Fetch an post."""
         api = 'https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&id=' + str(

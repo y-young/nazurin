@@ -8,7 +8,7 @@ from nazurin.models import File
 from nazurin.utils.decorators import async_wrap
 from nazurin.utils.helpers import ensure_existence
 
-class Local(object):
+class Local:
     def __init__(self):
         ensure_existence(os.path.join(DATA_DIR, STORAGE_DIR))
 

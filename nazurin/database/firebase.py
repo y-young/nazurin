@@ -6,7 +6,7 @@ from firebase_admin import credentials, firestore
 from nazurin.config import env
 from nazurin.utils.decorators import async_wrap
 
-class Firebase(object):
+class Firebase:
     """Firestore driver of Firebase."""
     def __init__(self):
         """Load credentials and initialize Firebase app."""

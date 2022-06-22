@@ -7,7 +7,7 @@ from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
-class Bilibili(object):
+class Bilibili:
     @network_retry
     async def get_dynamic(self, dynamic_id: int):
         """Get dynamic data from API."""

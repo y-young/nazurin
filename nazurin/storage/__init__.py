@@ -6,7 +6,7 @@ from nazurin.config import STORAGE
 from nazurin.models import Illust
 from nazurin.utils import logger
 
-class Storage(object):
+class Storage:
     """Storage manager."""
     disks = list()
 

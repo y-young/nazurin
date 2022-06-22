@@ -15,7 +15,7 @@ GD_FOLDER = env.str('GD_FOLDER')
 GD_CREDENTIALS = env.str('GD_CREDENTIALS',
                          default=env.str('GOOGLE_APPLICATION_CREDENTIALS'))
 
-class GoogleDrive(object):
+class GoogleDrive:
     """Google Drive driver."""
     drive = None
 
