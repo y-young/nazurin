@@ -59,7 +59,7 @@ async def on_error(update: Update, exception: Exception):
             f'Response Error: {error.status} {error.message}')
     except NazurinError as error:
         await update.message.reply(error.msg)
-    except Exception as error:
+    except Exception as error:  # pylint: disable=broad-except
         logger.error('Update %s caused %s: %s', update, type(error), error)
         traceback.print_exc()
         if not isinstance(error, TelegramAPIError):

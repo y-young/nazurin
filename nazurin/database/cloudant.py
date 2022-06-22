@@ -19,6 +19,8 @@ class Cloudant:
                                    adapter=HTTPAdapter(max_retries=RETRIES))
         self.client.connect()
         self.db = self.client[DATABASE]
+        self._partition = None
+        self._document = None
 
     def collection(self, key):
         self._partition = str(key)

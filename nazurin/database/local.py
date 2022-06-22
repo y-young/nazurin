@@ -3,12 +3,12 @@ from os import path
 from tinydb import Query, TinyDB
 
 from nazurin.config import DATA_DIR
-from nazurin.utils.helpers import ensureExistence
+from nazurin.utils.helpers import ensure_existence
 
 class Local:
     """Local database driver using TinyDB."""
     def __init__(self):
-        ensureExistence(DATA_DIR)
+        ensure_existence(DATA_DIR)
         self.db = None
         self._key = None
 
@@ -25,8 +25,7 @@ class Local:
         result = self.db.search(document.key == self._key)
         if result:
             return result[0]
-        else:
-            return None
+        return None
 
     async def insert(self, key, data):
         if key:

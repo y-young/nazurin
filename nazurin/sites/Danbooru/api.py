@@ -130,10 +130,9 @@ class Danbooru:
     def _sentence(self, names: List[str]) -> str:
         if len(names) == 1:
             return names[0]
-        else:
-            sentence = ' '.join(names[:-1])
-            sentence += ' and ' + names[-1]
-            return sentence
+        sentence = ' '.join(names[:-1])
+        sentence += ' and ' + names[-1]
+        return sentence
 
     def _normalize(self, name: str) -> str:
         name = re.sub(r'_\(.*\)', '', name)  # replace _(...)

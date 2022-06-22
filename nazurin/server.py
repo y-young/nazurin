@@ -29,6 +29,7 @@ class NazurinServer(web.Application):
             await self.bot.update_collection([url])
             await self.bot.send_message(config.ADMIN_ID,
                                         f'Successfully collected {url}')
+        # pylint: disable=broad-except
         except Exception as error:
             traceback.print_exc()
             await self.bot.send_message(

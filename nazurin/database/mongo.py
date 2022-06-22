@@ -13,6 +13,8 @@ class Mongo:
         URI = env.str('MONGO_URI', default='mongodb://localhost:27017/nazurin')
         self.client = AsyncIOMotorClient(URI)
         self.db = self.client.get_default_database()
+        self._collection = None
+        self._document = None
 
     def collection(self, key: str):
         self._collection = self.db[key]

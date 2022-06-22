@@ -17,6 +17,8 @@ class Firebase:
         if len(firebase_admin._apps) == 0:
             firebase_admin.initialize_app(cred)
         self.db = firestore.client()
+        self._collection = None
+        self._document = None
 
     def collection(self, key):
         self._collection = self.db.collection(str(key))
@@ -38,8 +40,7 @@ class Firebase:
     def insert(self, key, data):
         if key:
             return self._collection.document(str(key)).set(data)
-        else:
-            return self._collection.add(data)
+        return self._collection.add(data)
 
     @async_wrap
     def update(self, data):
