@@ -36,7 +36,8 @@ class Wallhaven:
         caption = self.build_caption(wallpaper)
         return Illust(imgs, caption, wallpaper)
 
-    def get_images(self, wallpaper) -> List[Image]:
+    @staticmethod
+    def get_images(wallpaper) -> List[Image]:
         url = wallpaper['path']
         filename = os.path.basename(url)
         thumbnail = wallpaper['thumbs']['large']
@@ -45,7 +46,8 @@ class Wallhaven:
                   wallpaper['dimension_x'], wallpaper['dimension_y'])
         ]
 
-    def build_caption(self, wallpaper) -> Caption:
+    @staticmethod
+    def build_caption(wallpaper) -> Caption:
         tags = str()
         for tag in wallpaper['tags']:
             tags += '#' + tag['name'].strip().replace(' ', '_') + ' '

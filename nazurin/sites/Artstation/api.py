@@ -45,7 +45,8 @@ class Artstation:
                       height=asset['height']))
         return imgs
 
-    def build_caption(self, post) -> Caption:
+    @staticmethod
+    def build_caption(post) -> Caption:
         user = post['user']
         tags = post['tags']
         tag_string = str()
@@ -58,7 +59,8 @@ class Artstation:
             'tags': tag_string,
         })
 
-    def parse_url(self, src: str) -> Tuple[str, str, str]:
+    @staticmethod
+    def parse_url(src: str) -> Tuple[str, str, str]:
         """Get filename, original file url & thumbnail url of the original image
 
         eg:

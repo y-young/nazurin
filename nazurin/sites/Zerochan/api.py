@@ -57,7 +57,8 @@ class Zerochan:
         caption = self.build_caption(post)
         return Illust(imgs, caption, post)
 
-    def get_images(self, post) -> List[Image]:
+    @staticmethod
+    def get_images(post) -> List[Image]:
         url = post['file_url']
         name = 'Zerochan ' + str(
             post['id']) + ' ' + post['name'] + '.' + post['file_ext']
@@ -66,7 +67,8 @@ class Zerochan:
                   int(post['image_width']), int(post['image_height']))
         ]
 
-    def build_caption(self, post) -> Caption:
+    @staticmethod
+    def build_caption(post) -> Caption:
         """Build media caption from an post."""
         tag_string = artists = source = str()
         for tag, tag_type in post['tags'].items():

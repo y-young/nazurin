@@ -42,7 +42,8 @@ class Lofter:
         })
         return Illust(imgs, caption, post)
 
-    def get_images(self, post: dict) -> List[Image]:
+    @staticmethod
+    def get_images(post: dict) -> List[Image]:
         """Get images from post."""
         if 'photoLinks' not in post.keys():
             raise NazurinError('No images found')

@@ -39,7 +39,8 @@ class Gelbooru:
                   height=post['height']))
         return imgs
 
-    def build_caption(self, post) -> Caption:
+    @staticmethod
+    def build_caption(post) -> Caption:
         tags = post['tags'].split(' ')
         tag_string = str()
         for tag in tags:
@@ -51,7 +52,8 @@ class Gelbooru:
             'tags': tag_string
         })
 
-    def get_thumbnail(self, post) -> Optional[str]:
+    @staticmethod
+    def get_thumbnail(post) -> Optional[str]:
         """
         Get thumbnail URL from post['file_url'].
         eg:

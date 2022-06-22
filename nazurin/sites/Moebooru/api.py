@@ -85,7 +85,8 @@ class Moebooru:
             img.name = pool_name + '/' + img.name
             await img.download()  # TODO
 
-    def get_images(self, post) -> List[Image]:
+    @staticmethod
+    def get_images(post) -> List[Image]:
         file_url = post['file_url']
         name = unquote(os.path.basename(file_url))
         imgs = [
@@ -115,6 +116,7 @@ class Moebooru:
         })
         return caption
 
-    def parse_url(self, url: str) -> str:
+    @staticmethod
+    def parse_url(url: str) -> str:
         name = os.path.basename(url)
         return os.path.splitext(name)

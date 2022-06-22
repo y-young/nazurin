@@ -12,8 +12,9 @@ class Local:
     def __init__(self):
         ensure_existence(os.path.join(DATA_DIR, STORAGE_DIR))
 
+    @staticmethod
     @async_wrap
-    def move_file(self, file: File):
+    def move_file(file: File):
         shutil.copyfile(
             file.path,
             os.path.join(os.path.join(DATA_DIR, STORAGE_DIR), file.name))

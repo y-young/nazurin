@@ -23,7 +23,8 @@ class GoogleDrive:
         """Initialize and log in."""
         self.auth()
 
-    def auth(self):
+    @staticmethod
+    def auth():
         if GoogleDrive.drive:
             return
         gauth = GoogleAuth()
@@ -42,8 +43,9 @@ class GoogleDrive:
                 'Credentials not found for Google Drive storage.')
         GoogleDrive.drive = GDrive(gauth)
 
+    @staticmethod
     @async_wrap
-    def upload(self, file: File):
+    def upload(file: File):
         metadata = {'title': file.name, 'parents': [{'id': GD_FOLDER}]}
         f = GoogleDrive.drive.CreateFile(metadata)
         f.SetContentFile(file.path)
@@ -53,7 +55,8 @@ class GoogleDrive:
         tasks = [self.upload(item) for item in files]
         await asyncio.gather(*tasks)
 
-    def find_folder(self, name: str) -> str:
+    @staticmethod
+    def find_folder(name: str) -> str:
         query = {
             'q': "mimeType='application/vnd.google-apps.folder' and title='" +
             name + "'",
@@ -62,7 +65,8 @@ class GoogleDrive:
         result = GoogleDrive.drive.ListFile(query).GetList()
         return result[0].get('id')
 
-    def create_folder(self, name: str) -> str:
+    @staticmethod
+    def create_folder(name: str) -> str:
         metadata = {
             'title': name,
             'mimeType': 'application/vnd.google-apps.folder',
