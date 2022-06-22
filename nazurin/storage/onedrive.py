@@ -50,15 +50,15 @@ class OneDrive(object):
         await self.stream_upload(file, response['uploadUrl'])
 
     async def store(self, files: List[File]):
-        await self.requireAuth()
+        await self.require_auth()
         if not self.folder_id:
-            await self.getDestination()
+            await self.get_destination()
 
         tasks = [self.upload(file) for file in files]
         await asyncio.gather(*tasks)
 
-    async def findFolder(self, name: str) -> Optional[str]:
-        await self.requireAuth()
+    async def find_folder(self, name: str) -> Optional[str]:
+        await self.require_auth()
         # https://docs.microsoft.com/zh-cn/graph/api/driveitem-list-children?view=graph-rest-1.0&tabs=http
         url = 'https://graph.microsoft.com/v1.0/me/drive/root/children'
         folders = dict(await self._request('GET', url))
@@ -68,15 +68,15 @@ class OneDrive(object):
                 return folder['id']
         return None
 
-    async def createFolder(self, name: str) -> str:
-        await self.requireAuth()
+    async def create_folder(self, name: str) -> str:
+        await self.require_auth()
         # https://docs.microsoft.com/zh-cn/graph/api/driveitem-post-children?view=graph-rest-1.0&tabs=http
         url = 'https://graph.microsoft.com/v1.0/me/drive/root/children'
         body = {"name": name, "folder": {}}
         result = await self._request('POST', url, json=body)
         return result['id']
 
-    async def requireAuth(self):
+    async def require_auth(self):
         # https://docs.microsoft.com/zh-cn/azure/active-directory/develop/v2-oauth2-auth-code-flow
         if self.access_token and self.expires_at > time.time():
             # Logged in, access_token not expired
@@ -130,12 +130,12 @@ class OneDrive(object):
             await self.document.update(credentials)
             logger.info('OneDrive access token updated')
 
-    async def getDestination(self):
+    async def get_destination(self):
         # Try to find the folder and its id
-        self.folder_id = await self.findFolder(OD_FOLDER)
+        self.folder_id = await self.find_folder(OD_FOLDER)
         # Not found, create a new folder
         if not self.folder_id:
-            self.folder_id = await self.createFolder(OD_FOLDER)
+            self.folder_id = await self.create_folder(OD_FOLDER)
         await self.document.update({'folder_id': self.folder_id})
         logger.info('OneDrive folder ID cached')
 

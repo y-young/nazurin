@@ -53,23 +53,23 @@ class DeviantArt(object):
         if not deviation['isDownloadable']:
             return None
         download = deviation['extended']['download']
-        originalFile = deviation['extended']['originalFile']
+        original_file = deviation['extended']['originalFile']
 
         if download['width'] and \
-            download['filesize'] == originalFile['filesize'] and \
-            download['width'] == originalFile['width'] and \
-            download['height'] == originalFile['height']:
+            download['filesize'] == original_file['filesize'] and \
+            download['width'] == original_file['width'] and \
+            download['height'] == original_file['height']:
             logger.info(
                 "No need to download since it's the same as the original image"
             )
             return None
 
-        authorUuid = deviation['author']['useridUuid']
+        author_uuid = deviation['author']['useridUuid']
         url = urlparse(deviation['media']['baseUri'])
         filename = os.path.basename(download['url']).split('?')[0]
         url = url._replace(netloc=url.netloc.replace('images-wixmp-',
                                                      'wixmp-'),
-                           path=f"/f/{authorUuid}/{filename}")
+                           path=f"/f/{author_uuid}/{filename}")
         pretty_name = deviation['media']['prettyName'] + os.path.splitext(
             filename)[1]
         token = self.generate_token(url.path)

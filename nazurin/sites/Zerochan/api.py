@@ -11,7 +11,7 @@ from nazurin.utils.decorators import network_retry
 
 class Zerochan(object):
     @network_retry
-    async def getPost(self, post_id: int):
+    async def get_post(self, post_id: int):
         async with Request() as request:
             async with request.get('https://www.zerochan.net/' +
                                    str(post_id)) as response:
@@ -52,12 +52,12 @@ class Zerochan(object):
         return post
 
     async def view(self, post_id: int) -> Illust:
-        post = await self.getPost(post_id)
-        imgs = self.getImages(post)
-        caption = self.buildCaption(post)
+        post = await self.get_post(post_id)
+        imgs = self.get_images(post)
+        caption = self.build_caption(post)
         return Illust(imgs, caption, post)
 
-    def getImages(self, post) -> List[Image]:
+    def get_images(self, post) -> List[Image]:
         url = post['file_url']
         name = 'Zerochan ' + str(
             post['id']) + ' ' + post['name'] + '.' + post['file_ext']
@@ -66,7 +66,7 @@ class Zerochan(object):
                   int(post['image_width']), int(post['image_height']))
         ]
 
-    def buildCaption(self, post) -> Caption:
+    def build_caption(self, post) -> Caption:
         """Build media caption from an post."""
         tag_string = artists = source = str()
         for tag, tag_type in post['tags'].items():

@@ -18,7 +18,7 @@ async def yandere_view(message: Message, command: Command.CommandObj):
         await message.reply('Invalid post id!')
         return
     illust = await moebooru.site('yande.re').view(post_id)
-    await bot.sendIllust(illust, message)
+    await bot.send_illust(illust, message)
 
 @dp.message_handler(Command(['yandere_download']))
 async def yandere_download(message: Message, command: Command.CommandObj):
@@ -32,7 +32,7 @@ async def yandere_download(message: Message, command: Command.CommandObj):
         return
     illust = await moebooru.site('yande.re').view(post_id)
     await illust.download()
-    await bot.sendDocuments(illust, message)
+    await bot.send_docs(illust, message)
 
 @dp.message_handler(Command(['konachan']))
 async def konachan_view(message: Message, command: Command.CommandObj):
@@ -45,7 +45,7 @@ async def konachan_view(message: Message, command: Command.CommandObj):
         await message.reply('Invalid post id!')
         return
     illust = await moebooru.site('konachan.com').view(post_id)
-    await bot.sendIllust(illust, message)
+    await bot.send_illust(illust, message)
 
 @dp.message_handler(Command(['konachan_download']))
 async def konachan_download(message: Message, command: Command.CommandObj):
@@ -59,4 +59,4 @@ async def konachan_download(message: Message, command: Command.CommandObj):
         return
     illust = await moebooru.site('konachan.com').view(post_id)
     await illust.download()
-    await bot.sendDocuments(illust, message)
+    await bot.send_docs(illust, message)

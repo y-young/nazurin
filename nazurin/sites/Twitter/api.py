@@ -8,7 +8,7 @@ from nazurin.utils.exceptions import NazurinError
 
 class Twitter(object):
     @network_retry
-    async def getTweet(self, status_id: int):
+    async def get_tweet(self, status_id: int):
         """Get a tweet from API."""
         # Old: 'https://syndication.twitter.com/tweets.json?ids='+ status_id +'&lang=en'
         api = 'https://cdn.syndication.twimg.com/tweet?id=' + str(
@@ -23,19 +23,19 @@ class Twitter(object):
 
     async def fetch(self, status_id: int) -> Illust:
         """Fetch & return tweet images and information."""
-        tweet = await self.getTweet(status_id)
-        imgs = self.getImages(tweet)
-        caption = self.buildCaption(tweet)
+        tweet = await self.get_tweet(status_id)
+        imgs = self.get_images(tweet)
+        caption = self.build_caption(tweet)
         return Illust(imgs, caption, tweet)
 
-    def getImages(self, tweet) -> List[Image]:
+    def get_images(self, tweet) -> List[Image]:
         """Get all images in a tweet."""
         if 'photos' not in tweet.keys():
             raise NazurinError('No photo found.')
         photos = tweet['photos']
         imgs = list()
         for photo in photos:
-            filename, url, thumbnail = self.parseUrl(photo['url'])
+            filename, url, thumbnail = self.parse_url(photo['url'])
             imgs.append(
                 Image('twitter - ' + tweet['id_str'] + ' - ' + filename,
                       url,
@@ -44,21 +44,21 @@ class Twitter(object):
                       height=photo['height']))
         return imgs
 
-    def buildCaption(self, tweet) -> Caption:
+    def build_caption(self, tweet) -> Caption:
         return Caption({
             'url': f"https://twitter.com/{tweet['user']['screen_name']}/status/{tweet['id_str']}",
             'author': f"{tweet['user']['name']} #{tweet['user']['screen_name']}",
             'text': tweet['text']
         })
 
-    def parseUrl(self, src: str) -> Tuple[str, str, str]:
+    def parse_url(self, src: str) -> Tuple[str, str, str]:
         """Get filename, original file url & thumbnail url of the original image
 
         eg:
-
-            src: 'https://pbs.twimg.com/media/DOhM30VVwAEpIHq.jpg'
-
-            return: 'DOhM30VVwAEpIHq.jpg', 'https://pbs.twimg.com/media/DOhM30VVwAEpIHq?format=jpg&name=orig', 'https://pbs.twimg.com/media/DOhM30VVwAEpIHq?format=jpg&name=large'
+        - src: 'https://pbs.twimg.com/media/DOhM30VVwAEpIHq.jpg'
+        - return: 'DOhM30VVwAEpIHq.jpg',
+            'https://pbs.twimg.com/media/DOhM30VVwAEpIHq?format=jpg&name=orig',
+            'https://pbs.twimg.com/media/DOhM30VVwAEpIHq?format=jpg&name=large'
 
         Doc: https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/entities-object
         """

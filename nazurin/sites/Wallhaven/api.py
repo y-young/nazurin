@@ -10,9 +10,9 @@ from .config import API_KEY
 
 class Wallhaven(object):
     @network_retry
-    async def getWallpaper(self, wallpaperId: str):
+    async def get_wallpaper(self, wallpaper_id: str):
         """Get wallpaper information from API."""
-        api = 'https://wallhaven.cc/api/v1/w/' + wallpaperId
+        api = 'https://wallhaven.cc/api/v1/w/' + wallpaper_id
         if API_KEY:
             api += '?apikey=' + API_KEY
         async with Request() as request:
@@ -29,14 +29,14 @@ class Wallhaven(object):
                     raise NazurinError(wallpaper['error'])
                 return wallpaper['data']
 
-    async def fetch(self, wallpaperId: str) -> Illust:
+    async def fetch(self, wallpaper_id: str) -> Illust:
         """Fetch & return wallpaper image and information."""
-        wallpaper = await self.getWallpaper(wallpaperId)
-        imgs = self.getImages(wallpaper)
-        caption = self.buildCaption(wallpaper)
+        wallpaper = await self.get_wallpaper(wallpaper_id)
+        imgs = self.get_images(wallpaper)
+        caption = self.build_caption(wallpaper)
         return Illust(imgs, caption, wallpaper)
 
-    def getImages(self, wallpaper) -> List[Image]:
+    def get_images(self, wallpaper) -> List[Image]:
         url = wallpaper['path']
         filename = os.path.basename(url)
         thumbnail = wallpaper['thumbs']['large']
@@ -45,7 +45,7 @@ class Wallhaven(object):
                   wallpaper['dimension_x'], wallpaper['dimension_y'])
         ]
 
-    def buildCaption(self, wallpaper) -> Caption:
+    def build_caption(self, wallpaper) -> Caption:
         tags = str()
         for tag in wallpaper['tags']:
             tags += '#' + tag['name'].strip().replace(' ', '_') + ' '

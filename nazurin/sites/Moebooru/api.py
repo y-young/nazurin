@@ -11,14 +11,17 @@ from nazurin.config import TEMP_DIR
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request, logger
 from nazurin.utils.exceptions import NazurinError
-from nazurin.utils.helpers import ensureExistence
+from nazurin.utils.helpers import ensure_existence
 
 class Moebooru(object):
+    def __init__(self):
+        self.url = 'yande.re'
+
     def site(self, site_url: Optional[str] = 'yande.re'):
         self.url = site_url
         return self
 
-    async def getPost(self, post_id: int):
+    async def get_post(self, post_id: int):
         url = 'https://' + self.url + '/post/show/' + str(post_id)
         async with Request() as request:
             async with request.get(url) as response:
@@ -47,9 +50,9 @@ class Moebooru(object):
         return post, tags
 
     async def view(self, post_id: int) -> Illust:
-        post, tags = await self.getPost(post_id)
-        imgs = self.getImages(post)
-        caption = self.buildCaption(post, tags)
+        post, tags = await self.get_post(post_id)
+        imgs = self.get_images(post)
+        caption = self.build_caption(post, tags)
         return Illust(imgs, caption, post)
 
     def pool(self, pool_id: int, jpeg=False):
@@ -62,7 +65,7 @@ class Moebooru(object):
                 url = post['file_url']
             else:
                 url = post['jpeg_url']
-            name, _ = self.parseUrl(url)
+            name, _ = self.parse_url(url)
             imgs.append(Image(name, url))
         caption = Caption({
             'name': info['name'],
@@ -73,16 +76,16 @@ class Moebooru(object):
     async def download_pool(self, pool_id, jpeg=False):
         imgs, caption = self.pool(pool_id, jpeg)
         pool_name = caption['name']
-        ensureExistence(os.path.join(TEMP_DIR, pool_name))
+        ensure_existence(os.path.join(TEMP_DIR, pool_name))
         for key, img in enumerate(imgs):
             filename = str(key + 1)
             filename = '0' * (3 - len(filename)) + filename
-            _, ext = self.parseUrl(img.url)
+            _, ext = self.parse_url(img.url)
             filename += ext
             img.name = pool_name + '/' + img.name
             await img.download()  # TODO
 
-    def getImages(self, post) -> List[Image]:
+    def get_images(self, post) -> List[Image]:
         file_url = post['file_url']
         name = unquote(os.path.basename(file_url))
         imgs = [
@@ -91,7 +94,7 @@ class Moebooru(object):
         ]
         return imgs
 
-    def buildCaption(self, post, tags) -> Caption:
+    def build_caption(self, post, tags) -> Caption:
         """Build media caption from an post."""
         title = post['tags']
         source = post['source']
@@ -112,6 +115,6 @@ class Moebooru(object):
         })
         return caption
 
-    def parseUrl(self, url: str) -> str:
+    def parse_url(self, url: str) -> str:
         name = os.path.basename(url)
         return os.path.splitext(name)

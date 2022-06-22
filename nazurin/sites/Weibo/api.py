@@ -10,23 +10,23 @@ from nazurin.utils.exceptions import NazurinError
 
 class Weibo(object):
     @network_retry
-    async def getPost(self, post_id: str):
+    async def get_post(self, post_id: str):
         """Fetch a post."""
         api = f"https://m.weibo.cn/detail/{post_id}"
         async with Request() as request:
             async with request.get(api) as response:
                 response.raise_for_status()
                 html = await response.text()
-                post = self.parseHtml(html)
+                post = self.parse_html(html)
                 return post
 
     async def fetch(self, post_id: str) -> Illust:
-        post = await self.getPost(post_id)
-        imgs = self.getImages(post)
-        caption = self.buildCaption(post)
+        post = await self.get_post(post_id)
+        imgs = self.get_images(post)
+        caption = self.build_caption(post)
         return Illust(imgs, caption, post)
 
-    def getImages(self, post) -> List[Image]:
+    def get_images(self, post) -> List[Image]:
         """Get images from post."""
         if 'pics' not in post.keys():
             raise NazurinError('No image found')
@@ -34,7 +34,7 @@ class Weibo(object):
         mid = post['mid']
         imgs = list()
         for pic in pics:
-            filename, url, thumbnail, width, height = self.parsePic(pic)
+            filename, url, thumbnail, width, height = self.parse_pic(pic)
             imgs.append(
                 Image(f"Weibo - {mid} - {filename}",
                       url,
@@ -43,9 +43,9 @@ class Weibo(object):
                       height=height))
         return imgs
 
-    def buildCaption(self, post) -> Caption:
+    def build_caption(self, post) -> Caption:
         user = post['user']
-        tags = self.getTags(post)
+        tags = self.get_tags(post)
         tag_string = str()
         for tag in tags:
             tag_string += '#' + tag + ' '
@@ -57,7 +57,7 @@ class Weibo(object):
             'tags': tag_string,
         })
 
-    def getTags(self, post) -> List[str]:
+    def get_tags(self, post) -> List[str]:
         if 'text' not in post.keys() or not post['text']:
             return []
         regex = r"#(\S+)#"
@@ -66,7 +66,7 @@ class Weibo(object):
             return []
         return matches
 
-    def parsePic(self, pic: dict) -> Tuple[str, str, str, int, int]:
+    def parse_pic(self, pic: dict) -> Tuple[str, str, str, int, int]:
         """Get filename, original file url & thumbnail url of the picture
 
         eg:
@@ -105,7 +105,7 @@ class Weibo(object):
         height = int(pic['large']['geo']['height'])
         return basename, url, thumbnail, width, height
 
-    def parseHtml(self, html) -> dict:
+    def parse_html(self, html) -> dict:
         """
         Extract post data from html <script> block as example below.
         We're lucky the JS objects are written in JSON syntax with quotes wrapped property names.

@@ -8,7 +8,7 @@ from nazurin.utils.exceptions import NazurinError
 
 class Artstation(object):
     @network_retry
-    async def getPost(self, post_id: str):
+    async def get_post(self, post_id: str):
         """Fetch a post."""
         api = f"https://www.artstation.com/projects/{post_id}.json"
         async with Request() as request:
@@ -20,12 +20,12 @@ class Artstation(object):
                 return post
 
     async def fetch(self, post_id: str) -> Illust:
-        post = await self.getPost(post_id)
-        imgs = self.getImages(post)
-        caption = self.buildCaption(post)
+        post = await self.get_post(post_id)
+        imgs = self.get_images(post)
+        caption = self.build_caption(post)
         return Illust(imgs, caption, post)
 
-    def getImages(self, post) -> List[Image]:
+    def get_images(self, post) -> List[Image]:
         """Get images from post."""
         if 'assets' not in post.keys():
             raise NazurinError('No asset found.')
@@ -36,7 +36,7 @@ class Artstation(object):
             if asset['asset_type'] != 'image':
                 continue
             # https://cdnb.artstation.com/p/assets/images/images/042/908/363/large/_z-ed_-da.jpg?1635784439
-            filename, url, thumbnail = self.parseUrl(asset['image_url'])
+            filename, url, thumbnail = self.parse_url(asset['image_url'])
             imgs.append(
                 Image(f"ArtStation - {hash_id} - {filename}",
                       url,
@@ -45,7 +45,7 @@ class Artstation(object):
                       height=asset['height']))
         return imgs
 
-    def buildCaption(self, post) -> Caption:
+    def build_caption(self, post) -> Caption:
         user = post['user']
         tags = post['tags']
         tag_string = str()
@@ -58,17 +58,16 @@ class Artstation(object):
             'tags': tag_string,
         })
 
-    def parseUrl(self, src: str) -> Tuple[str, str, str]:
+    def parse_url(self, src: str) -> Tuple[str, str, str]:
         """Get filename, original file url & thumbnail url of the original image
 
         eg:
+        - src: 'https://cdnb.artstation.com/p/assets/images/images/042/908/363/large/_z-ed_-da.jpg'
 
-            src: 'https://cdnb.artstation.com/p/assets/images/images/042/908/363/large/_z-ed_-da.jpg?1635784439'
-
-            return:
-                '_z-ed_-da.jpg',
-                'https://cdnb.artstation.com/p/assets/images/images/042/908/363/4k/_z-ed_-da.jpg',
-                'https://cdnb.artstation.com/p/assets/images/images/042/908/363/medium/_z-ed_-da.jpg'
+        - return:
+            '_z-ed_-da.jpg',
+            'https://cdnb.artstation.com/p/assets/images/images/042/908/363/4k/_z-ed_-da.jpg',
+            'https://cdnb.artstation.com/p/assets/images/images/042/908/363/medium/_z-ed_-da.jpg'
 
         """
         baseurl = src.split('?')[0]

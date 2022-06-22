@@ -13,7 +13,7 @@ from nazurin.storage import Storage
 from nazurin.utils import logger
 from nazurin.utils.decorators import retry_after
 from nazurin.utils.exceptions import NazurinError
-from nazurin.utils.helpers import handleBadRequest, sanitizeCaption
+from nazurin.utils.helpers import handle_bad_request, sanitize_caption
 
 class NazurinBot(Bot):
     send_message = retry_after(Bot.send_message)
@@ -28,11 +28,11 @@ class NazurinBot(Bot):
         self.storage.load()
 
     @retry_after
-    async def sendSingleGroup(self,
-                              imgs: List[Image],
-                              caption: str,
-                              chat_id: int,
-                              reply_to: Optional[int] = None):
+    async def send_single_group(self,
+                                imgs: List[Image],
+                                caption: str,
+                                chat_id: int,
+                                reply_to: Optional[int] = None):
         await self.send_chat_action(chat_id, ChatActions.UPLOAD_PHOTO)
         media = list()
         for img in imgs:
@@ -42,11 +42,11 @@ class NazurinBot(Bot):
                                     media,
                                     reply_to_message_id=reply_to)
 
-    async def sendPhotos(self,
-                         illust: Illust,
-                         chat_id: int,
-                         reply_to: Optional[int] = None):
-        caption = sanitizeCaption(illust.caption)
+    async def send_photos(self,
+                          illust: Illust,
+                          chat_id: int,
+                          reply_to: Optional[int] = None):
+        caption = sanitize_caption(illust.caption)
         groups = list()
         imgs = illust.images
         if len(imgs) == 0:
@@ -57,12 +57,12 @@ class NazurinBot(Bot):
             imgs = imgs[10:]
 
         for group in groups:
-            await self.sendSingleGroup(group, caption, chat_id, reply_to)
+            await self.send_single_group(group, caption, chat_id, reply_to)
 
-    async def sendIllust(self,
-                         illust: Illust,
-                         message: Optional[Message] = None,
-                         chat_id: Optional[int] = None):
+    async def send_illust(self,
+                          illust: Illust,
+                          message: Optional[Message] = None,
+                          chat_id: Optional[int] = None):
         reply_to = message.message_id if message else None
         if not chat_id:
             chat_id = message.chat.id
@@ -72,25 +72,25 @@ class NazurinBot(Bot):
             if isinstance(illust, Ugoira):
                 await self.send_animation(chat_id,
                                           InputFile(illust.video.path),
-                                          caption=sanitizeCaption(
+                                          caption=sanitize_caption(
                                               illust.caption),
                                           reply_to_message_id=reply_to)
             else:
-                await self.sendPhotos(illust, chat_id, reply_to)
+                await self.send_photos(illust, chat_id, reply_to)
         except BadRequest as error:
-            await handleBadRequest(message, error)
+            await handle_bad_request(message, error)
 
     @retry_after
-    async def sendDocument(self, file: File, chat_id, message_id=None):
+    async def send_doc(self, file: File, chat_id, message_id=None):
         await self.send_chat_action(chat_id, ChatActions.UPLOAD_DOCUMENT)
         await self.send_document(chat_id,
                                  InputFile(file.path),
                                  reply_to_message_id=message_id)
 
-    async def sendDocuments(self,
-                            illust: Illust,
-                            message: Optional[Message] = None,
-                            chat_id=None):
+    async def send_docs(self,
+                        illust: Illust,
+                        message: Optional[Message] = None,
+                        chat_id=None):
         if message:
             message_id = message.message_id
             if not chat_id:
@@ -98,11 +98,11 @@ class NazurinBot(Bot):
         else:
             message_id = None  # Sending to channel, no message to reply
         for file in illust.all_files:
-            await self.sendDocument(file, chat_id, message_id)
+            await self.send_doc(file, chat_id, message_id)
 
-    async def updateCollection(self,
-                               urls: List[str],
-                               message: Optional[Message] = None):
+    async def update_collection(self,
+                                urls: List[str],
+                                message: Optional[Message] = None):
         result = self.sites.match(urls)
         if not result:
             raise NazurinError('No source matched')
@@ -122,7 +122,7 @@ class NazurinBot(Bot):
                 self.send_message(config.GALLERY_ID, '\n'.join(urls)))
         else:
             save = asyncio.create_task(
-                self.sendIllust(illust, message, config.GALLERY_ID))
+                self.send_illust(illust, message, config.GALLERY_ID))
         download = asyncio.create_task(illust.download())
         await asyncio.gather(save, download)
         await self.storage.store(illust)

@@ -9,6 +9,8 @@ class Local(object):
     """Local database driver using TinyDB."""
     def __init__(self):
         ensureExistence(DATA_DIR)
+        self.db = None
+        self._key = None
 
     def collection(self, key):
         self.db = TinyDB(path.join(DATA_DIR, key + '.json'))
@@ -19,8 +21,8 @@ class Local(object):
         return self
 
     async def get(self):
-        Document = Query()
-        result = self.db.search(Document.key == self._key)
+        document = Query()
+        result = self.db.search(document.key == self._key)
         if result:
             return result[0]
         else:
@@ -32,9 +34,9 @@ class Local(object):
         return self.db.insert(data)
 
     async def update(self, data):
-        Document = Query()
-        return self.db.update(data, Document.key == self._key)
+        document = Query()
+        return self.db.update(data, document.key == self._key)
 
     async def delete(self):
-        Document = Query()
-        return self.db.remove(Document.key == self._key)
+        document = Query()
+        return self.db.remove(document.key == self._key)
