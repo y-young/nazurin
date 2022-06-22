@@ -26,7 +26,7 @@ patterns = [
     r'(lolibooru\.moe)/(?:image|jpeg|sample)/[a-f0-9]{32}/lolibooru%20(\d+)'
 ]
 
-async def handle(match, **kwargs) -> Illust:
+async def handle(match) -> Illust:
     site_url = match.group(1)
     post_id = match.group(2)
     db = Database().driver()

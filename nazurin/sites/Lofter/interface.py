@@ -11,7 +11,7 @@ patterns = [
     r'(\w+)\.lofter\.com/post/(\w+)'
 ]
 
-async def handle(match, **kwargs) -> Illust:
+async def handle(match) -> Illust:
     username = match.group(1)
     permalink = match.group(2)
     db = Database().driver()

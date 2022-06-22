@@ -15,7 +15,7 @@ patterns = [
     r'zerochan\.net/\S+\.(\d+)\.\w+$'
 ]
 
-async def handle(match, **kwargs) -> Illust:
+async def handle(match) -> Illust:
     post_id = match.group(1)
     api = Zerochan()
     db = Database().driver()

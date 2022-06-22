@@ -14,7 +14,7 @@ patterns = [
     r't\.bilibili\.com/h5/dynamic/detail/(\d+)'
 ]
 
-async def handle(match, **kwargs) -> Illust:
+async def handle(match) -> Illust:
     dynamic_id = match.group(1)
     db = Database().driver()
     collection = db.collection(COLLECTION)

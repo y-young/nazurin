@@ -12,7 +12,7 @@ patterns = [
     r'artstation\.com/(?:artwork|projects)/([0-9a-zA-Z]+)'
 ]
 
-async def handle(match, **kwargs) -> Illust:
+async def handle(match) -> Illust:
     post_id = match.group(1)
     db = Database().driver()
     collection = db.collection(COLLECTION)

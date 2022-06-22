@@ -14,7 +14,7 @@ patterns = [
     r'(?:mobile\.|www\.)?twitter\.com/[^.]+/status/(\d+)'
 ]
 
-async def handle(match, **kwargs) -> Illust:
+async def handle(match) -> Illust:
     status_id = match.group(1)
     db = Database().driver()
     collection = db.collection(COLLECTION)

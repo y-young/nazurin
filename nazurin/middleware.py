@@ -5,7 +5,7 @@ from aiogram.types import Message
 from nazurin import config
 
 class AuthMiddleware(BaseMiddleware):
-    async def on_process_message(self, message: Message, data: dict):
+    async def on_process_message(self, message: Message, _data: dict):
         if config.IS_PUBLIC:
             return
         allowed_chats = config.ALLOW_ID + config.ALLOW_GROUP + [
