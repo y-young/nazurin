@@ -236,7 +236,8 @@ class Pixiv:
                            height=height))
         return imgs
 
-    def build_caption(self, illust) -> Caption:
+    @staticmethod
+    def build_caption(illust) -> Caption:
         """Build media caption from an artwork."""
         tags = str()
         for tag in illust.tags:
@@ -255,7 +256,8 @@ class Pixiv:
         })
         return caption
 
-    def get_filename(self, url: str, illust) -> str:
+    @staticmethod
+    def get_filename(url: str, illust) -> str:
         basename = os.path.basename(url)
         filename, extension = os.path.splitext(basename)
         name = "%s - %s - %s(%d)%s" % (filename, illust.title,
@@ -263,7 +265,8 @@ class Pixiv:
                                        extension)
         return name
 
-    def get_thumbnail(self, url: str) -> str:
+    @staticmethod
+    def get_thumbnail(url: str) -> str:
         pre, _ = os.path.splitext(url)
         pre = pre.replace('img-original', 'img-master')
         thumbnail = pre + '_master1200.jpg'

@@ -57,7 +57,8 @@ class Weibo:
             'tags': tag_string,
         })
 
-    def get_tags(self, post) -> List[str]:
+    @staticmethod
+    def get_tags(post) -> List[str]:
         if 'text' not in post.keys() or not post['text']:
             return []
         regex = r"#(\S+)#"
@@ -66,7 +67,8 @@ class Weibo:
             return []
         return matches
 
-    def parse_pic(self, pic: dict) -> Tuple[str, str, str, int, int]:
+    @staticmethod
+    def parse_pic(pic: dict) -> Tuple[str, str, str, int, int]:
         """Get filename, original file url & thumbnail url of the picture
 
         eg:
@@ -105,7 +107,8 @@ class Weibo:
         height = int(pic['large']['geo']['height'])
         return basename, url, thumbnail, width, height
 
-    def parse_html(self, html) -> dict:
+    @staticmethod
+    def parse_html(html) -> dict:
         """
         Extract post data from html <script> block as example below.
         We're lucky the JS objects are written in JSON syntax with quotes wrapped property names.

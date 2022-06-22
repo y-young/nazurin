@@ -44,14 +44,16 @@ class Twitter:
                       height=photo['height']))
         return imgs
 
-    def build_caption(self, tweet) -> Caption:
+    @staticmethod
+    def build_caption(tweet) -> Caption:
         return Caption({
             'url': f"https://twitter.com/{tweet['user']['screen_name']}/status/{tweet['id_str']}",
             'author': f"{tweet['user']['name']} #{tweet['user']['screen_name']}",
             'text': tweet['text']
         })
 
-    def parse_url(self, src: str) -> Tuple[str, str, str]:
+    @staticmethod
+    def parse_url(src: str) -> Tuple[str, str, str]:
         """Get filename, original file url & thumbnail url of the original image
 
         eg:

@@ -76,11 +76,12 @@ class Danbooru:
         })
         return Illust(imgs, caption, post, files)
 
-    def _get_names(self, post) -> Tuple[str, str]:
+    @staticmethod
+    def _get_names(post) -> Tuple[str, str]:
         """Build title and filename."""
-        characters = self._format_characters(post['tag_string_character'])
-        copyrights = self._format_copyrights(post['tag_string_copyright'])
-        artists = self._format_artists(post['tag_string_artist'])
+        characters = Danbooru._format_characters(post['tag_string_character'])
+        copyrights = Danbooru._format_copyrights(post['tag_string_copyright'])
+        artists = Danbooru._format_artists(post['tag_string_artist'])
         extension = path.splitext(post['file_url'])[1]
         filename = str()
 
@@ -96,25 +97,27 @@ class Danbooru:
         filename = 'danbooru ' + str(post['id']) + ' ' + filename + extension
         return title, filename
 
-    def _format_characters(self, characters: str) -> str:
+    @staticmethod
+    def _format_characters(characters: str) -> str:
         if not characters:
             return ''
         characters = characters.split(' ')
-        characters = list(map(self._normalize, characters))
+        characters = list(map(Danbooru._normalize, characters))
         size = len(characters)
         if size <= 5:
-            result = self._sentence(characters)
+            result = Danbooru._sentence(characters)
         else:
             characters = characters[:5]
-            result = self._sentence(characters) + ' and ' + str(size -
-                                                                1) + ' more'
+            result = Danbooru._sentence(characters) + ' and ' + str(
+                size - 1) + ' more'
         return result
 
-    def _format_copyrights(self, copyrights: str) -> str:
+    @staticmethod
+    def _format_copyrights(copyrights: str) -> str:
         if not copyrights:
             return ''
         copyrights = copyrights.split(' ')
-        copyrights = list(map(self._normalize, copyrights))
+        copyrights = list(map(Danbooru._normalize, copyrights))
         size = len(copyrights)
         if size == 1:
             result = copyrights[0]
@@ -122,19 +125,22 @@ class Danbooru:
             result = copyrights[0] + ' and ' + str(size - 1) + ' more'
         return result
 
-    def _format_artists(self, artists: str) -> str:
+    @staticmethod
+    def _format_artists(artists: str) -> str:
         if not artists:
             return ''
-        return self._normalize(self._sentence(artists.split(' ')))
+        return Danbooru._normalize(Danbooru._sentence(artists.split(' ')))
 
-    def _sentence(self, names: List[str]) -> str:
+    @staticmethod
+    def _sentence(names: List[str]) -> str:
         if len(names) == 1:
             return names[0]
         sentence = ' '.join(names[:-1])
         sentence += ' and ' + names[-1]
         return sentence
 
-    def _normalize(self, name: str) -> str:
+    @staticmethod
+    def _normalize(name: str) -> str:
         name = re.sub(r'_\(.*\)', '', name)  # replace _(...)
         name = name.replace('_', ' ')
         name = re.sub(r'[\\\/]', ' ', name)  # replace / and \

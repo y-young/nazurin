@@ -35,7 +35,8 @@ class Bilibili:
         caption['url'] = f"https://t.bilibili.com/{dynamic_id}"
         return Illust(imgs, caption, card)
 
-    def get_images(self, card, dynamic_id: int) -> List[Image]:
+    @staticmethod
+    def get_images(card, dynamic_id: int) -> List[Image]:
         """Get all images in a dynamic card."""
         if 'item' not in card.keys() or 'pictures' not in card['item'].keys():
             raise NazurinError("No image found")
@@ -52,7 +53,8 @@ class Bilibili:
                     pic['img_height']))
         return imgs
 
-    def build_caption(self, card) -> Caption:
+    @staticmethod
+    def build_caption(card) -> Caption:
         return Caption({
             'author': card['user']['name'],
             'content': card['item']['description']

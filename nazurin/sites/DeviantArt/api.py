@@ -75,7 +75,8 @@ class DeviantArt:
         token = self.generate_token(url.path)
         return File(pretty_name, f"{url.geturl()}?token={token}")
 
-    def build_caption(self, deviation: dict) -> Caption:
+    @staticmethod
+    def build_caption(deviation: dict) -> Caption:
         caption = Caption({
             'title': deviation['title'],
             'author': f"#{deviation['author']['username']}",
@@ -126,7 +127,8 @@ class DeviantArt:
 
         return filename, url, thumbnail
 
-    def generate_token(self, path: str) -> str:
+    @staticmethod
+    def generate_token(path: str) -> str:
         header = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0'  # {"typ":"JWT","alg":"none"}
         payload = {
             "sub": "urn:app:",
