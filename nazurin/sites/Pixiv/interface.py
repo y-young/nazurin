@@ -30,7 +30,7 @@ patterns = [
     r'(?:i|img)\d+\.pixiv\.net/(?:img\d+/)?img/(?:\S+)*/(\d+)'
 ]
 
-async def handle(match, **kwargs) -> Illust:
+async def handle(match) -> Illust:
     artwork_id = match.group(1)
     api = Pixiv()
     db = Database().driver()

@@ -19,7 +19,7 @@ patterns = [
     r'(?:danbooru|safebooru)\.donmai\.us/data/(?:sample/)?(?:\S+)?(?P<md5>[a-f0-9]{32})\.'
 ]
 
-async def handle(match, **kwargs) -> Illust:
+async def handle(match) -> Illust:
     api = Danbooru()
     db = Database().driver()
     collection = db.collection(COLLECTION)

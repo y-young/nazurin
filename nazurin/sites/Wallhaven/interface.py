@@ -12,7 +12,7 @@ patterns = [
     r'(?:wallhaven|whvn)\.cc\/(?:w\/)?([\w]+)'
 ]
 
-async def handle(match, **kwargs) -> Illust:
+async def handle(match) -> Illust:
     wallpaper_id = match.group(1)
     db = Database().driver()
     collection = db.collection(COLLECTION)

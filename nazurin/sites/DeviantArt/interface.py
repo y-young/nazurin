@@ -14,7 +14,7 @@ patterns = [
     r'[\w-]+\.deviantart\.com/art/[\w-]+-(\d+)'
 ]
 
-async def handle(match, **kwargs) -> Illust:
+async def handle(match) -> Illust:
     post_id = match.group(1)
     db = Database().driver()
     collection = db.collection(COLLECTION)

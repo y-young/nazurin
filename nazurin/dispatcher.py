@@ -34,7 +34,7 @@ class NazurinDispatcher(Dispatcher):
         return super().register_message_handler(self.async_task(callback),
                                                 *args, **kwargs)
 
-    async def on_startup(self, dp):
+    async def on_startup(self, *_args):
         await self.bot.set_webhook(config.WEBHOOK_URL + config.TOKEN,
                                    allowed_updates=AllowedUpdates.MESSAGE)
 
