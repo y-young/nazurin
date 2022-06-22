@@ -44,7 +44,7 @@ class Mega(object):
             })
         logger.info('MEGA tokens cached')
 
-    async def requireAuth(self):
+    async def require_auth(self):
         if not Mega.api.sid:
             tokens = await Mega.document.get()
             if tokens and 'sid' in tokens.keys():
@@ -58,9 +58,9 @@ class Mega(object):
             else:  # Initialize database
                 await self.login(initialize=True)
         if not Mega.destination:
-            await self.getDestination()
+            await self.get_destination()
 
-    async def getDestination(self):
+    async def get_destination(self):
         result = await Mega.find_folder(STORAGE_DIR, exclude_deleted=True)
         if result:
             Mega.destination = result[0]
@@ -83,6 +83,6 @@ class Mega(object):
                     await self.login()
 
     async def store(self, files: List[File]):
-        await self.requireAuth()
+        await self.require_auth()
         tasks = [self.upload(file) for file in files]
         await asyncio.gather(*tasks)

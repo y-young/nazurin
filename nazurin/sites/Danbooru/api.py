@@ -8,7 +8,7 @@ from pybooru import PybooruHTTPError
 from nazurin.models import Caption, File, Illust, Image
 from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
-from nazurin.utils.helpers import isImage
+from nazurin.utils.helpers import is_image
 
 class Danbooru(object):
     def __init__(self, site='danbooru'):
@@ -18,9 +18,9 @@ class Danbooru(object):
         self.post_show = async_wrap(self.api.post_show)
         self.post_list = async_wrap(self.api.post_list)
 
-    async def getPost(self,
-                      post_id: Optional[int] = None,
-                      md5: Optional[str] = None):
+    async def get_post(self,
+                       post_id: Optional[int] = None,
+                       md5: Optional[str] = None):
         """Fetch a post."""
         try:
             if post_id:
@@ -28,6 +28,7 @@ class Danbooru(object):
             else:
                 post = await self.post_list(md5=md5)
         except PybooruHTTPError as err:
+            # pylint: disable=protected-access
             if 'Not Found' in err._msg:
                 raise NazurinError('Post not found') from None
         if 'file_url' not in post.keys():
@@ -39,19 +40,19 @@ class Danbooru(object):
     async def view(self,
                    post_id: Optional[int] = None,
                    md5: Optional[str] = None) -> Illust:
-        post = await self.getPost(post_id, md5)
-        illust = self.parsePost(post)
+        post = await self.get_post(post_id, md5)
+        illust = self.parse_post(post)
         return illust
 
-    def parsePost(self, post) -> Illust:
+    def parse_post(self, post) -> Illust:
         """Get images and build caption."""
         # Get images
         url = post['file_url']
         artists = post['tag_string_artist']
-        title, filename = self._getNames(post)
+        title, filename = self._get_names(post)
         imgs = list()
         files = list()
-        if isImage(url):
+        if is_image(url):
             imgs.append(
                 Image(filename, url, post['large_file_url'], post['file_size'],
                       post['image_width'], post['image_height']))
@@ -75,11 +76,11 @@ class Danbooru(object):
         })
         return Illust(imgs, caption, post, files)
 
-    def _getNames(self, post) -> Tuple[str, str]:
+    def _get_names(self, post) -> Tuple[str, str]:
         """Build title and filename."""
-        characters = self._formatCharacters(post['tag_string_character'])
-        copyrights = self._formatCopyrights(post['tag_string_copyright'])
-        artists = self._formatArtists(post['tag_string_artist'])
+        characters = self._format_characters(post['tag_string_character'])
+        copyrights = self._format_copyrights(post['tag_string_copyright'])
+        artists = self._format_artists(post['tag_string_artist'])
         extension = path.splitext(post['file_url'])[1]
         filename = str()
 
@@ -95,7 +96,7 @@ class Danbooru(object):
         filename = 'danbooru ' + str(post['id']) + ' ' + filename + extension
         return title, filename
 
-    def _formatCharacters(self, characters: str) -> str:
+    def _format_characters(self, characters: str) -> str:
         if not characters:
             return ''
         characters = characters.split(' ')
@@ -109,7 +110,7 @@ class Danbooru(object):
                                                                 1) + ' more'
         return result
 
-    def _formatCopyrights(self, copyrights: str) -> str:
+    def _format_copyrights(self, copyrights: str) -> str:
         if not copyrights:
             return ''
         copyrights = copyrights.split(' ')
@@ -121,7 +122,7 @@ class Danbooru(object):
             result = copyrights[0] + ' and ' + str(size - 1) + ' more'
         return result
 
-    def _formatArtists(self, artists: str) -> str:
+    def _format_artists(self, artists: str) -> str:
         if not artists:
             return ''
         return self._normalize(self._sentence(artists.split(' ')))

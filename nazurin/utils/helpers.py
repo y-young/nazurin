@@ -13,7 +13,7 @@ from nazurin.models import Caption
 
 from . import logger
 
-async def handleBadRequest(message: Message, error: BadRequest):
+async def handle_bad_request(message: Message, error: BadRequest):
     logger.error('BadRequest exception: %s', error)
     if not message:
         return
@@ -32,7 +32,7 @@ async def handleBadRequest(message: Message, error: BadRequest):
     else:
         raise error
 
-def sanitizeFilename(name: str) -> str:
+def sanitize_filename(name: str) -> str:
     # https://docs.microsoft.com/zh-cn/windows/win32/fileio/naming-a-file
     name = re.sub(r"[\"*/:<>?\\|]+", '_', name)  # reserved characters
     name = re.sub(r"[\t\n\r\f\v]+", ' ', name)
@@ -46,14 +46,14 @@ def sanitizeFilename(name: str) -> str:
         name = filename[:255 - len(ext)] + ext
     return name
 
-def sanitizeCaption(caption: Caption) -> str:
+def sanitize_caption(caption: Caption) -> str:
     content = caption.text
     if len(content) > 1024:
         content = content[:1024]
     content = escape(content, quote=False)
     return content
 
-def getUrlsFromMessage(message: Message) -> List[str]:
+def get_urls_from_message(message: Message) -> List[str]:
     if message.entities:
         entities = message.entities
         text = message.text
@@ -75,7 +75,7 @@ def getUrlsFromMessage(message: Message) -> List[str]:
                              2].decode('utf-16-le'))
     return urls
 
-def isImage(url: str) -> bool:
+def is_image(url: str) -> bool:
     """
     Guess if a file is image by extension
     """
@@ -83,7 +83,7 @@ def isImage(url: str) -> bool:
     filetype = str(guess_type(url)[0])
     return filetype.startswith('image')
 
-def ensureExistence(path: str):
+def ensure_existence(path: str):
     if not os.path.exists(path):
         os.makedirs(path)
 

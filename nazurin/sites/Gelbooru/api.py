@@ -6,7 +6,7 @@ from nazurin.utils import Request
 from nazurin.utils.exceptions import NazurinError
 
 class Gelbooru(object):
-    async def getPost(self, post_id: int):
+    async def get_post(self, post_id: int):
         """Fetch an post."""
         api = 'https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&id=' + str(
             post_id)
@@ -20,12 +20,12 @@ class Gelbooru(object):
                 return post
 
     async def fetch(self, post_id: int) -> Illust:
-        post = await self.getPost(post_id)
-        imgs = self.getImages(post)
-        caption = self.buildCaption(post)
+        post = await self.get_post(post_id)
+        imgs = self.get_images(post)
+        caption = self.build_caption(post)
         return Illust(imgs, caption, post)
 
-    def getImages(self, post) -> List[Image]:
+    def get_images(self, post) -> List[Image]:
         """Get images from post."""
         url = post['file_url']
         ext = post['image'].split('.')[1]
@@ -34,12 +34,12 @@ class Gelbooru(object):
         imgs.append(
             Image(filename,
                   url,
-                  self.getThumbnail(post),
+                  self.get_thumbnail(post),
                   width=post['width'],
                   height=post['height']))
         return imgs
 
-    def buildCaption(self, post) -> Caption:
+    def build_caption(self, post) -> Caption:
         tags = post['tags'].split(' ')
         tag_string = str()
         for tag in tags:
@@ -51,7 +51,7 @@ class Gelbooru(object):
             'tags': tag_string
         })
 
-    def getThumbnail(self, post) -> Optional[str]:
+    def get_thumbnail(self, post) -> Optional[str]:
         """
         Get thumbnail URL from post['file_url'].
         eg:

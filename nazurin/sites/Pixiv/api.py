@@ -39,13 +39,13 @@ class Pixiv(object):
         if TRANSLATION:
             Pixiv.api.set_accept_language(TRANSLATION)
 
-    async def requireAuth(self):
+    async def require_auth(self):
         if Pixiv.api.access_token and time.time() - Pixiv.updated_time < 3600:
             # Logged in, access_token not expired
             return
         if Pixiv.api.refresh_token:
             # Logged in, access_token expired
-            await self.refreshToken()
+            await self.refresh_token()
             return
 
         # Haven't logged in
@@ -55,7 +55,7 @@ class Pixiv(object):
             Pixiv.api.refresh_token = tokens['refresh_token']
             Pixiv.updated_time = tokens['updated_time']
             if time.time() - Pixiv.updated_time >= 3600:  # Token expired
-                await self.refreshToken()
+                await self.refresh_token()
             else:
                 logger.info('Pixiv logged in through cached tokens')
         else:  # Initialize database
@@ -72,7 +72,7 @@ class Pixiv(object):
                 })
             logger.info('Pixiv tokens cached')
 
-    async def getArtwork(self, artwork_id: int):
+    async def get_artwork(self, artwork_id: int):
         """Fetch an artwork."""
         response = await self.call(Pixiv.illust_detail, artwork_id)
         if 'illust' in response.keys():
@@ -86,19 +86,19 @@ class Pixiv(object):
         return illust
 
     async def view(self, artwork_id: int = None) -> Illust:
-        illust = await self.getArtwork(artwork_id)
+        illust = await self.get_artwork(artwork_id)
         if illust.type == 'ugoira':
-            illust = await self.viewUgoira(illust)
+            illust = await self.view_ugoira(illust)
         else:  # Ordinary illust
-            illust = await self.viewIllust(illust)
+            illust = await self.view_illust(illust)
         return illust
 
-    async def viewIllust(self, illust) -> PixivIllust:
-        caption = self.buildCaption(illust)
-        imgs = self.getImages(illust)
+    async def view_illust(self, illust) -> PixivIllust:
+        caption = self.build_caption(illust)
+        imgs = self.get_images(illust)
         return PixivIllust(imgs, caption, illust)
 
-    async def viewUgoira(self, illust) -> Ugoira:
+    async def view_ugoira(self, illust) -> Ugoira:
         """Download ugoira zip file, store animation data and convert ugoira to mp4."""
         metadata = await Pixiv.ugoira_metadata(illust.id)
         frames = metadata.ugoira_metadata
@@ -113,8 +113,8 @@ class Pixiv(object):
             await gif_zip.download(session)
         async with aiofiles.open(metafile.path, 'w') as f:
             await f.write(json.dumps(frames))
-        video = await self.ugoira2Mp4(gif_zip, frames)
-        caption = self.buildCaption(illust)
+        video = await self.ugoira_to_mp4(gif_zip, frames)
+        caption = self.build_caption(illust)
         return Ugoira(video, caption, illust, files)
 
     async def bookmark(self,
@@ -130,10 +130,10 @@ class Pixiv(object):
                     privacy.value)
         return True
 
-    async def followUser(self, user_id: int):
+    async def follow_user(self, user_id: int):
         await self.call(Pixiv.user_follow_add, user_id)
 
-    async def refreshToken(self):
+    async def refresh_token(self):
         """Refresh tokens and cache in database."""
         await self.auth()
         Pixiv.updated_time = time.time()
@@ -146,18 +146,18 @@ class Pixiv(object):
 
     async def call(self, func: Callable, *args):
         """Call API with login state check."""
-        await self.requireAuth()
+        await self.require_auth()
         response = await func(*args)
         if 'error' in response.keys(
         ) and 'invalid_grant' in response.error.message:  # Access token expired
-            await self.refreshToken()
+            await self.refresh_token()
             response = await func(*args)
         return response
 
-    async def ugoira2Mp4(self, ugoira_zip: File,
-                         ugoira_metadata: dict) -> File:
+    async def ugoira_to_mp4(self, ugoira_zip: File,
+                            ugoira_metadata: dict) -> File:
         @async_wrap
-        def extractUgoiraZip(ugoira_zip: File, to_path: str):
+        def extract_zip(ugoira_zip: File, to_path: str):
             with zipfile.ZipFile(ugoira_zip.path, 'r') as zip_file:
                 zip_file.extractall(to_path)
 
@@ -166,7 +166,8 @@ class Pixiv(object):
             # For some illustrations like https://www.pixiv.net/artworks/44298467,
             # the output video is in YUV444P colorspace, which can't be played on some devices,
             # thus we convert to YUV420P colorspace for better compatibility.
-            cmd = f'ffmpeg -i "{config.path}" -vcodec libx264 -pix_fmt yuv420p -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -y "{output.path}"'
+            cmd = f'ffmpeg -i "{config.path}" -vcodec libx264 -pix_fmt yuv420p' + \
+                  f'-vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -y "{output.path}"'
             logger.info('Calling FFmpeg with command: %s', cmd)
             args = shlex.split(cmd)
             try:
@@ -197,14 +198,14 @@ class Pixiv(object):
             await f.write(ffconcat)
 
         zip_path = ugoira_zip.path[:-4]
-        await extractUgoiraZip(ugoira_zip, zip_path)
+        await extract_zip(ugoira_zip, zip_path)
         await convert(input_config, output_mp4)
 
         await async_wrap(shutil.rmtree)(zip_path)
         await aiofiles.os.remove(input_config.path)
         return output_mp4
 
-    def getImages(self, illust) -> List[PixivImage]:
+    def get_images(self, illust) -> List[PixivImage]:
         """Get images from an artwork."""
         width = illust.width
         height = illust.height
@@ -213,11 +214,11 @@ class Pixiv(object):
             pages = illust.meta_pages
             for page in pages:
                 url = page.image_urls.original
-                name = self.getFilename(url, illust)
+                name = self.get_filename(url, illust)
                 imgs.append(
                     PixivImage(name,
                                url,
-                               self.getThumbnail(url),
+                               self.get_thumbnail(url),
                                width=width,
                                height=height))
                 # For multi-page illusts, width & height will be the size of the first page,
@@ -225,16 +226,16 @@ class Pixiv(object):
                 width = height = 0
         else:
             url = illust.meta_single_page.original_image_url
-            name = self.getFilename(url, illust)
+            name = self.get_filename(url, illust)
             imgs.append(
                 PixivImage(name,
                            url,
-                           self.getThumbnail(url),
+                           self.get_thumbnail(url),
                            width=width,
                            height=height))
         return imgs
 
-    def buildCaption(self, illust) -> Caption:
+    def build_caption(self, illust) -> Caption:
         """Build media caption from an artwork."""
         tags = str()
         for tag in illust.tags:
@@ -253,7 +254,7 @@ class Pixiv(object):
         })
         return caption
 
-    def getFilename(self, url: str, illust) -> str:
+    def get_filename(self, url: str, illust) -> str:
         basename = os.path.basename(url)
         filename, extension = os.path.splitext(basename)
         name = "%s - %s - %s(%d)%s" % (filename, illust.title,
@@ -261,7 +262,7 @@ class Pixiv(object):
                                        extension)
         return name
 
-    def getThumbnail(self, url: str) -> str:
+    def get_thumbnail(self, url: str) -> str:
         pre, _ = os.path.splitext(url)
         pre = pre.replace('img-original', 'img-master')
         thumbnail = pre + '_master1200.jpg'

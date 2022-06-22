@@ -53,7 +53,7 @@ class GoogleDrive(object):
         tasks = [self.upload(item) for item in files]
         await asyncio.gather(*tasks)
 
-    def findFolder(self, name: str) -> str:
+    def find_folder(self, name: str) -> str:
         query = {
             'q': "mimeType='application/vnd.google-apps.folder' and title='" +
             name + "'",
@@ -62,7 +62,7 @@ class GoogleDrive(object):
         result = GoogleDrive.drive.ListFile(query).GetList()
         return result[0].get('id')
 
-    def createFolder(self, name: str) -> str:
+    def create_folder(self, name: str) -> str:
         metadata = {
             'title': name,
             'mimeType': 'application/vnd.google-apps.folder',

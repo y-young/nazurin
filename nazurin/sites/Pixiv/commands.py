@@ -21,7 +21,7 @@ async def pixiv_view(message: Message, command: Command.CommandObj):
         await message.reply('Invalid artwork id!')
         return
     illust = await pixiv.view(artwork_id)
-    await bot.sendIllust(illust, message)
+    await bot.send_illust(illust, message)
 
 @dp.message_handler(Command(['pixiv_download']))
 async def pixiv_download(message: Message, command: Command.CommandObj):
@@ -35,7 +35,7 @@ async def pixiv_download(message: Message, command: Command.CommandObj):
         return
     illust = await pixiv.view(artwork_id)
     await illust.download()
-    await bot.sendDocuments(illust, message)
+    await bot.send_docs(illust, message)
 
 @dp.message_handler(Command(['pixiv_bookmark', 'pixiv_bookmark_private']))
 async def pixiv_bookmark(message: Message, command: Command.CommandObj):
@@ -56,5 +56,5 @@ async def pixiv_bookmark(message: Message, command: Command.CommandObj):
 @dp.message_handler(Regexp(r'(?:www\.)?pixiv\.net/(?:users|u)/(\d+)'))
 async def pixiv_follow(message: Message, regexp: Match):
     user_id = int(regexp.group(1))
-    await pixiv.followUser(user_id)
+    await pixiv.follow_user(user_id)
     await message.reply(f'Successfully followed user {user_id}.')

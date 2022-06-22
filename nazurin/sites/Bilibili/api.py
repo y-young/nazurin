@@ -9,10 +9,10 @@ from nazurin.utils.exceptions import NazurinError
 
 class Bilibili(object):
     @network_retry
-    async def getDynamic(self, dynamic_id: int):
+    async def get_dynamic(self, dynamic_id: int):
         """Get dynamic data from API."""
-        api = 'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail?dynamic_id=' + str(
-            dynamic_id)
+        api = 'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr' +\
+              '/get_dynamic_detail?dynamic_id=' + str(dynamic_id)
         async with Request() as request:
             async with request.get(api) as response:
                 response.raise_for_status()
@@ -29,13 +29,13 @@ class Bilibili(object):
 
     async def fetch(self, dynamic_id: int) -> Illust:
         """Fetch images and detail."""
-        card = await self.getDynamic(dynamic_id)
-        imgs = self.getImages(card, dynamic_id)
-        caption = self.buildCaption(card)
+        card = await self.get_dynamic(dynamic_id)
+        imgs = self.get_images(card, dynamic_id)
+        caption = self.build_caption(card)
         caption['url'] = f"https://t.bilibili.com/{dynamic_id}"
         return Illust(imgs, caption, card)
 
-    def getImages(self, card, dynamic_id: int) -> List[Image]:
+    def get_images(self, card, dynamic_id: int) -> List[Image]:
         """Get all images in a dynamic card."""
         if 'item' not in card.keys() or 'pictures' not in card['item'].keys():
             raise NazurinError("No image found")
@@ -52,7 +52,7 @@ class Bilibili(object):
                     pic['img_height']))
         return imgs
 
-    def buildCaption(self, card) -> Caption:
+    def build_caption(self, card) -> Caption:
         return Caption({
             'author': card['user']['name'],
             'content': card['item']['description']

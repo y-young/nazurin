@@ -56,5 +56,5 @@ class NazurinDispatcher(Dispatcher):
             executor.start_polling(self, skip_updates=True)
 
     async def update_collection(self, message: Message, urls: List[str]):
-        await self.bot.updateCollection(urls, message)
+        await self.bot.update_collection(urls, message)
         await message.reply('Done!')

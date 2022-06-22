@@ -18,7 +18,7 @@ async def zerochan_view(message: Message, command: Command.CommandObj):
         await message.reply('Invalid post id!')
         return
     illust = await api.view(post_id)
-    await bot.sendIllust(illust, message)
+    await bot.send_illust(illust, message)
 
 @dp.message_handler(Command(['zerochan_download']))
 async def zerochan_download(message: Message, command: Command.CommandObj):
@@ -32,4 +32,4 @@ async def zerochan_download(message: Message, command: Command.CommandObj):
         return
     illust = await api.view(post_id)
     await illust.download()
-    await bot.sendDocuments(illust, message)
+    await bot.send_docs(illust, message)
