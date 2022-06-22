@@ -8,7 +8,7 @@ from typing import List
 from nazurin.models import Illust
 from nazurin.utils import logger
 
-class SiteManager(object):
+class SiteManager:
     """Site plugin manager."""
     def __init__(self):
         """Initialize."""

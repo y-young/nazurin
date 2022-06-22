@@ -10,7 +10,7 @@ from nazurin.utils import Request, logger
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
-class DeviantArt(object):
+class DeviantArt:
     @network_retry
     async def get_deviation(self, deviation_id: int) -> dict:
         """Fetch a deviation."""

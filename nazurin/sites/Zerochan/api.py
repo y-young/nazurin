@@ -9,7 +9,7 @@ from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 
-class Zerochan(object):
+class Zerochan:
     @network_retry
     async def get_post(self, post_id: int):
         async with Request() as request:

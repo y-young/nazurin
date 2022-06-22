@@ -8,7 +8,7 @@ from nazurin.utils.exceptions import NazurinError
 
 from .config import API_KEY
 
-class Wallhaven(object):
+class Wallhaven:
     @network_retry
     async def get_wallpaper(self, wallpaper_id: str):
         """Get wallpaper information from API."""

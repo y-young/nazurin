@@ -13,7 +13,7 @@ from nazurin.utils import Request, logger
 from nazurin.utils.exceptions import NazurinError
 from nazurin.utils.helpers import ensure_existence
 
-class Moebooru(object):
+class Moebooru:
     def __init__(self):
         self.url = 'yande.re'
 

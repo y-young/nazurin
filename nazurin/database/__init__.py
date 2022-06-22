@@ -3,7 +3,7 @@ import importlib
 
 from nazurin.config import DATABASE
 
-class Database(object):
+class Database:
     """Nazurin database manager."""
     def __init__(self):
         """Dynamically load all database drivers."""

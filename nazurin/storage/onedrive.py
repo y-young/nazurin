@@ -16,7 +16,7 @@ OD_SECRET = env.str('OD_SECRET')
 OD_RF_TOKEN = env.str('OD_RF_TOKEN')  # Refresh token for first-time auth
 OD_DOCUMENT = 'onedrive'
 
-class OneDrive(object):
+class OneDrive:
     """OneDrive driver."""
     db = Database().driver()
     collection = db.collection(NAZURIN_DATA)

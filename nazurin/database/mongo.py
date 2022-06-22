@@ -6,7 +6,7 @@ from pymongo.errors import DuplicateKeyError
 from nazurin.config import env
 from nazurin.utils.exceptions import NazurinError
 
-class Mongo(object):
+class Mongo:
     """MongoDB driver for MongoDB Atlas or local server."""
     def __init__(self):
         """Load credentials and initialize client."""

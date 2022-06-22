@@ -6,7 +6,7 @@ from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
-class Twitter(object):
+class Twitter:
     @network_retry
     async def get_tweet(self, status_id: int):
         """Get a tweet from API."""

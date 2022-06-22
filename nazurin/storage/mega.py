@@ -15,7 +15,7 @@ MEGA_USER = env.str('MEGA_USER')
 MEGA_PASS = env.str('MEGA_PASS')
 MEGA_DOCUMENT = 'mega'
 
-class Mega(object):
+class Mega:
     api = mega()
     db = Database().driver()
     collection = db.collection(NAZURIN_DATA)
