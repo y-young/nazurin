@@ -11,7 +11,7 @@ class Bilibili:
     @network_retry
     async def get_dynamic(self, dynamic_id: int):
         """Get dynamic data from API."""
-        api = 'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr' +\
+        api = 'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr'\
               '/get_dynamic_detail?dynamic_id=' + str(dynamic_id)
         async with Request() as request:
             async with request.get(api) as response:

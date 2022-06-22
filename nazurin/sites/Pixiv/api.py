@@ -166,7 +166,7 @@ class Pixiv:
             # For some illustrations like https://www.pixiv.net/artworks/44298467,
             # the output video is in YUV444P colorspace, which can't be played on some devices,
             # thus we convert to YUV420P colorspace for better compatibility.
-            cmd = f'ffmpeg -i "{config.path}" -vcodec libx264 -pix_fmt yuv420p' + \
+            cmd = f'ffmpeg -i "{config.path}" -vcodec libx264 -pix_fmt yuv420p '\
                   f'-vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -y "{output.path}"'
             logger.info('Calling FFmpeg with command: %s', cmd)
             args = shlex.split(cmd)

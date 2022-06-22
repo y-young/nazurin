@@ -31,8 +31,8 @@ class OneDrive:
         # https://docs.microsoft.com/zh-cn/graph/api/driveitem-createuploadsession?view=graph-rest-1.0
         # create drive item
         logger.info("Creating drive item...")
-        create_file_url = 'https://graph.microsoft.com/v1.0/me/drive/items/{parent_id}/children'.format(
-            parent_id=self.folder_id)
+        create_file_url = 'https://graph.microsoft.com/v1.0/me/drive'\
+                          '/items/{parent_id}/children'.format(parent_id=self.folder_id)
         size = await file.size()
         body = {
             "name": file.name,
@@ -43,8 +43,8 @@ class OneDrive:
         response = await self._request('POST', create_file_url, json=body)
         # create upload session
         logger.info("Creating upload session...")
-        create_session_url = 'https://graph.microsoft.com/v1.0/me/drive/items/{item_id}/createUploadSession'.format(
-            item_id=response['id'])
+        create_session_url = 'https://graph.microsoft.com/v1.0/me/drive'\
+                             '/items/{item_id}/createUploadSession'.format(item_id=response['id'])
         response = await self._request('POST', create_session_url)
         # upload
         await self.stream_upload(file, response['uploadUrl'])
@@ -167,9 +167,10 @@ class OneDrive:
         async with Request(headers=headers) as session:
             async for chunk in read_by_chunks(file.path, CHUNK_SIZE):
                 content_length = len(chunk)
+                range_end = range_start + content_length - 1
                 session.headers.update({'Content-Length': str(content_length)})
                 session.headers.update({
-                    'Content-Range': f"bytes {range_start}-{range_start + content_length - 1}/{total_size}"
+                    'Content-Range': f"bytes {range_start}-{range_end}/{total_size}"
                 })
                 await upload_chunk(url, chunk)
                 range_start += content_length
