@@ -11,13 +11,14 @@ from typing import Callable, List
 
 import aiofiles
 import aiofiles.os
+from pixivpy3 import AppPixivAPI, PixivError
+
 from nazurin.config import NAZURIN_DATA
 from nazurin.database import Database
 from nazurin.models import Caption, File, Illust, Ugoira
 from nazurin.utils import Request, logger
 from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
-from pixivpy3 import AppPixivAPI, PixivError
 
 from .config import DOCUMENT, HEADERS, REFRESH_TOKEN, TRANSLATION, PixivPrivacy
 from .models import PixivIllust, PixivImage
@@ -284,9 +285,8 @@ class Pixiv:
                         random_ua)
                     Pixiv.api.additional_headers = {"User-Agent": random_ua}
                     return await self.auth(retry=False)
-                else:
-                    logger.error(error)
-                    raise NazurinError(
-                        "Blocked by CloudFlare security check, please try again later."
-                    ) from None
+                logger.error(error)
+                raise NazurinError(
+                    "Blocked by CloudFlare security check, please try again later."
+                ) from None
             raise error
