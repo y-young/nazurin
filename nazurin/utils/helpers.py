@@ -3,6 +3,7 @@ import re
 from html import escape
 from mimetypes import guess_type
 from pathlib import Path
+from string import capwords
 from typing import List
 
 import aiofiles
@@ -86,6 +87,10 @@ def is_image(url: str) -> bool:
 def ensure_existence(path: str):
     if not os.path.exists(path):
         os.makedirs(path)
+
+def snake_to_pascal(name: str):
+    """Convert snake_case to PascalCase"""
+    return capwords(name.replace('_', ' ')).replace(' ', '')
 
 async def read_by_chunks(path: str, chunk_size: int = 4 * 1024 * 1024):
     async with aiofiles.open(path, 'rb') as f:
