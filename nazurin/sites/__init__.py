@@ -7,6 +7,7 @@ from typing import List
 
 from nazurin.models import Illust
 from nazurin.utils import logger
+from nazurin.utils.helpers import snake_to_pascal
 
 class SiteManager:
     """Site plugin manager."""
@@ -24,14 +25,16 @@ class SiteManager:
                 continue
 
             module = import_module('nazurin.sites.' + module_name)
-            self.sites[module_name.lower()] = getattr(module, module_name)()
+            # Store site API class
+            self.sites[module_name.lower()] = getattr(
+                module, snake_to_pascal(module_name))()
             if hasattr(module, 'patterns') and hasattr(module, 'handle'):
                 PRIORITY = getattr(module, 'PRIORITY')
                 patterns = getattr(module, 'patterns')
                 handle = getattr(module, 'handle')
                 self.sources.append((PRIORITY, patterns, handle, module_name))
             self.sources.sort(key=lambda s: s[0], reverse=True)
-        logger.info("Sites loaded")
+        logger.info("Loaded %s sites", len(self.sites))
 
     def api(self, site):
         return self.sites[site]
