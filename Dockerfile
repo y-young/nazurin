@@ -1,4 +1,17 @@
-FROM python:3.8-slim
+ARG PYTHON_VERSION=3.8
+
+# Builder
+FROM python:${PYTHON_VERSION}-slim as builder
+
+WORKDIR /root
+COPY requirements.txt /root
+
+# Install requirements
+RUN apt update && apt install -y python3-pip git
+RUN pip install --prefix="/install" --no-warn-script-location -r requirements.txt
+
+# Runtime
+FROM python:${PYTHON_VERSION}-slim
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -6,9 +19,8 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Turns off buffering for easier container logging
 ENV PYTHONUNBUFFERED=1
 
-# Install pip requirements
-COPY requirements.txt .
-RUN python -m pip install -r requirements.txt
+# Copy pip requirements
+COPY --from=builder /install /usr/local
 
 # Install FFmpeg
 RUN apt-get update && \
