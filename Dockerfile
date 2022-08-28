@@ -5,7 +5,7 @@ FROM jrottenberg/ffmpeg:4.2-scratch as ffmpeg
 # Builder
 FROM python:${PYTHON_VERSION}-slim as builder
 
-RUN apt update && apt install -y git
+RUN apt-get update && apt-get install -y --no-install-recommends git
 
 WORKDIR /root
 
