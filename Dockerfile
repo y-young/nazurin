@@ -3,11 +3,12 @@ ARG PYTHON_VERSION=3.8
 # Builder
 FROM python:${PYTHON_VERSION}-slim as builder
 
+RUN apt update && apt install -y git
+
 WORKDIR /root
-COPY requirements.txt /root
 
 # Install requirements
-RUN apt update && apt install -y python3-pip git
+COPY requirements.txt /root
 RUN pip install --prefix="/install" --no-warn-script-location -r requirements.txt
 
 # Runtime
