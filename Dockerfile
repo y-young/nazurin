@@ -1,5 +1,7 @@
 ARG PYTHON_VERSION=3.8
 
+FROM jrottenberg/ffmpeg:4.2-scratch as ffmpeg
+
 # Builder
 FROM python:${PYTHON_VERSION}-slim as builder
 
@@ -20,13 +22,11 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Turns off buffering for easier container logging
 ENV PYTHONUNBUFFERED=1
 
+# Install FFmpeg
+COPY --from=ffmpeg / /
+
 # Copy pip requirements
 COPY --from=builder /install /usr/local
-
-# Install FFmpeg
-RUN apt-get update && \
-    apt-get install --no-install-recommends -y ffmpeg && \
-    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY nazurin ./nazurin
