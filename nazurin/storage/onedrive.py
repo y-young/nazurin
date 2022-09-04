@@ -2,13 +2,13 @@ import asyncio
 import time
 from typing import List, Optional
 
-import aiofiles
-
 from nazurin.config import NAZURIN_DATA, STORAGE_DIR, env
 from nazurin.database import Database
 from nazurin.models import File
 from nazurin.utils import Request, logger
+from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
+from nazurin.utils.helpers import read_by_chunks
 
 OD_FOLDER = STORAGE_DIR
 OD_CLIENT = env.str('OD_CLIENT')
@@ -30,6 +30,7 @@ class OneDrive(object):
     async def upload(self, file: File):
         # https://docs.microsoft.com/zh-cn/graph/api/driveitem-createuploadsession?view=graph-rest-1.0
         # create drive item
+        logger.info("Creating drive item...")
         create_file_url = 'https://graph.microsoft.com/v1.0/me/drive/items/{parent_id}/children'.format(
             parent_id=self.folder_id)
         size = await file.size()
@@ -41,19 +42,12 @@ class OneDrive(object):
         }
         response = await self._request('POST', create_file_url, json=body)
         # create upload session
+        logger.info("Creating upload session...")
         create_session_url = 'https://graph.microsoft.com/v1.0/me/drive/items/{item_id}/createUploadSession'.format(
             item_id=response['id'])
         response = await self._request('POST', create_session_url)
         # upload
-        headers = {
-            'Content-Range': 'bytes 0-{end}/{size}'.format(end=size - 1,
-                                                           size=size)
-        }
-        async with aiofiles.open(file.path, mode='rb') as data:
-            await self._request('PUT',
-                                response['uploadUrl'],
-                                headers=headers,
-                                data=await data.read())
+        await self.stream_upload(file, response['uploadUrl'])
 
     async def store(self, files: List[File]):
         await self.requireAuth()
@@ -145,19 +139,52 @@ class OneDrive(object):
         await self.document.update({'folder_id': self.folder_id})
         logger.info('OneDrive folder ID cached')
 
+    @network_retry
     async def _request(self, method, url, headers=None, **kwargs):
         # make a request with access token
-        _headers = {
-            'Accept': 'application/json',
-            'Authorization': 'Bearer ' + self.access_token,
-        }
-        if headers:
-            _headers.update(headers)
-        if 'data' not in kwargs:
-            _headers['Content-Type'] = 'application/json'
+        _headers = self.with_credentials(headers)
+        _headers['Content-Type'] = 'application/json'
         async with Request(headers=_headers) as session:
             async with session.request(method, url, **kwargs) as response:
                 response.raise_for_status()
                 if 'application/json' in response.headers['Content-Type']:
                     return await response.json()
                 return await response.text()
+
+    async def stream_upload(self, file: File, url: str):
+        @network_retry
+        async def upload_chunk(url: str, chunk: bytes):
+            async with session.put(url, data=chunk) as response:
+                response.raise_for_status()
+
+        # Must be a multiple of 320 KB
+        CHUNK_SIZE = 16 * 320 * 1024  # 5MB
+        headers = self.with_credentials()
+        range_start = 0
+        total_size = await file.size()
+        logger.info("Uploading file, total size: %s...", total_size)
+
+        async with Request(headers=headers) as session:
+            async for chunk in read_by_chunks(file.path, CHUNK_SIZE):
+                content_length = len(chunk)
+                session.headers.update({'Content-Length': str(content_length)})
+                session.headers.update({
+                    'Content-Range': f"bytes {range_start}-{range_start + content_length - 1}/{total_size}"
+                })
+                await upload_chunk(url, chunk)
+                range_start += content_length
+                logger.info("Uploaded %s", range_start)
+        logger.info("Upload completed")
+
+    def with_credentials(self, headers: dict = None) -> dict:
+        """
+        Add credentials to the request header.
+        """
+
+        _headers = {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ' + self.access_token,
+        }
+        if headers:
+            _headers.update(headers)
+        return _headers
