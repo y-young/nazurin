@@ -4,7 +4,7 @@ from os import path
 from environs import Env
 
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format='%(asctime)s - %(name)s.%(module)s - %(levelname)s - %(message)s',
     level=logging.INFO)
 
 env = Env()
