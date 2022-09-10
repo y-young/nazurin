@@ -14,9 +14,9 @@ env.read_env()
 ENV = env.str('ENV', default='production')
 TOKEN = env.str('TOKEN')
 
-# Webhook url, eg: https://xxx.herokuapp.com/, should end with '/'
+# Webhook url, eg: https://xxx.fly.dev/, should end with '/'
 WEBHOOK_URL = env.str('WEBHOOK_URL', default=None)
-# Port is automatically set if on Heroku
+# Port is automatically set if on Heroku or fly.io
 PORT = env.int('PORT', default=80)
 
 STORAGE = env.list('STORAGE', subcast=str, default=['Local'])
