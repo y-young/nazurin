@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import os
+import random
 import shlex
 import shutil
 import subprocess
@@ -10,14 +11,13 @@ from typing import Callable, List
 
 import aiofiles
 import aiofiles.os
-from pixivpy3 import AppPixivAPI
-
 from nazurin.config import NAZURIN_DATA
 from nazurin.database import Database
 from nazurin.models import Caption, File, Illust, Ugoira
 from nazurin.utils import Request, logger
 from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
+from pixivpy3 import AppPixivAPI, PixivError
 
 from .config import DOCUMENT, HEADERS, REFRESH_TOKEN, TRANSLATION, PixivPrivacy
 from .models import PixivIllust, PixivImage
@@ -62,7 +62,7 @@ class Pixiv(object):
             if not REFRESH_TOKEN:
                 raise NazurinError('Pixiv refresh token is required')
             Pixiv.api.refresh_token = REFRESH_TOKEN
-            await Pixiv.api_auth()
+            await self.auth()
             Pixiv.updated_time = time.time()
             await Pixiv.collection.insert(
                 DOCUMENT, {
@@ -135,7 +135,7 @@ class Pixiv(object):
 
     async def refreshToken(self):
         """Refresh tokens and cache in database."""
-        await Pixiv.api_auth()
+        await self.auth()
         Pixiv.updated_time = time.time()
         await Pixiv.document.update({
             'access_token': Pixiv.api.access_token,
@@ -266,3 +266,26 @@ class Pixiv(object):
         pre = pre.replace('img-original', 'img-master')
         thumbnail = pre + '_master1200.jpg'
         return thumbnail
+
+    async def auth(self, retry=True):
+        try:
+            await Pixiv.api_auth()
+            if not retry:
+                # Reset UA after bypassing successfully
+                Pixiv.api.additional_headers = {}
+        except PixivError as error:
+            if "challenge_basic_security" in error.reason:
+                # Blocked by CloudFlare, try to bypass by changing UA
+                if retry:
+                    random_ua = f"PixivAndroidApp/6.{random.randrange(0, 60)}.0"
+                    logger.info(
+                        "Blocked by CloudFlare, retry with random UA: %s",
+                        random_ua)
+                    Pixiv.api.additional_headers = {"User-Agent": random_ua}
+                    return await self.auth(retry=False)
+                else:
+                    logger.error(error)
+                    raise NazurinError(
+                        "Blocked by CloudFlare security check, please try again later."
+                    ) from None
+            raise error
