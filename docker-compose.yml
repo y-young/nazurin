@@ -2,7 +2,8 @@ version: "3.4"
 
 services:
   nazurin:
-    image: nazurin
+    # Alternatively, you may use "yyoung01/nazurin:latest"
+    image: ghcr.io/y-young/nazurin:latest
     build: .
     env_file:
       - ".env"

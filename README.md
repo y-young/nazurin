@@ -6,11 +6,11 @@
 
 English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 
-小さな小さな賢将, a Telegram bot which helps you collect ACG illustrations from various sites.
+小さな小さな賢将, a Telegram bot that helps you collect ACG illustrations from various sites.
 
 ## Architecture
 
-![architecture.png](https://i.loli.net/2021/02/02/8G7QJ9kiFTcmlwf.png)
+![architecture.png](https://s2.loli.net/2022/09/10/mpW32BJqxajV7Sg.png)
 
 ## Features
 
@@ -63,25 +63,13 @@ You can also implement your own database driver by creating a file under `databa
 
 ## Configuration
 
-For more information, see [Wiki](https://github.com/y-young/nazurin/wiki/Configuration)
+For more information, see [Wiki](https://github.com/y-young/nazurin/wiki/Configuration).
 
 ## Deploy
 
-### Deploy on Heroku
+> For more deploy options, checkout [Wiki](https://github.com/y-young/nazurin/wiki/Deploy).
 
-#### 'Deploy to Heroku' Button
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-
-> Tips: You can fork this repository, modify it to your needs, and use this button to deploy your own version.
-
-#### Manual
-
-Set all required environment variables on Heroku according to [Configuration Guide](https://github.com/y-young/nazurin/wiki/Configuration), clone this repository and push to Heroku, everything should be working properly.
-
-### Deploy on your own server
-
-#### Manual
+### Manual
 
 > Tips: You may comment out unused dependencies in `requirements.txt` before installation.
 
@@ -89,10 +77,10 @@ Set all required environment variables on Heroku according to [Configuration Gui
 2.  Set the required environment variables or place them in `.env` file, you may refer to `.env.example` as an example
 3.  Start the bot: `python -m nazurin`
 
-#### Docker
+### Docker
 
 1.  Configure the options in `.env`
-2.  Run `docker-compose up -d --build`
+2.  Run `docker-compose up -d` to use the lastet pre-built Docker images. (Alternatively, you may build the image yourself: `docker-compose up -d --build`)
 
 ## Usage
 

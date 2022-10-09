@@ -4,7 +4,7 @@ from os import path
 from environs import Env
 
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format='%(asctime)s - %(name)s.%(module)s - %(levelname)s - %(message)s',
     level=logging.INFO)
 
 env = Env()
@@ -14,9 +14,9 @@ env.read_env()
 ENV = env.str('ENV', default='production')
 TOKEN = env.str('TOKEN')
 
-# Webhook url, eg: https://xxx.herokuapp.com/, should end with '/'
+# Webhook url, eg: https://xxx.fly.dev/, should end with '/'
 WEBHOOK_URL = env.str('WEBHOOK_URL', default=None)
-# Port is automatically set if on Heroku
+# Port is automatically set if on Heroku or fly.io
 PORT = env.int('PORT', default=80)
 
 STORAGE = env.list('STORAGE', subcast=str, default=['Local'])
