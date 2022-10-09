@@ -54,6 +54,7 @@ async def on_error(update: Update, exception: Exception):
     try:
         raise exception
     except ClientResponseError as error:
+        traceback.print_exc()
         await update.message.reply(
             f'Response Error: {error.status} {error.message}')
     except NazurinError as error:

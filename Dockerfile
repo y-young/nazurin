@@ -1,4 +1,20 @@
-FROM python:3.8-slim
+ARG PYTHON_VERSION=3.8
+
+FROM jrottenberg/ffmpeg:4.2-scratch as ffmpeg
+
+# Builder
+FROM python:${PYTHON_VERSION}-slim as builder
+
+RUN apt-get update && apt-get install -y --no-install-recommends git
+
+WORKDIR /root
+
+# Install requirements
+COPY requirements.txt /root
+RUN pip install --prefix="/install" --no-warn-script-location -r requirements.txt
+
+# Runtime
+FROM python:${PYTHON_VERSION}-slim
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -6,14 +22,11 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Turns off buffering for easier container logging
 ENV PYTHONUNBUFFERED=1
 
-# Install pip requirements
-COPY requirements.txt .
-RUN python -m pip install -r requirements.txt
-
 # Install FFmpeg
-RUN apt-get update && \
-    apt-get install --no-install-recommends -y ffmpeg && \
-    rm -rf /var/lib/apt/lists/*
+COPY --from=ffmpeg / /
+
+# Copy pip requirements
+COPY --from=builder /install /usr/local
 
 WORKDIR /app
 COPY nazurin ./nazurin

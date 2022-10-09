@@ -5,10 +5,10 @@ from mimetypes import guess_type
 from pathlib import Path
 from typing import List
 
+import aiofiles
 from aiogram.types import Message
 from aiogram.utils.exceptions import (BadRequest, InvalidHTTPUrlContent,
                                       WrongFileIdentifier)
-
 from nazurin.models import Caption
 
 from . import logger
@@ -86,3 +86,10 @@ def isImage(url: str) -> bool:
 def ensureExistence(path: str):
     if not os.path.exists(path):
         os.makedirs(path)
+
+async def read_by_chunks(path: str, chunk_size: int = 4 * 1024 * 1024):
+    async with aiofiles.open(path, 'rb') as f:
+        chunk = await f.read(chunk_size)
+        while chunk:
+            yield chunk
+            chunk = await f.read(chunk_size)
