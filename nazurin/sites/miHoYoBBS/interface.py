@@ -1,7 +1,5 @@
 from time import time
 
-from h11 import Data
-
 from nazurin.database import Database
 from nazurin.models import Illust
 

@@ -53,7 +53,8 @@ class miHoYoBBS(object):
         return imgs
 
     def buildCaption(self, post) -> Caption:
-        game_ids = {1: '崩坏3', 2: '原神', 3: '崩坏2', 4: '未定事件簿', 5: '大别野', 6: '崩坏: 星穹铁道', 8: '绝区零'} #https://github.com/y1ndan/genshinhelper2/blob/main/genshinhelper/mihoyo.py#L183
+        #https://github.com/y1ndan/genshinhelper2/blob/main/genshinhelper/mihoyo.py#L183
+        game_ids = {1: '崩坏3', 2: '原神', 3: '崩坏2', 4: '未定事件簿', 5: '大别野', 6: '崩坏: 星穹铁道', 8: '绝区零'}
         game_ids_abbr = {1: 'bh3', 2: 'ys', 3: 'bh2', 4: 'wd', 5: 'dby', 6: 'sr', 8: 'zzz'}
 
         tags = post['topics']
