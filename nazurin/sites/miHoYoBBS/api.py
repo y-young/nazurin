@@ -17,7 +17,7 @@ class miHoYoBBS(object):
                 data = await response.json()
                 if data['retcode'] != 0:
                     raise NazurinError(data['message'])
-    
+
                 post = data['data']['post']
                 return post
 
