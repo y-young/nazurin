@@ -6,6 +6,7 @@ import aiofiles.os
 import aiohttp
 
 from nazurin.config import TEMP_DIR
+from nazurin.utils.decorators import network_retry
 from nazurin.utils.helpers import ensure_existence, sanitize_filename
 
 @dataclass
@@ -31,6 +32,7 @@ class File:
             return True
         return False
 
+    @network_retry
     async def download(self, session: aiohttp.ClientSession):
         if await self.exists():
             return True

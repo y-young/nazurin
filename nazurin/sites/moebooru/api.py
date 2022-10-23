@@ -10,6 +10,7 @@ from pybooru import Moebooru as moebooru
 from nazurin.config import TEMP_DIR
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request, logger
+from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 from nazurin.utils.helpers import ensure_existence
 
@@ -21,6 +22,7 @@ class Moebooru:
         self.url = site_url
         return self
 
+    @network_retry
     async def get_post(self, post_id: int):
         url = 'https://' + self.url + '/post/show/' + str(post_id)
         async with Request() as request:
