@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import asyncio
 import shutil
 import traceback
 from html import escape
@@ -59,6 +60,9 @@ async def on_error(update: Update, exception: Exception):
             f'Response Error: {error.status} {error.message}')
     except NazurinError as error:
         await update.message.reply(error.msg)
+    except asyncio.TimeoutError:
+        traceback.print_exc()
+        await update.message.reply('Error: Timeout, please try again.')
     except Exception as error:  # pylint: disable=broad-except
         logger.error('Update %s caused %s: %s', update, type(error), error)
         traceback.print_exc()

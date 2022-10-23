@@ -1,3 +1,4 @@
+import asyncio
 import traceback
 
 import aiohttp_cors
@@ -32,6 +33,8 @@ class NazurinServer(web.Application):
         # pylint: disable=broad-except
         except Exception as error:
             traceback.print_exc()
+            if isinstance(error, asyncio.TimeoutError):
+                error = 'Timeout, please try again.'
             await self.bot.send_message(
                 config.ADMIN_ID, f'Error processing {url}: {str(error)}')
 
