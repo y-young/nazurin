@@ -6,6 +6,8 @@ from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
+from .config import DESTINATION
+
 class Twitter:
     @network_retry
     async def get_tweet(self, status_id: int):
@@ -44,6 +46,7 @@ class Twitter:
             imgs.append(
                 Image('twitter - ' + tweet['id_str'] + ' - ' + filename,
                       url,
+                      DESTINATION,
                       thumbnail,
                       width=photo['width'],
                       height=photo['height']))

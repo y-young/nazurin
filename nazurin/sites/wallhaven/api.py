@@ -6,7 +6,7 @@ from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
-from .config import API_KEY
+from .config import API_KEY, DESTINATION
 
 class Wallhaven:
     @network_retry
@@ -42,8 +42,9 @@ class Wallhaven:
         filename = os.path.basename(url)
         thumbnail = wallpaper['thumbs']['large']
         return [
-            Image(filename, url, thumbnail, wallpaper['file_size'],
-                  wallpaper['dimension_x'], wallpaper['dimension_y'])
+            Image(filename, url, DESTINATION, thumbnail,
+                  wallpaper['file_size'], wallpaper['dimension_x'],
+                  wallpaper['dimension_y'])
         ]
 
     @staticmethod

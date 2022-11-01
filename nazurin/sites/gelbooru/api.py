@@ -5,6 +5,8 @@ from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
 from nazurin.utils.exceptions import NazurinError
 
+from .config import DESTINATION
+
 class Gelbooru:
     async def get_post(self, post_id: int):
         """Fetch an post."""
@@ -34,6 +36,7 @@ class Gelbooru:
         imgs.append(
             Image(filename,
                   url,
+                  DESTINATION,
                   self.get_thumbnail(post),
                   width=post['width'],
                   height=post['height']))

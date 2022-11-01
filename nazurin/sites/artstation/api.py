@@ -6,6 +6,8 @@ from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
+from .config import DESTINATION
+
 class Artstation:
     @network_retry
     async def get_post(self, post_id: str):
@@ -40,6 +42,7 @@ class Artstation:
             imgs.append(
                 Image(f"ArtStation - {hash_id} - {filename}",
                       url,
+                      DESTINATION,
                       thumbnail,
                       width=asset['width'],
                       height=asset['height']))

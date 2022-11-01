@@ -10,6 +10,8 @@ from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
+from .config import DESTINATION
+
 class Lofter:
     @network_retry
     async def get_post(self, username: str, permalink: str) -> dict:
@@ -57,6 +59,7 @@ class Lofter:
             imgs.append(
                 Image(filename,
                       url,
+                      DESTINATION,
                       thumbnail=photo['orign'],
                       width=photo['rw'],
                       height=photo['rh']))

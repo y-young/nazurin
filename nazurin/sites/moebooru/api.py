@@ -12,7 +12,9 @@ from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request, logger
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
-from nazurin.utils.helpers import ensure_existence
+from nazurin.utils.helpers import ensure_existence_async, snake_to_pascal
+
+from .config import COLLECTIONS, DESTINATION
 
 class Moebooru:
     def __init__(self):
@@ -68,7 +70,7 @@ class Moebooru:
             else:
                 url = post['jpeg_url']
             name, _ = self.parse_url(url)
-            imgs.append(Image(name, url))
+            imgs.append(Image(name, url, self.file_destination))
         caption = Caption({
             'name': info['name'],
             'description': info['description']
@@ -78,7 +80,7 @@ class Moebooru:
     async def download_pool(self, pool_id, jpeg=False):
         imgs, caption = self.pool(pool_id, jpeg)
         pool_name = caption['name']
-        ensure_existence(os.path.join(TEMP_DIR, pool_name))
+        await ensure_existence_async(os.path.join(TEMP_DIR, pool_name))
         for key, img in enumerate(imgs):
             filename = str(key + 1)
             filename = '0' * (3 - len(filename)) + filename
@@ -87,13 +89,12 @@ class Moebooru:
             img.name = pool_name + '/' + img.name
             await img.download()  # TODO
 
-    @staticmethod
-    def get_images(post) -> List[Image]:
+    def get_images(self, post) -> List[Image]:
         file_url = post['file_url']
         name = unquote(os.path.basename(file_url))
         imgs = [
-            Image(name, file_url, post['sample_url'], post['file_size'],
-                  post['width'], post['height'])
+            Image(name, file_url, self.file_destination, post['sample_url'],
+                  post['file_size'], post['width'], post['height'])
         ]
         return imgs
 
@@ -122,3 +123,8 @@ class Moebooru:
     def parse_url(url: str) -> str:
         name = os.path.basename(url)
         return os.path.splitext(name)
+
+    @property
+    def file_destination(self) -> str:
+        site_name = snake_to_pascal(COLLECTIONS[self.url])
+        return DESTINATION.format(site_name=site_name, site_url=self.url)

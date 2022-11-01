@@ -5,11 +5,12 @@ from typing import List
 from mega import Mega as mega
 from mega.errors import RequestError
 
-from nazurin.config import NAZURIN_DATA, STORAGE_DIR, env
+from nazurin.config import NAZURIN_DATA, env
 from nazurin.database import Database
 from nazurin.models import File
 from nazurin.utils import logger
-from nazurin.utils.decorators import async_wrap
+from nazurin.utils.decorators import async_wrap, network_retry
+from nazurin.utils.exceptions import NazurinError
 
 MEGA_USER = env.str('MEGA_USER')
 MEGA_PASS = env.str('MEGA_PASS')
@@ -25,8 +26,8 @@ class Mega:
     api_login = async_wrap(api.login)
     api_upload = async_wrap(api.upload)
     create_folder = async_wrap(api.create_folder)
-    find_folder = async_wrap(api.find)
 
+    @network_retry
     async def login(self, initialize=False):
         await Mega.api_login(MEGA_USER, MEGA_PASS)
         if initialize:
@@ -52,37 +53,47 @@ class Mega:
                 Mega.api.master_key = tuple(tokens['master_key'])
                 Mega.api.root_id = tokens['root_id']
                 logger.info('MEGA logged in through cached tokens')
-                if 'destination' in tokens.keys():
-                    Mega.destination = tokens['destination']
-                    logger.info('MEGA retrieved destination from cache')
             else:  # Initialize database
                 await self.login(initialize=True)
-        if not Mega.destination:
-            await self.get_destination()
 
-    async def get_destination(self):
-        result = await Mega.find_folder(STORAGE_DIR, exclude_deleted=True)
-        if result:
-            Mega.destination = result[0]
-        else:
-            result = await Mega.create_folder(STORAGE_DIR)
-            Mega.destination = result[STORAGE_DIR]
-        await Mega.document.update({'destination': Mega.destination})
-        logger.info('MEGA destination cached')
-
-    async def upload(self, file: File):
-        while True:
-            try:
-                await Mega.api_upload(file.path, Mega.destination)
-                break
-            except RequestError as error:
-                # mega.errors.RequestError: ESID, Invalid or expired user session, please relogin
-                if 'relogin' in error.message:
-                    logger.info(error)
-                    Mega.api.sid = None
-                    await self.login()
+    @network_retry
+    async def upload(self,
+                     file: File,
+                     folders: dict = None,
+                     retry: bool = False):
+        path = file.destination.as_posix()
+        try:
+            destination = folders[
+                path] if folders else await self.ensure_existence(path)
+            await Mega.api_upload(file.path, destination)
+        except RequestError as error:
+            # mega.errors.RequestError: ESID, Invalid or expired user session, please relogin
+            if 'relogin' in error.message and not retry:
+                logger.info(error)
+                Mega.api.sid = None
+                await self.login()
+                await self.upload(file, folders, retry=True)
 
     async def store(self, files: List[File]):
         await self.require_auth()
-        tasks = [self.upload(file) for file in files]
+
+        # Create necessary folders in advance
+        destinations = {file.destination.as_posix() for file in files}
+        tasks = [
+            self.ensure_existence(destination) for destination in destinations
+        ]
+        logger.info("Creating folders: %s", destinations)
+        folder_ids = await asyncio.gather(*tasks)
+        folders = {}
+        for destination, folder_id in zip(destinations, folder_ids):
+            folders[destination] = folder_id
+
+        tasks = [self.upload(file, folders) for file in files]
         await asyncio.gather(*tasks)
+
+    @network_retry
+    async def ensure_existence(self, path: str) -> str:
+        result = await Mega.create_folder(path)
+        if result.get(path):
+            return result[path]
+        raise NazurinError('Failed to create folder: ' + path)

@@ -7,6 +7,8 @@ from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
+from .config import DESTINATION
+
 class Bilibili:
     @network_retry
     async def get_dynamic(self, dynamic_id: int):
@@ -50,6 +52,7 @@ class Bilibili:
                 Image(
                     str(dynamic_id) + '_' + str(index) + extension,
                     url,
+                    DESTINATION,
                     url + '@518w.jpg',
                     pic['img_size'] * 1024,  # size returned by API is in KB
                     pic['img_width'],

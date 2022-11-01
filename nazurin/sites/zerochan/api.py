@@ -9,6 +9,8 @@ from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 
+from .config import DESTINATION
+
 class Zerochan:
     @network_retry
     async def get_post(self, post_id: int):
@@ -63,8 +65,9 @@ class Zerochan:
         name = 'Zerochan ' + str(
             post['id']) + ' ' + post['name'] + '.' + post['file_ext']
         return [
-            Image(name, url, post['preview_file_url'], post['file_size'],
-                  int(post['image_width']), int(post['image_height']))
+            Image(name, url, DESTINATION, post['preview_file_url'],
+                  post['file_size'], int(post['image_width']),
+                  int(post['image_height']))
         ]
 
     @staticmethod

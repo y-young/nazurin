@@ -12,6 +12,8 @@ from nazurin.utils import Request, logger
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
+from .config import DESTINATION
+
 BASE_URL = "https://www.deviantart.com"
 
 class DeviantArt:
@@ -63,7 +65,7 @@ class DeviantArt:
         filename, url, thumbnail = self.parse_url(deviation)
         original_file = deviation['extended']['originalFile']
         imgs = [
-            Image(f"DeviantArt - {filename}", url, thumbnail,
+            Image(f"DeviantArt - {filename}", url, DESTINATION, thumbnail,
                   original_file['filesize'], original_file['width'],
                   original_file['height'])
         ]
@@ -93,7 +95,7 @@ class DeviantArt:
         pretty_name = deviation['media']['prettyName'] + os.path.splitext(
             filename)[1]
         token = self.generate_token(url.path)
-        return File(pretty_name, f"{url.geturl()}?token={token}")
+        return File(pretty_name, f"{url.geturl()}?token={token}", DESTINATION)
 
     @staticmethod
     def build_caption(deviation: dict) -> Caption:

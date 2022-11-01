@@ -10,6 +10,8 @@ from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
 from nazurin.utils.helpers import is_image
 
+from .config import DESTINATION
+
 class Danbooru:
     def __init__(self, site='danbooru'):
         """Set Danbooru site."""
@@ -54,8 +56,9 @@ class Danbooru:
         files = list()
         if is_image(url):
             imgs.append(
-                Image(filename, url, post['large_file_url'], post['file_size'],
-                      post['image_width'], post['image_height']))
+                Image(filename, url, DESTINATION, post['large_file_url'],
+                      post['file_size'], post['image_width'],
+                      post['image_height']))
         else:  # danbooru has non-image posts, such as #animated
             files.append(File(filename, url))
 
