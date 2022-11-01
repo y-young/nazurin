@@ -8,6 +8,7 @@ from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
+from .config import DESTINATION
 from .models import WeiboIllust, WeiboImage
 
 class Weibo:
@@ -43,6 +44,7 @@ class Weibo:
             imgs.append(
                 WeiboImage(f"Weibo - {mid} - {filename}",
                            url,
+                           DESTINATION,
                            thumbnail,
                            width=width,
                            height=height,

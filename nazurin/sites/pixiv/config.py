@@ -12,13 +12,17 @@ COLLECTION = 'pixiv'
 DOCUMENT = 'pixiv'
 
 with env.prefixed('PIXIV_'):
-    REFRESH_TOKEN = env.str('TOKEN', default=None)
+    REFRESH_TOKEN: str = env.str('TOKEN', default=None)
 
-    IMG_PROXY = env.str('MIRROR', default='i.pximg.net')
-    TRANSLATION = env.str('TRANSLATION', default=None)
-    BOOKMARK_PRIVACY = env.enum('BOOKMARK_PRIVACY',
-                                type=PixivPrivacy,
-                                default=PixivPrivacy.PUBLIC.value,
-                                ignore_case=True)
+    IMG_PROXY: str = env.str('MIRROR', default='i.pximg.net')
+    TRANSLATION: str = env.str('TRANSLATION', default=None)
+    BOOKMARK_PRIVACY: PixivPrivacy = env.enum(
+        'BOOKMARK_PRIVACY',
+        type=PixivPrivacy,
+        default=PixivPrivacy.PUBLIC.value,
+        ignore_case=True)
+
+    with env.prefixed('FILE_'):
+        DESTINATION: str = env.str('PATH', default='Pixiv')
 
 HEADERS = {'Referer': 'https://app-api.pixiv.net/'}

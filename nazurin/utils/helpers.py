@@ -1,15 +1,18 @@
 import os
+import pathlib
 import re
 from html import escape
 from mimetypes import guess_type
 from pathlib import Path
 from string import capwords
-from typing import List
+from typing import Callable, List
 
 import aiofiles
+import aiofiles.os
 from aiogram.types import Message
 from aiogram.utils.exceptions import (BadRequest, InvalidHTTPUrlContent,
                                       WrongFileIdentifier)
+
 from nazurin.models import Caption
 
 from . import logger
@@ -33,11 +36,19 @@ async def handle_bad_request(message: Message, error: BadRequest):
     else:
         raise error
 
+def sanitize_path_segment(segment: str) -> str:
+    """
+    Remove invalid characters from a path segment. e.g. `/\\<>:"|?*`.
+    """
+
+    segment = re.sub(r"[\"*/:<>?\\|]+", '_', segment)  # reserved characters
+    segment = re.sub(r"[\t\n\r\f\v]+", ' ', segment)
+    segment = re.sub(r"\u202E|\u200E|\u200F", '', segment)  # RTL marks
+    return segment
+
 def sanitize_filename(name: str) -> str:
     # https://docs.microsoft.com/zh-cn/windows/win32/fileio/naming-a-file
-    name = re.sub(r"[\"*/:<>?\\|]+", '_', name)  # reserved characters
-    name = re.sub(r"[\t\n\r\f\v]+", ' ', name)
-    name = re.sub(r"\u202E|\u200E|\u200F", '', name)  # RTL marks
+    name = sanitize_path_segment(name)
     filename, ext = os.path.splitext(name)
     filename = filename.strip()
     if Path(filename).is_reserved():
@@ -46,6 +57,22 @@ def sanitize_filename(name: str) -> str:
     if len(name) > 255:
         name = filename[:255 - len(ext)] + ext
     return name
+
+def sanitize_path(
+    path: os.PathLike,
+    sanitize: Callable[[str],
+                       str] = sanitize_path_segment) -> pathlib.PurePath:
+    """
+    Remove invalid characters from a path.
+    Apply `sanitize` function to every segment and join them as PurePath.
+    """
+
+    segments = pathlib.PurePath(path).parts
+    segments = [
+        sanitize(segment) if segment != "/" else segment
+        for segment in segments
+    ]
+    return pathlib.PurePath(*segments)
 
 def sanitize_caption(caption: Caption) -> str:
     content = caption.text
@@ -87,6 +114,10 @@ def is_image(url: str) -> bool:
 def ensure_existence(path: str):
     if not os.path.exists(path):
         os.makedirs(path)
+
+async def ensure_existence_async(path: str):
+    if not await aiofiles.os.path.exists(path):
+        await aiofiles.os.makedirs(path)
 
 def snake_to_pascal(name: str):
     """Convert snake_case to PascalCase"""

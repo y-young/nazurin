@@ -20,7 +20,8 @@ from nazurin.utils import Request, logger
 from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
 
-from .config import DOCUMENT, HEADERS, REFRESH_TOKEN, TRANSLATION, PixivPrivacy
+from .config import (DESTINATION, DOCUMENT, HEADERS, REFRESH_TOKEN,
+                     TRANSLATION, PixivPrivacy)
 from .models import PixivIllust, PixivImage
 
 class Pixiv:
@@ -107,8 +108,8 @@ class Pixiv:
         zip_url = url.replace('/img-original/', '/img-zip-ugoira/')
         zip_url = zip_url.split('_ugoira0')[0] + '_ugoira1920x1080.zip'
         filename = str(illust.id) + '_ugoira1920x1080.zip'
-        metafile = File(str(illust.id) + '_ugoira.json')
-        gif_zip = File(filename, zip_url)
+        metafile = File(str(illust.id) + '_ugoira.json', None, DESTINATION)
+        gif_zip = File(filename, zip_url, DESTINATION)
         files = [gif_zip, metafile]
         async with Request(headers=HEADERS) as session:
             await gif_zip.download(session)
@@ -182,7 +183,7 @@ class Pixiv:
                     'Failed to convert ugoira to mp4.') from None
 
         folder = ugoira_zip.name[:-4]
-        output_mp4 = File(folder + '.mp4')
+        output_mp4 = File(folder + '.mp4', None, DESTINATION)
         if await output_mp4.exists():
             return output_mp4
 
@@ -219,7 +220,8 @@ class Pixiv:
                 imgs.append(
                     PixivImage(name,
                                url,
-                               self.get_thumbnail(url),
+                               DESTINATION,
+                               thumbnail=self.get_thumbnail(url),
                                width=width,
                                height=height))
                 # For multi-page illusts, width & height will be the size of the first page,
@@ -231,7 +233,8 @@ class Pixiv:
             imgs.append(
                 PixivImage(name,
                            url,
-                           self.get_thumbnail(url),
+                           DESTINATION,
+                           thumbnail=self.get_thumbnail(url),
                            width=width,
                            height=height))
         return imgs

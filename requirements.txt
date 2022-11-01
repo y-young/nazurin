@@ -1,7 +1,7 @@
 aiogram~=2.20.0
 aiohttp~=3.8.0
 aiohttp_cors~=0.7.0
-aiofiles~=0.7.0
+aiofiles~=0.8.0
 aiojobs~=0.3.0
 tenacity~=5.1.5
 environs~=9.3.4
@@ -23,6 +23,6 @@ cloudant~=2.15.0
 
 # STORAGE
 # Mega:
-git+https://github.com/y-young/mega.py@7f061bb2#egg=mega.py
+git+https://github.com/y-young/mega.py@f8de74a#egg=mega.py
 # Google Drive:
 PyDrive2~=1.10.0

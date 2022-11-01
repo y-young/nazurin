@@ -1,6 +1,7 @@
 import asyncio
 import time
 from typing import List, Optional
+from urllib.parse import quote
 
 from nazurin.config import NAZURIN_DATA, STORAGE_DIR, env
 from nazurin.database import Database
@@ -8,7 +9,7 @@ from nazurin.models import File
 from nazurin.utils import Request, logger
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
-from nazurin.utils.helpers import read_by_chunks
+from nazurin.utils.helpers import read_by_chunks, sanitize_path
 
 OD_FOLDER = STORAGE_DIR
 OD_CLIENT = env.str('OD_CLIENT')
@@ -32,7 +33,7 @@ class OneDrive:
         # create drive item
         logger.info("Creating drive item...")
         create_file_url = 'https://graph.microsoft.com/v1.0/me/drive'\
-                          '/items/{parent_id}/children'.format(parent_id=self.folder_id)
+                          f'/items/root:{self.encode_path(file.destination)}:/children'
         size = await file.size()
         body = {
             "name": file.name,
@@ -51,12 +52,19 @@ class OneDrive:
 
     async def store(self, files: List[File]):
         await self.require_auth()
-        if not self.folder_id:
-            await self.get_destination()
+
+        # Create necessary folders in advance
+        destinations = {file.destination for file in files}
+        tasks = [
+            self.ensure_existence(destination) for destination in destinations
+        ]
+        logger.info("Creating folders: %s", destinations)
+        await asyncio.gather(*tasks)
 
         tasks = [self.upload(file) for file in files]
         await asyncio.gather(*tasks)
 
+    @network_retry
     async def find_folder(self, name: str) -> Optional[str]:
         await self.require_auth()
         # https://docs.microsoft.com/zh-cn/graph/api/driveitem-list-children?view=graph-rest-1.0&tabs=http
@@ -68,12 +76,36 @@ class OneDrive:
                 return folder['id']
         return None
 
-    async def create_folder(self, name: str) -> str:
+    @network_retry
+    async def create_folder(self, name: str, parent_id: str = 'root') -> str:
+        """
+        Create a folder in the given parent folder and return the ID of created folder.
+        If `parent_id` is not specified, the folder will be created at the root.
+
+        Docs:\
+        https://docs.microsoft.com/zh-cn/graph/api/driveitem-post-children?view=graph-rest-1.0&tabs=http
+        """
+
         await self.require_auth()
-        # https://docs.microsoft.com/zh-cn/graph/api/driveitem-post-children?view=graph-rest-1.0&tabs=http
-        url = 'https://graph.microsoft.com/v1.0/me/drive/root/children'
+        url = f'https://graph.microsoft.com/v1.0/me/drive/items/{parent_id}/children'
         body = {"name": name, "folder": {}}
         result = await self._request('POST', url, json=body)
+        return result['id']
+
+    @network_retry
+    async def ensure_existence(self, path: str):
+        """
+        Ensure the given path exists under `OD_FOLDER` and return the ID of the innermost folder.
+        If not, create the necessary folders.
+        """
+
+        path = self.encode_path(path)
+        await self.require_auth()
+        # Hack to create nested folders in one go
+        # https://stackoverflow.com/questions/56479865/creating-nested-folders-in-one-go-onedrive-api
+        url = f'https://graph.microsoft.com/v1.0/me/drive/items/root:{path}'
+        body = {"folder": {}, "@microsoft.graph.conflictBehavior": "replace"}
+        result = await self._request('PATCH', url, json=body)
         return result['id']
 
     async def require_auth(self):
@@ -98,6 +130,7 @@ class OneDrive:
             self.refresh_token = OD_RF_TOKEN
             await self.auth(initialize=True)
 
+    @network_retry
     async def auth(self, initialize=False):
         # https://docs.microsoft.com/zh-cn/azure/active-directory/develop/v2-oauth2-auth-code-flow
         url = 'https://login.microsoftonline.com/common/oauth2/v2.0/token'
@@ -131,6 +164,8 @@ class OneDrive:
             logger.info('OneDrive access token updated')
 
     async def get_destination(self):
+        if self.folder_id:
+            return
         # Try to find the folder and its id
         self.folder_id = await self.find_folder(OD_FOLDER)
         # Not found, create a new folder
@@ -146,6 +181,8 @@ class OneDrive:
         _headers['Content-Type'] = 'application/json'
         async with Request(headers=_headers) as session:
             async with session.request(method, url, **kwargs) as response:
+                if not response.ok:
+                    logger.info(await response.text())
                 response.raise_for_status()
                 if 'application/json' in response.headers['Content-Type']:
                     return await response.json()
@@ -191,3 +228,24 @@ class OneDrive:
         if headers:
             _headers.update(headers)
         return _headers
+
+    @staticmethod
+    def encode_path(_path: str) -> str:
+        """
+        Sanitize and encode the given path to a valid URL to address drive items.
+
+        Docs: https://learn.microsoft.com/en-us/graph/onedrive-addressing-driveitems
+        """
+        def sanitize(segment: str) -> str:
+            if segment.endswith('.'):
+                segment = segment[:-1]
+            if segment.startswith('~'):
+                segment = segment[1:]
+            if len(segment) == 0:
+                segment = '_'
+            return segment
+
+        path = sanitize_path(_path, sanitize)
+        if not path.root:
+            path = '/' / path
+        return quote(path.as_posix())
