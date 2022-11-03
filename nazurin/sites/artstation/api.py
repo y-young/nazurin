@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from typing import List, Tuple
 
 from nazurin.models import Caption, Illust, Image
@@ -6,7 +7,7 @@ from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
-from .config import DESTINATION
+from .config import DESTINATION, FILENAME
 
 class Artstation:
     @network_retry
@@ -32,21 +33,45 @@ class Artstation:
         if 'assets' not in post.keys():
             raise NazurinError('No asset found.')
         assets = sorted(post['assets'], key=lambda x: x['position'])
-        hash_id = post['hash_id']
         imgs = list()
+        index = 0
         for asset in assets:
             if asset['asset_type'] != 'image':
                 continue
             # https://cdnb.artstation.com/p/assets/images/images/042/908/363/large/_z-ed_-da.jpg?1635784439
-            filename, url, thumbnail = self.parse_url(asset['image_url'])
+            _, url, thumbnail = self.parse_url(asset['image_url'])
+            destination, filename = self.get_storage_dest(post, asset, index)
             imgs.append(
-                Image(f"ArtStation - {hash_id} - {filename}",
+                Image(filename,
                       url,
-                      DESTINATION,
+                      destination,
                       thumbnail,
                       width=asset['width'],
                       height=asset['height']))
+            index += 1
         return imgs
+
+    @staticmethod
+    def get_storage_dest(post: dict,
+                         asset: dict,
+                         index: int = 0) -> Tuple[str, str]:
+        """
+        Format destination and filename.
+        """
+
+        # https://cdnb.artstation.com/p/assets/images/images/042/908/363/large/_z-ed_-da.jpg?1635784439
+        filename = Artstation.parse_url(asset['image_url'])[0]
+        filename, ext = os.path.splitext(filename)
+        context = {
+            **post, 'created_at': datetime.fromisoformat(post['created_at']),
+            'updated_at': datetime.fromisoformat(post['updated_at']),
+            'asset': asset,
+            'filename': filename,
+            'extension': ext,
+            'index': index
+        }
+        return (DESTINATION.format_map(context),
+                FILENAME.format_map(context) + ext)
 
     @staticmethod
     def build_caption(post) -> Caption:
