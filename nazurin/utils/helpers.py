@@ -1,6 +1,7 @@
 import os
 import pathlib
 import re
+from datetime import datetime
 from html import escape
 from mimetypes import guess_type
 from pathlib import Path
@@ -129,3 +130,17 @@ async def read_by_chunks(path: str, chunk_size: int = 4 * 1024 * 1024):
         while chunk:
             yield chunk
             chunk = await f.read(chunk_size)
+
+def fromisoformat(date: str):
+    """
+    A polyfill for `datetime.fromisoformat` before Python 3.11.
+
+    Prior to Python 3.11, `datetime.fromisoformat` does not recognize
+    UTC timezone represented as 'Z'.
+
+    https://docs.python.org/3/library/datetime.html?highlight=fromisoformat#datetime.datetime.fromisoformat
+    """
+
+    if date.endswith('Z'):
+        date = date[:-1] + '+00:00'
+    return datetime.fromisoformat(date)

@@ -5,8 +5,9 @@ from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
+from nazurin.utils.helpers import fromisoformat
 
-from .config import DESTINATION
+from .config import DESTINATION, FILENAME
 
 class Twitter:
     @network_retry
@@ -41,16 +42,39 @@ class Twitter:
             raise NazurinError('No photo found.')
         photos = tweet['photos']
         imgs = list()
-        for photo in photos:
+        for index, photo in enumerate(photos):
             filename, url, thumbnail = self.parse_url(photo['url'])
+            destination, filename = self.get_storage_dest(
+                filename, tweet, index)
             imgs.append(
-                Image('twitter - ' + tweet['id_str'] + ' - ' + filename,
+                Image(filename,
                       url,
-                      DESTINATION,
+                      destination,
                       thumbnail,
                       width=photo['width'],
                       height=photo['height']))
         return imgs
+
+    @staticmethod
+    def get_storage_dest(filename: str,
+                         tweet: dict,
+                         index: int = 0) -> Tuple[str, str]:
+        """
+        Format destination and filename.
+        """
+        filename, extension = os.path.splitext(filename)
+        created_at = fromisoformat(tweet['created_at'])
+        context = {
+            **tweet,
+            # Original filename in twimg.com URL, without extension
+            'filename': filename,
+            # Photo index in a tweet
+            'index': index,
+            'created_at': created_at,
+            'extension': extension
+        }
+        return (DESTINATION.format_map(context),
+                FILENAME.format_map(context) + extension)
 
     @staticmethod
     def build_caption(tweet) -> Caption:
