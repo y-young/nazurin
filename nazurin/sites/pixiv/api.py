@@ -7,7 +7,8 @@ import shutil
 import subprocess
 import time
 import zipfile
-from typing import Callable, List
+from datetime import datetime
+from typing import Callable, List, Tuple
 
 import aiofiles
 import aiofiles.os
@@ -20,7 +21,7 @@ from nazurin.utils import Request, logger
 from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
 
-from .config import (DESTINATION, DOCUMENT, HEADERS, REFRESH_TOKEN,
+from .config import (DESTINATION, DOCUMENT, FILENAME, HEADERS, REFRESH_TOKEN,
                      TRANSLATION, PixivPrivacy)
 from .models import PixivIllust, PixivImage
 
@@ -214,13 +215,13 @@ class Pixiv:
         imgs = list()
         if illust.meta_pages:  # Contains more than one image
             pages = illust.meta_pages
-            for page in pages:
+            for idx, page in enumerate(pages):
                 url = page.image_urls.original
-                name = self.get_filename(url, illust)
+                destination, filename = self.get_storage_dest(url, illust, idx)
                 imgs.append(
-                    PixivImage(name,
+                    PixivImage(filename,
                                url,
-                               DESTINATION,
+                               destination,
                                thumbnail=self.get_thumbnail(url),
                                width=width,
                                height=height))
@@ -229,11 +230,11 @@ class Pixiv:
                 width = height = 0
         else:
             url = illust.meta_single_page.original_image_url
-            name = self.get_filename(url, illust)
+            destination, filename = self.get_storage_dest(url, illust)
             imgs.append(
-                PixivImage(name,
+                PixivImage(filename,
                            url,
-                           DESTINATION,
+                           destination,
                            thumbnail=self.get_thumbnail(url),
                            width=width,
                            height=height))
@@ -260,13 +261,28 @@ class Pixiv:
         return caption
 
     @staticmethod
-    def get_filename(url: str, illust) -> str:
+    def get_storage_dest(url: str,
+                         illust: dict,
+                         page: int = 0) -> Tuple[str, str]:
+        """
+        Format destination and filename.
+        """
+
         basename = os.path.basename(url)
         filename, extension = os.path.splitext(basename)
-        name = "%s - %s - %s(%d)%s" % (filename, illust.title,
-                                       illust.user.name, illust.user.id,
-                                       extension)
-        return name
+        # Convert string to datetime object so that we can use custom fomatting
+        # https://docs.python.org/3/library/string.html#format-string-syntax
+        create_date = datetime.fromisoformat(illust['create_date'])
+        context = {
+            # Original filename e.g. 12345678_p0
+            'filename': filename,
+            'page': page,
+            **illust,
+            'create_date': create_date,
+            'extension': extension
+        }
+        return (DESTINATION.format_map(context),
+                FILENAME.format_map(context) + extension)
 
     @staticmethod
     def get_thumbnail(url: str) -> str:
