@@ -11,14 +11,19 @@ class Twitter:
     async def get_tweet(self, status_id: int):
         """Get a tweet from API."""
         # Old: 'https://syndication.twitter.com/tweets.json?ids='+ status_id +'&lang=en'
-        api = 'https://cdn.syndication.twimg.com/tweet?id=' + str(
-            status_id) + '&lang=en'
+        API_URL = 'https://cdn.syndication.twimg.com/tweet-result'
+        params = {
+            'features': 'tfw_tweet_edit_backend:on',
+            'id': str(status_id),
+            'lang': 'en'
+        }
         async with Request() as request:
-            async with request.get(api) as response:
+            async with request.get(API_URL, params=params) as response:
                 if response.status == 404:
                     raise NazurinError('Tweet not found or unavailable.')
                 response.raise_for_status()
                 tweet = await response.json()
+                del tweet['__typename']
                 return tweet
 
     async def fetch(self, status_id: int) -> Illust:
