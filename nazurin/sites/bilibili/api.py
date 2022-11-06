@@ -1,13 +1,14 @@
 import json
 import os
-from typing import List
+from datetime import datetime
+from typing import List, Tuple
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
-from .config import DESTINATION
+from .config import DESTINATION, FILENAME
 
 class Bilibili:
     @network_retry
@@ -26,19 +27,32 @@ class Bilibili:
                 if data['code'] != 0:
                     raise NazurinError('Failed to get dynamic: ' +
                                        data['message'])
-        card = json.loads(data['data']['card']['card'])
+        card = data['data']['card']
+        desc = card['desc']
+        card = json.loads(card['card'])
+        card.update({
+            'type': desc['type'],
+            'dynamic_id_str': desc['dynamic_id_str'],
+            'view': desc['view'],
+            'repost': desc['repost'],
+            'comment': desc['comment'],
+            'like': desc['like'],
+            'timestamp': desc['timestamp'],
+        })
+        if 'vip' in card['user']:
+            del card['user']['vip']
         return card
 
     async def fetch(self, dynamic_id: int) -> Illust:
         """Fetch images and detail."""
         card = await self.get_dynamic(dynamic_id)
-        imgs = self.get_images(card, dynamic_id)
+        imgs = self.get_images(card)
         caption = self.build_caption(card)
         caption['url'] = f"https://t.bilibili.com/{dynamic_id}"
         return Illust(imgs, caption, card)
 
     @staticmethod
-    def get_images(card, dynamic_id: int) -> List[Image]:
+    def get_images(card) -> List[Image]:
         """Get all images in a dynamic card."""
         if 'item' not in card.keys() or 'pictures' not in card['item'].keys():
             raise NazurinError("No image found")
@@ -46,18 +60,42 @@ class Bilibili:
         imgs = list()
         for index, pic in enumerate(pics):
             url = pic['img_src']
-            basename = os.path.basename(url)
-            extension = os.path.splitext(basename)[1]
+            destination, filename = Bilibili.get_storage_dest(card, pic, index)
             imgs.append(
                 Image(
-                    str(dynamic_id) + '_' + str(index) + extension,
+                    filename,
                     url,
-                    DESTINATION,
+                    destination,
                     url + '@518w.jpg',
                     pic['img_size'] * 1024,  # size returned by API is in KB
                     pic['img_width'],
                     pic['img_height']))
         return imgs
+
+    @staticmethod
+    def get_storage_dest(card: dict,
+                         pic: dict,
+                         index: int = 0) -> Tuple[str, str]:
+        """
+        Format destination and filename.
+        """
+
+        url = pic['img_src']
+        timestamp = datetime.fromtimestamp(card['timestamp'])
+        basename = os.path.basename(url)
+        filename, extension = os.path.splitext(basename)
+        context = {
+            **card,
+            # Original filename, without extension
+            'filename': filename,
+            # Image index
+            'index': index,
+            'timestamp': timestamp,
+            'extension': extension,
+            'pic': pic
+        }
+        return (DESTINATION.format_map(context),
+                FILENAME.format_map(context) + extension)
 
     @staticmethod
     def build_caption(card) -> Caption:
