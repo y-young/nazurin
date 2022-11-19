@@ -8,3 +8,4 @@ with env.prefixed('WALLHAVEN_'):
 
     with env.prefixed('FILE_'):
         DESTINATION: str = env.str('PATH', default='Wallhaven')
+        FILENAME: str = env.str('NAME', default='{id}')

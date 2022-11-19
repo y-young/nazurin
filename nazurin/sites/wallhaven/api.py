@@ -1,12 +1,13 @@
 import os
-from typing import List
+from datetime import datetime
+from typing import List, Tuple
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
-from .config import API_KEY, DESTINATION
+from .config import API_KEY, DESTINATION, FILENAME
 
 class Wallhaven:
     @network_retry
@@ -39,13 +40,29 @@ class Wallhaven:
     @staticmethod
     def get_images(wallpaper) -> List[Image]:
         url = wallpaper['path']
-        filename = os.path.basename(url)
         thumbnail = wallpaper['thumbs']['large']
+        destination, filename = Wallhaven.get_storage_dest(wallpaper)
         return [
-            Image(filename, url, DESTINATION, thumbnail,
+            Image(filename, url, destination, thumbnail,
                   wallpaper['file_size'], wallpaper['dimension_x'],
                   wallpaper['dimension_y'])
         ]
+
+    @staticmethod
+    def get_storage_dest(wallpaper: dict) -> Tuple[str, str]:
+        """
+        Format destination and filename.
+        """
+
+        # Wallhaven uses UTC time
+        created_at = datetime.fromisoformat(wallpaper['created_at'] + "+00:00")
+        _, extension = os.path.splitext(os.path.basename(wallpaper['path']))
+        context = {
+            **wallpaper, 'created_at': created_at,
+            'extension': extension
+        }
+        filename = FILENAME.format_map(context)
+        return (DESTINATION.format_map(context), filename + extension)
 
     @staticmethod
     def build_caption(wallpaper) -> Caption:
