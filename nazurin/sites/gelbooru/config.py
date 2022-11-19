@@ -6,3 +6,4 @@ COLLECTION = 'gelbooru'
 with env.prefixed('GELBOORU_'):
     with env.prefixed('FILE_'):
         DESTINATION: str = env.str('PATH', default='Gelbooru')
+        FILENAME: str = env.str('NAME', default='{id}')

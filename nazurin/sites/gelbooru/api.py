@@ -1,11 +1,13 @@
-from typing import List, Optional
+import os
+from datetime import datetime
+from typing import List, Optional, Tuple
 from urllib.parse import urlparse
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
 from nazurin.utils.exceptions import NazurinError
 
-from .config import DESTINATION
+from .config import DESTINATION, FILENAME
 
 class Gelbooru:
     async def get_post(self, post_id: int):
@@ -30,17 +32,36 @@ class Gelbooru:
     def get_images(self, post) -> List[Image]:
         """Get images from post."""
         url = post['file_url']
-        ext = post['image'].split('.')[1]
-        filename = 'gelbooru - ' + str(post['id']) + '.' + ext
         imgs = list()
+        destination, filename = self.get_storage_dest(post)
         imgs.append(
             Image(filename,
                   url,
-                  DESTINATION,
+                  destination,
                   self.get_thumbnail(post),
                   width=post['width'],
                   height=post['height']))
         return imgs
+
+    @staticmethod
+    def get_storage_dest(post: dict) -> Tuple[str, str]:
+        """
+        Format destination and filename.
+        """
+
+        # Parse string like "Sat Oct 22 08:45:05 -0500 2022" into datetime
+        created_at = datetime.strptime(post['created_at'],
+                                       '%a %b %d %H:%M:%S %z %Y')
+        filename, extension = os.path.splitext(post['image'])
+        context = {
+            **post,
+            # Default filename (MD5), without extension
+            'filename': filename,
+            'created_at': created_at,
+            'extension': extension
+        }
+        filename = FILENAME.format_map(context)
+        return (DESTINATION.format_map(context), filename + extension)
 
     @staticmethod
     def build_caption(post) -> Caption:
