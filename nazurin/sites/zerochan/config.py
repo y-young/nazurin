@@ -6,3 +6,4 @@ COLLECTION = 'zerochan'
 with env.prefixed('ZEROCHAN_'):
     with env.prefixed('FILE_'):
         DESTINATION: str = env.str('PATH', default='Zerochan')
+        FILENAME: str = env.str('NAME', default='{id} - {name}')
