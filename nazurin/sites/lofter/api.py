@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 from typing import List, Tuple
 from urllib.parse import parse_qs, urlparse
 
@@ -10,7 +11,7 @@ from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
-from .config import DESTINATION
+from .config import DESTINATION, FILENAME
 
 class Lofter:
     @network_retry
@@ -54,16 +55,39 @@ class Lofter:
         imgs = list()
         for (index, photo) in enumerate(photos):
             url = photo['raw']
-            ext = os.path.splitext(url)[1]
-            filename = f"Lofter - {post['id']}_{index}{ext}"
+            filename = os.path.basename(url)
+            destination, filename = Lofter.get_storage_dest(
+                post, filename, index)
             imgs.append(
                 Image(filename,
                       url,
-                      DESTINATION,
+                      destination,
                       thumbnail=photo['orign'],
                       width=photo['rw'],
                       height=photo['rh']))
         return imgs
+
+    @staticmethod
+    def get_storage_dest(post: dict, filename: str,
+                         index: int) -> Tuple[str, str]:
+        """
+        Format destination and filename.
+        """
+
+        publish_time = datetime.fromtimestamp(post['publishTime'] / 1000)
+        filename, extension = os.path.splitext(filename)
+        context = {
+            **post,
+            # Default filename, without extension
+            'filename': filename,
+            'publishTime': publish_time,
+            'extension': extension,
+            'index': index,
+            'blogName': post['blogInfo']['blogName'],
+            'nickName': post['blogInfo']['blogNickName']
+        }
+        filename = FILENAME.format_map(context)
+        return (DESTINATION.format_map(context), filename + extension)
 
     @network_retry
     async def get_real_id(self, username: str,
