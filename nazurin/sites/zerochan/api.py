@@ -1,6 +1,7 @@
 import json
+import os
 from datetime import datetime, timezone
-from typing import List
+from typing import List, Tuple
 from urllib.parse import unquote
 
 from bs4 import BeautifulSoup
@@ -9,7 +10,7 @@ from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 
-from .config import DESTINATION
+from .config import DESTINATION, FILENAME
 
 class Zerochan:
     @network_retry
@@ -62,13 +63,31 @@ class Zerochan:
     @staticmethod
     def get_images(post) -> List[Image]:
         url = post['file_url']
-        name = 'Zerochan ' + str(
-            post['id']) + ' ' + post['name'] + '.' + post['file_ext']
+        destination, filename = Zerochan.get_storage_dest(post)
         return [
-            Image(name, url, DESTINATION, post['preview_file_url'],
+            Image(filename, url, destination, post['preview_file_url'],
                   post['file_size'], int(post['image_width']),
                   int(post['image_height']))
         ]
+
+    @staticmethod
+    def get_storage_dest(post: dict) -> Tuple[str, str]:
+        """
+        Format destination and filename.
+        """
+
+        created_at = datetime.fromtimestamp(post['created_at'])
+        filename, extension = os.path.splitext(
+            os.path.basename(post['file_url']))
+        context = {
+            **post,
+            'created_at': created_at,
+            # Original filename, without extension
+            'filename': filename,
+            'extension': extension
+        }
+        filename = FILENAME.format_map(context)
+        return (DESTINATION.format_map(context), filename + extension)
 
     @staticmethod
     def build_caption(post) -> Caption:
