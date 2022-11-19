@@ -7,8 +7,9 @@ from nazurin.models import Caption
 from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
+from nazurin.utils.helpers import fromasctimeformat
 
-from .config import DESTINATION
+from .config import DESTINATION, FILENAME
 from .models import WeiboIllust, WeiboImage
 
 class Weibo:
@@ -37,19 +38,36 @@ class Weibo:
         if 'pics' not in post.keys():
             raise NazurinError('No image found')
         pics = post['pics']
-        mid = post['mid']
         imgs = list()
-        for pic in pics:
-            filename, url, thumbnail, width, height = self.parse_pic(pic)
+        for index, pic in enumerate(pics):
+            url, thumbnail, width, height = self.parse_pic(pic)
+            destination, filename = self.get_storage_dest(post, pic, index)
             imgs.append(
-                WeiboImage(f"Weibo - {mid} - {filename}",
+                WeiboImage(filename,
                            url,
-                           DESTINATION,
+                           destination,
                            thumbnail,
                            width=width,
                            height=height,
-                           referer=f"https://m.weibo.cn/detail/{mid}"))
+                           referer=f"https://m.weibo.cn/detail/{post['mid']}"))
         return imgs
+
+    @staticmethod
+    def get_storage_dest(post: dict, pic: dict, index: int) -> Tuple[str, str]:
+        """
+        Format destination and filename.
+        """
+
+        created_at = fromasctimeformat(post['created_at'])
+        _, extension = os.path.splitext(os.path.basename(pic['url']))
+        context = {
+            **post, 'pic': pic,
+            'created_at': created_at,
+            'index': index,
+            'extension': extension
+        }
+        filename = FILENAME.format_map(context)
+        return (DESTINATION.format_map(context), filename + extension)
 
     def build_caption(self, post) -> Caption:
         user = post['user']
@@ -77,7 +95,7 @@ class Weibo:
 
     @staticmethod
     def parse_pic(pic: dict) -> Tuple[str, str, str, int, int]:
-        """Get filename, original file url & thumbnail url of the picture
+        """Get original file url & thumbnail url of the picture
 
         eg:
             {
@@ -101,7 +119,6 @@ class Weibo:
             }
 
             return:
-                '001Y6PUIgy1gvre6rshhbj61iv0zmdlw02.jpg',
                 'https://wx3.sinaimg.cn/large/001Y6PUIgy1gvre6rshhbj61iv0zmdlw02.jpg',
                 'https://wx3.sinaimg.cn/orj360/001Y6PUIgy1gvre6rshhbj61iv0zmdlw02.jpg',
                 1975,
@@ -109,11 +126,10 @@ class Weibo:
 
         """
         thumbnail = pic['url']
-        basename = os.path.basename(thumbnail)
         url = pic['large']['url']
         width = int(pic['large']['geo']['width'])
         height = int(pic['large']['geo']['height'])
-        return basename, url, thumbnail, width, height
+        return url, thumbnail, width, height
 
     @staticmethod
     def parse_html(html) -> dict:

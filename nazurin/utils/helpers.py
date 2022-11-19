@@ -144,3 +144,11 @@ def fromisoformat(date: str):
     if date.endswith('Z'):
         date = date[:-1] + '+00:00'
     return datetime.fromisoformat(date)
+
+def fromasctimeformat(date: str):
+    """
+    Convert a string in an asctime-like format (but with timezone)
+    to datetime object. e.g. "Sat Oct 22 08:45:05 -0500 2022"
+    """
+
+    return datetime.strptime(date, '%a %b %d %H:%M:%S %z %Y')

@@ -1,11 +1,11 @@
 import os
-from datetime import datetime
 from typing import List, Optional, Tuple
 from urllib.parse import urlparse
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
 from nazurin.utils.exceptions import NazurinError
+from nazurin.utils.helpers import fromasctimeformat
 
 from .config import DESTINATION, FILENAME
 
@@ -49,9 +49,7 @@ class Gelbooru:
         Format destination and filename.
         """
 
-        # Parse string like "Sat Oct 22 08:45:05 -0500 2022" into datetime
-        created_at = datetime.strptime(post['created_at'],
-                                       '%a %b %d %H:%M:%S %z %Y')
+        created_at = fromasctimeformat(post['created_at'])
         filename, extension = os.path.splitext(post['image'])
         context = {
             **post,
