@@ -10,3 +10,4 @@ COLLECTIONS = {
 with env.prefixed('MOEBOORU_'):
     with env.prefixed('FILE_'):
         DESTINATION: str = env.str('PATH', default='{site_name}')
+        FILENAME: str = env.str('NAME', default='{filename}')
