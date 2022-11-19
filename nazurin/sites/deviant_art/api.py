@@ -2,6 +2,7 @@ import binascii
 import json
 import os
 import re
+from datetime import datetime
 from http.cookies import SimpleCookie
 from typing import List, Optional, Tuple
 from urllib.parse import urlparse
@@ -12,7 +13,7 @@ from nazurin.utils import Request, logger
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
-from .config import DESTINATION
+from .config import DESTINATION, DOWNLOAD_FILENAME, FILENAME
 
 BASE_URL = "https://www.deviantart.com"
 
@@ -64,12 +65,43 @@ class DeviantArt:
         """Get images from deviation."""
         filename, url, thumbnail = self.parse_url(deviation)
         original_file = deviation['extended']['originalFile']
+        destination, filename = self.get_storage_dest(deviation, filename)
         imgs = [
-            Image(f"DeviantArt - {filename}", url, DESTINATION, thumbnail,
+            Image(filename, url, destination, thumbnail,
                   original_file['filesize'], original_file['width'],
                   original_file['height'])
         ]
         return imgs
+
+    @staticmethod
+    def get_storage_dest(deviation: dict,
+                         filename: str,
+                         is_download: bool = False) -> Tuple[str, str]:
+        """
+        Format destination and filename.
+
+        Download files is distinguished through `is_download`,
+        and will be formatted using another template.
+        """
+
+        time_string = deviation['publishedTime']
+        # Insert a colon in time offset otherwise datetime won't recognize it
+        # e.g. 2009-09-09T06:26:37-0700 -> 2009-09-09T06:26:37-07:00
+        time_string = f"{time_string[0:-2]}:{time_string[-2:]}"
+        published_time = datetime.fromisoformat(time_string)
+
+        filename, extension = os.path.splitext(filename)
+        context = {
+            **deviation,
+            # Default filename (UUID), without extension
+            # For human-friendly name of download file, use `prettyName`
+            'filename': filename,
+            'publishedTime': published_time,
+            'extension': extension
+        }
+        filename = (DOWNLOAD_FILENAME
+                    if is_download else FILENAME).format_map(context)
+        return (DESTINATION.format_map(context), filename + extension)
 
     async def get_download(self, deviation: dict) -> Optional[File]:
         if not deviation['isDownloadable']:
@@ -92,10 +124,13 @@ class DeviantArt:
         url = url._replace(netloc=url.netloc.replace('images-wixmp-',
                                                      'wixmp-'),
                            path=f"/f/{author_uuid}/{filename}")
-        pretty_name = deviation['media']['prettyName'] + os.path.splitext(
-            filename)[1]
         token = self.generate_token(url.path)
-        return File(pretty_name, f"{url.geturl()}?token={token}", DESTINATION)
+
+        # Duplicate attribute on top level for convenience
+        deviation['prettyName'] = deviation['media']['prettyName']
+        destination, filename = self.get_storage_dest(deviation, filename,
+                                                      True)
+        return File(filename, f"{url.geturl()}?token={token}", destination)
 
     @staticmethod
     def build_caption(deviation: dict) -> Caption:
@@ -121,9 +156,7 @@ class DeviantArt:
         for type_ in media['types']:
             types[type_['t']] = type_
 
-        filename = f"{deviation['title']} - {deviation['deviationId']}"
-        filename += os.path.splitext(base_uri)[1]
-
+        filename = os.path.basename(base_uri)
         path = urlparse(base_uri).path
 
         token = tokens[0] if len(tokens) > 0 else ''
