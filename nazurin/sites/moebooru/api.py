@@ -1,6 +1,7 @@
 import json
 import os
-from typing import List, Optional
+from datetime import datetime
+from typing import List, Optional, Tuple
 from urllib.parse import unquote
 
 from aiohttp.client_exceptions import ClientResponseError
@@ -14,7 +15,7 @@ from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 from nazurin.utils.helpers import ensure_existence_async, snake_to_pascal
 
-from .config import COLLECTIONS, DESTINATION
+from .config import COLLECTIONS, DESTINATION, FILENAME
 
 class Moebooru:
     def __init__(self):
@@ -70,7 +71,8 @@ class Moebooru:
             else:
                 url = post['jpeg_url']
             name, _ = self.parse_url(url)
-            imgs.append(Image(name, url, self.file_destination))
+            destination, filename = self.get_storage_dest(post, name)
+            imgs.append(Image(filename, url, destination))
         caption = Caption({
             'name': info['name'],
             'description': info['description']
@@ -91,12 +93,36 @@ class Moebooru:
 
     def get_images(self, post) -> List[Image]:
         file_url = post['file_url']
-        name = unquote(os.path.basename(file_url))
+        name, _ = self.parse_url(file_url)
+        destination, filename = self.get_storage_dest(post, name)
         imgs = [
-            Image(name, file_url, self.file_destination, post['sample_url'],
+            Image(filename, file_url, destination, post['sample_url'],
                   post['file_size'], post['width'], post['height'])
         ]
         return imgs
+
+    def get_storage_dest(self, post: dict, filename: str) -> Tuple[str, str]:
+        """
+        Format destination and filename.
+        """
+
+        # `updated_at` is only available on yande.re, so we won't cover it here
+        created_at = datetime.fromtimestamp(post['created_at'])
+        filename, extension = os.path.splitext(filename)
+        # Site name in pascal case, i.e. Yandere, Konachan, Lolibooru
+        site_name = snake_to_pascal(COLLECTIONS[self.url])
+        context = {
+            **post,
+            # Original filename, without extension
+            # Format may differ from site to site
+            'filename': filename,
+            'created_at': created_at,
+            'extension': extension,
+            'site_name': site_name,
+            'site_url': self.url
+        }
+        filename = FILENAME.format_map(context)
+        return (DESTINATION.format_map(context), filename + extension)
 
     def build_caption(self, post, tags) -> Caption:
         """Build media caption from an post."""
@@ -120,11 +146,10 @@ class Moebooru:
         return caption
 
     @staticmethod
-    def parse_url(url: str) -> str:
-        name = os.path.basename(url)
-        return os.path.splitext(name)
+    def parse_url(url: str) -> Tuple[str, str]:
+        """
+        Parse filename and extension from url.
+        """
 
-    @property
-    def file_destination(self) -> str:
-        site_name = snake_to_pascal(COLLECTIONS[self.url])
-        return DESTINATION.format(site_name=site_name, site_url=self.url)
+        name = unquote(os.path.basename(url))
+        return name, os.path.splitext(name)[1]
