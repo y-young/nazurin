@@ -1,4 +1,6 @@
+import os
 import re
+from datetime import datetime
 from os import path
 from typing import List, Optional, Tuple
 
@@ -10,7 +12,7 @@ from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
 from nazurin.utils.helpers import is_image
 
-from .config import DESTINATION
+from .config import DESTINATION, FILENAME
 
 class Danbooru:
     def __init__(self, site='danbooru'):
@@ -55,8 +57,9 @@ class Danbooru:
         imgs = list()
         files = list()
         if is_image(url):
+            destination, filename = self.get_storage_dest(post, filename)
             imgs.append(
-                Image(filename, url, DESTINATION, post['large_file_url'],
+                Image(filename, url, destination, post['large_file_url'],
                       post['file_size'], post['image_width'],
                       post['image_height']))
         else:  # danbooru has non-image posts, such as #animated
@@ -80,8 +83,32 @@ class Danbooru:
         return Illust(imgs, caption, post, files)
 
     @staticmethod
+    def get_storage_dest(post: dict, filename: str) -> Tuple[str, str]:
+        """
+        Format destination and filename.
+        """
+
+        created_at = datetime.fromisoformat(post['created_at'])
+        updated_at = datetime.fromisoformat(post['updated_at'])
+        filename, extension = os.path.splitext(filename)
+        context = {
+            **post,
+            # Human-friendly filename, without extension
+            'filename': filename,
+            'created_at': created_at,
+            'updated_at': updated_at,
+            'extension': extension
+        }
+        return (DESTINATION.format_map(context),
+                FILENAME.format_map(context) + extension)
+
+    @staticmethod
     def _get_names(post) -> Tuple[str, str]:
-        """Build title and filename."""
+        """
+        Build title and filename like that one when downloading on the website,
+        usually in the form of "{characters} ({copyrights}) drawn by {artists}".
+        """
+
         characters = Danbooru._format_characters(post['tag_string_character'])
         copyrights = Danbooru._format_copyrights(post['tag_string_copyright'])
         artists = Danbooru._format_artists(post['tag_string_artist'])
@@ -97,8 +124,7 @@ class Danbooru:
         title = filename
         if artists:
             filename += 'drawn by ' + artists
-        filename = 'danbooru ' + str(post['id']) + ' ' + filename + extension
-        return title, filename
+        return title, filename + extension
 
     @staticmethod
     def _format_characters(characters: str) -> str:
