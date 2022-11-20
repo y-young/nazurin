@@ -32,7 +32,7 @@ class Gelbooru:
     def get_images(self, post) -> List[Image]:
         """Get images from post."""
         url = post['file_url']
-        imgs = list()
+        imgs = []
         destination, filename = self.get_storage_dest(post)
         imgs.append(
             Image(filename,

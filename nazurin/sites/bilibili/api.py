@@ -57,7 +57,7 @@ class Bilibili:
         if 'item' not in card.keys() or 'pictures' not in card['item'].keys():
             raise NazurinError("No image found")
         pics = card['item']['pictures']
-        imgs = list()
+        imgs = []
         for index, pic in enumerate(pics):
             url = pic['img_src']
             destination, filename = Bilibili.get_storage_dest(card, pic, index)

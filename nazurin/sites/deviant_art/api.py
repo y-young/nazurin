@@ -152,7 +152,7 @@ class DeviantArt:
         media = deviation['media']
         base_uri = media['baseUri']
         tokens = media['token'] if 'token' in media.keys() else []
-        types = dict()
+        types = {}
         for type_ in media['types']:
             types[type_['t']] = type_
 

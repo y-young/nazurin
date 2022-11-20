@@ -52,7 +52,7 @@ class Lofter:
             raise NazurinError('No images found')
 
         photos = json.loads(post['photoLinks'])
-        imgs = list()
+        imgs = []
         for (index, photo) in enumerate(photos):
             url = photo['raw']
             filename = os.path.basename(url)

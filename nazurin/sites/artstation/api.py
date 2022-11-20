@@ -33,7 +33,7 @@ class Artstation:
         if 'assets' not in post.keys():
             raise NazurinError('No asset found.')
         assets = sorted(post['assets'], key=lambda x: x['position'])
-        imgs = list()
+        imgs = []
         index = 0
         for asset in assets:
             if asset['asset_type'] != 'image':

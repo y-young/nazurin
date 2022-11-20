@@ -38,7 +38,7 @@ class Weibo:
         if 'pics' not in post.keys():
             raise NazurinError('No image found')
         pics = post['pics']
-        imgs = list()
+        imgs = []
         for index, pic in enumerate(pics):
             url, thumbnail, width, height = self.parse_pic(pic)
             destination, filename = self.get_storage_dest(post, pic, index)

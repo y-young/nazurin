@@ -93,7 +93,7 @@ def get_urls_from_message(message: Message) -> List[str]:
         return []
     # Telegram counts entity offset and length in UTF-16 code units
     text = text.encode('utf-16-le')
-    urls = list()
+    urls = []
     for item in entities:
         if item.type == 'text_link':
             urls.append(item.url)

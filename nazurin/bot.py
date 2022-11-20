@@ -34,7 +34,7 @@ class NazurinBot(Bot):
                                 chat_id: int,
                                 reply_to: Optional[int] = None):
         await self.send_chat_action(chat_id, ChatActions.UPLOAD_PHOTO)
-        media = list()
+        media = []
         for img in imgs:
             media.append(InputMediaPhoto(await img.display_url()))  # TODO
         media[0].caption = caption
@@ -47,7 +47,7 @@ class NazurinBot(Bot):
                           chat_id: int,
                           reply_to: Optional[int] = None):
         caption = sanitize_caption(illust.caption)
-        groups = list()
+        groups = []
         imgs = illust.images
         if len(imgs) == 0:
             raise NazurinError('No image to send, try download option.')

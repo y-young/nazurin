@@ -10,7 +10,7 @@ class Request(ClientSession):
                  timeout=ClientTimeout(total=TIMEOUT),
                  **kwargs):
         if not headers:
-            headers = dict()
+            headers = {}
         headers.update({'User-Agent': UA})
         connector = None
         if PROXY:
