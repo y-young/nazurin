@@ -30,7 +30,7 @@ class Artstation:
 
     def get_images(self, post) -> List[Image]:
         """Get images from post."""
-        if 'assets' not in post.keys():
+        if 'assets' not in post:
             raise NazurinError('No asset found.')
         assets = sorted(post['assets'], key=lambda x: x['position'])
         imgs = []

@@ -48,7 +48,7 @@ class Lofter:
     @staticmethod
     def get_images(post: dict) -> List[Image]:
         """Get images from post."""
-        if 'photoLinks' not in post.keys():
+        if 'photoLinks' not in post:
             raise NazurinError('No images found')
 
         photos = json.loads(post['photoLinks'])

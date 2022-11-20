@@ -26,7 +26,7 @@ class Wallhaven:
                         'Please ensure that you have set a valid API key.')
                 response.raise_for_status()
                 wallpaper = await response.json()
-                if 'error' in wallpaper.keys():
+                if 'error' in wallpaper:
                     raise NazurinError(wallpaper['error'])
                 return wallpaper['data']
 

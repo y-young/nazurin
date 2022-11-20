@@ -52,7 +52,7 @@ class Image(File):
         async with Request(**kwargs) as request:
             async with request.head(self.url) as response:
                 headers = response.headers
-                if 'Content-Length' in headers.keys():
+                if 'Content-Length' in headers:
                     self._size = int(headers['Content-Length'])
                     logger.info('Got image size: %s', self._size)
                 else:

@@ -21,8 +21,8 @@ class Bilibili:
                 response.raise_for_status()
                 data = await response.json()
                 # For some IDs, the API returns code 0 but empty content
-                if data['code'] == 500207 or (data['code'] == 0 and 'card'
-                                              not in data['data'].keys()):
+                if data['code'] == 500207 or (data['code'] == 0
+                                              and 'card' not in data['data']):
                     raise NazurinError('Dynamic not found')
                 if data['code'] != 0:
                     raise NazurinError('Failed to get dynamic: ' +
@@ -54,7 +54,7 @@ class Bilibili:
     @staticmethod
     def get_images(card) -> List[Image]:
         """Get all images in a dynamic card."""
-        if 'item' not in card.keys() or 'pictures' not in card['item'].keys():
+        if 'item' not in card or 'pictures' not in card['item']:
             raise NazurinError("No image found")
         pics = card['item']['pictures']
         imgs = []
