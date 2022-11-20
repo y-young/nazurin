@@ -45,7 +45,7 @@ class OneDrive:
         # create upload session
         logger.info("Creating upload session...")
         create_session_url = 'https://graph.microsoft.com/v1.0/me/drive'\
-                             '/items/{item_id}/createUploadSession'.format(item_id=response['id'])
+                             f'/items/{response["id"]}/createUploadSession'
         response = await self._request('POST', create_session_url)
         # upload
         await self.stream_upload(file, response['uploadUrl'])
