@@ -3,10 +3,12 @@ import os
 import re
 from typing import List, Tuple
 
-from nazurin.models import Caption, Illust, Image
+from nazurin.models import Caption
 from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
+
+from .models import WeiboIllust, WeiboImage
 
 class Weibo:
     @network_retry
@@ -20,13 +22,16 @@ class Weibo:
                 post = self.parse_html(html)
                 return post
 
-    async def fetch(self, post_id: str) -> Illust:
+    async def fetch(self, post_id: str) -> WeiboIllust:
         post = await self.get_post(post_id)
         imgs = self.get_images(post)
         caption = self.build_caption(post)
-        return Illust(imgs, caption, post)
+        return WeiboIllust(imgs,
+                           caption,
+                           post,
+                           referer=f"https://m.weibo.cn/detail/{post_id}")
 
-    def get_images(self, post) -> List[Image]:
+    def get_images(self, post) -> List[WeiboImage]:
         """Get images from post."""
         if 'pics' not in post.keys():
             raise NazurinError('No image found')
@@ -36,11 +41,12 @@ class Weibo:
         for pic in pics:
             filename, url, thumbnail, width, height = self.parse_pic(pic)
             imgs.append(
-                Image(f"Weibo - {mid} - {filename}",
-                      url,
-                      thumbnail,
-                      width=width,
-                      height=height))
+                WeiboImage(f"Weibo - {mid} - {filename}",
+                           url,
+                           thumbnail,
+                           width=width,
+                           height=height,
+                           referer=f"https://m.weibo.cn/detail/{mid}"))
         return imgs
 
     def build_caption(self, post) -> Caption:

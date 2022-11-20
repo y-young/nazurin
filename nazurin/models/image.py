@@ -26,7 +26,7 @@ class Image(File):
             )
         self._chosen_url = self.url
         if self.thumbnail:
-            # For safety reasons, use thumbnail when image size is unkown
+            # For safety reasons, use thumbnail when image size is unknown
             if (not self.width) or (
                     not self.height) or self.width + self.height > 10000:
                 self._chosen_url = self.thumbnail
@@ -42,21 +42,19 @@ class Image(File):
                         size, self._chosen_url)
         return self._chosen_url
 
-    async def size(self) -> int:
+    async def size(self, **kwargs) -> int:
         self._size = self._size or await super().size()
         if self._size:
             return self._size
-        async with Request(
-                headers={'Referer': 'https://www.pixiv.net/'}) as request:
+        async with Request(**kwargs) as request:
             async with request.head(self.url) as response:
                 headers = response.headers
-
-        if 'Content-Length' in headers.keys():
-            self._size = int(headers['Content-Length'])
-            logger.info('Got image size: %s', self._size)
-        else:
-            logger.info('Failed to get image size')
-        return self._size
+                if 'Content-Length' in headers.keys():
+                    self._size = int(headers['Content-Length'])
+                    logger.info('Got image size: %s', self._size)
+                else:
+                    logger.info('Failed to get image size')
+                return self._size
 
     def set_size(self, value: int):
         self._size = value
