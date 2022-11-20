@@ -34,7 +34,7 @@ class Zerochan:
             datetime.strptime(info['datePublished'],
                               '%c').replace(tzinfo=timezone.utc).timestamp())
         size = int(info['contentSize'][:-2]) * 1024
-        tags = dict()
+        tags = {}
         for tag in soup.find('ul', id='tags').find_all('li'):
             tag_type = ' '.join(tag['class']).title()
             tag_name = unquote(tag.find('a')['href'][1:]).replace('+', '_')

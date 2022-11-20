@@ -13,7 +13,7 @@ class Ugoira(Illust):
         self.video = video
         self.caption = caption or Caption()
         self.metadata = metadata
-        self.files = files or list()
+        self.files = files or []
 
     @property
     def all_files(self):

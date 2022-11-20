@@ -8,7 +8,7 @@ from nazurin.utils import logger
 
 class Storage:
     """Storage manager."""
-    disks = list()
+    disks = []
 
     def load(self):
         """Dynamically load all storage drivers."""

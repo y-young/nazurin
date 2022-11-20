@@ -41,7 +41,7 @@ class Twitter:
         if 'photos' not in tweet.keys():
             raise NazurinError('No photo found.')
         photos = tweet['photos']
-        imgs = list()
+        imgs = []
         for index, photo in enumerate(photos):
             filename, url, thumbnail = self.parse_url(photo['url'])
             destination, filename = self.get_storage_dest(

@@ -64,7 +64,7 @@ class Moebooru:
         client = moebooru(self.site)
         info = client.pool_posts(id=pool_id)
         posts = info['posts']
-        imgs = list()
+        imgs = []
         for post in posts:
             if not jpeg:
                 url = post['file_url']

@@ -54,8 +54,8 @@ class Danbooru:
         url = post['file_url']
         artists = post['tag_string_artist']
         title, filename = self._get_names(post)
-        imgs = list()
-        files = list()
+        imgs = []
+        files = []
         if is_image(url):
             destination, filename = self.get_storage_dest(post, filename)
             imgs.append(

@@ -13,8 +13,8 @@ class SiteManager:
     """Site plugin manager."""
     def __init__(self):
         """Initialize."""
-        self.sites = dict()
-        self.sources = list()
+        self.sites = {}
+        self.sources = []
 
     def load(self):
         """Dynamically load all site plugins."""

@@ -212,7 +212,7 @@ class Pixiv:
         """Get images from an artwork."""
         width = illust.width
         height = illust.height
-        imgs = list()
+        imgs = []
         if illust.meta_pages:  # Contains more than one image
             pages = illust.meta_pages
             for idx, page in enumerate(pages):
