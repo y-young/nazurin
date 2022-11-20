@@ -35,7 +35,7 @@ class Danbooru:
             # pylint: disable=protected-access
             if 'Not Found' in err._msg:
                 raise NazurinError('Post not found') from None
-        if 'file_url' not in post.keys():
+        if 'file_url' not in post:
             raise NazurinError(
                 'You may need a gold account to view this post\nSource: ' +
                 post['source'])

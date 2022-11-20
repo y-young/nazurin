@@ -38,7 +38,7 @@ class Twitter:
 
     def get_images(self, tweet) -> List[Image]:
         """Get all images in a tweet."""
-        if 'photos' not in tweet.keys():
+        if 'photos' not in tweet:
             raise NazurinError('No photo found.')
         photos = tweet['photos']
         imgs = []

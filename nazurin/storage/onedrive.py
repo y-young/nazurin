@@ -117,7 +117,7 @@ class OneDrive:
         credentials = await self.document.get()
         if credentials:
             self.refresh_token = credentials['refresh_token']
-            if 'folder_id' in credentials.keys():
+            if 'folder_id' in credentials:
                 self.folder_id = credentials['folder_id']
             if credentials['expires_at'] > time.time():
                 self.access_token = credentials['access_token']
@@ -143,7 +143,7 @@ class OneDrive:
         async with Request() as request:
             async with request.post(url, data=data) as response:
                 response = await response.json()
-                if 'error' in response.keys():
+                if 'error' in response:
                     logger.error(response)
                     raise NazurinError(
                         f"OneDrive authorization error: {response['error_description']}"

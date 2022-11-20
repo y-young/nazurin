@@ -78,7 +78,7 @@ class Pixiv:
     async def get_artwork(self, artwork_id: int):
         """Fetch an artwork."""
         response = await self.call(Pixiv.illust_detail, artwork_id)
-        if 'illust' in response.keys():
+        if 'illust' in response:
             illust = response.illust
         else:
             error = response.error
@@ -125,7 +125,7 @@ class Pixiv:
                        privacy: PixivPrivacy = PixivPrivacy.PUBLIC):
         response = await self.call(Pixiv.illust_bookmark_add, artwork_id,
                                    privacy.value)
-        if 'error' in response.keys():
+        if 'error' in response:
             logger.error(response)
             raise NazurinError(response.error.user_message
                                or response.error.message)

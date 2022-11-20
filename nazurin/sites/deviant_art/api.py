@@ -41,7 +41,7 @@ class DeviantArt:
                 response.raise_for_status()
 
                 data = await response.json()
-                if "error" in data.keys():
+                if "error" in data:
                     logger.error(data)
                     # If CSRF token is invalid, try to get a new one
                     if data.get('errorDetails',
@@ -139,7 +139,7 @@ class DeviantArt:
             'author': f"#{deviation['author']['username']}",
             'url': deviation['url']
         })
-        if 'tags' in deviation['extended'].keys():
+        if 'tags' in deviation['extended']:
             caption['tags'] = ' '.join(
                 ["#" + tag['name'] for tag in deviation['extended']['tags']])
         return caption
@@ -151,7 +151,7 @@ class DeviantArt:
 
         media = deviation['media']
         base_uri = media['baseUri']
-        tokens = media['token'] if 'token' in media.keys() else []
+        tokens = media['token'] if 'token' in media else []
         types = {}
         for type_ in media['types']:
             types[type_['t']] = type_
@@ -162,12 +162,12 @@ class DeviantArt:
         token = tokens[0] if len(tokens) > 0 else ''
         if path.startswith('/f/'):
             url = f"{base_uri}?token={self.generate_token(path)}"
-            if 'fullview' in types.keys():
+            if 'fullview' in types:
                 thumbnail = types['fullview']
                 # Sometimes fullview has no subpath but there're two tokens,
                 # in that case the base_uri should be used along with the second token
                 # e.g. https://www.deviantart.com/exitmothership/art/Unfold-879580475
-                if 'c' not in thumbnail.keys() and len(tokens) > 1:
+                if 'c' not in thumbnail and len(tokens) > 1:
                     thumbnail['c'] = ''
                     token = tokens[1]
             else:

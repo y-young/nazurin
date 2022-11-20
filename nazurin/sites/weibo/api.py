@@ -35,7 +35,7 @@ class Weibo:
 
     def get_images(self, post) -> List[WeiboImage]:
         """Get images from post."""
-        if 'pics' not in post.keys():
+        if 'pics' not in post:
             raise NazurinError('No image found')
         pics = post['pics']
         imgs = []
@@ -85,7 +85,7 @@ class Weibo:
 
     @staticmethod
     def get_tags(post) -> List[str]:
-        if 'text' not in post.keys() or not post['text']:
+        if 'text' not in post or not post['text']:
             return []
         regex = r"#(\S+)#"
         matches = re.findall(regex, post['text'], re.MULTILINE)

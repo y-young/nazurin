@@ -48,7 +48,7 @@ class Mega:
     async def require_auth(self):
         if not Mega.api.sid:
             tokens = await Mega.document.get()
-            if tokens and 'sid' in tokens.keys():
+            if tokens and 'sid' in tokens:
                 Mega.api.sid = tokens['sid']
                 Mega.api.master_key = tuple(tokens['master_key'])
                 Mega.api.root_id = tokens['root_id']
