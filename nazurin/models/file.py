@@ -22,6 +22,10 @@ class File:
         return os.path.join(TEMP_DIR, self.name)
 
     async def size(self):
+        """
+        Get file size in bytes
+        """
+
         if os.path.exists(self.path):
             stat = await aiofiles.os.stat(self.path)
             return stat.st_size

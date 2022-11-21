@@ -48,8 +48,11 @@ class Bilibili:
             extension = os.path.splitext(basename)[1]
             imgs.append(
                 Image(
-                    str(dynamic_id) + '_' + str(index) + extension, url,
-                    url + '@518w.jpg', pic['img_size'], pic['img_width'],
+                    str(dynamic_id) + '_' + str(index) + extension,
+                    url,
+                    url + '@518w.jpg',
+                    pic['img_size'] * 1024,  # size returned by API is in KB
+                    pic['img_width'],
                     pic['img_height']))
         return imgs
 

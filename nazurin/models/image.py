@@ -9,6 +9,9 @@ from .file import File
 class Image(File):
     thumbnail: str = None
     _size: int = None
+    """
+    File size in bytes
+    """
     width: int = 0
     height: int = 0
     _chosen_url: str = None
@@ -56,5 +59,12 @@ class Image(File):
                     logger.info('Failed to get image size')
                 return self._size
 
+    def __post_init__(self):
+        if self._size:
+            self.set_size(self._size)
+        return super().__post_init__()
+
     def set_size(self, value: int):
-        self._size = value
+        if value % 1 != 0:
+            raise TypeError('Image size must be an integer')
+        self._size = int(value)

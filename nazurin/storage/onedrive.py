@@ -155,6 +155,8 @@ class OneDrive:
         @network_retry
         async def upload_chunk(url: str, chunk: bytes):
             async with session.put(url, data=chunk) as response:
+                if not response.ok:
+                    logger.info(await response.text())
                 response.raise_for_status()
 
         # Must be a multiple of 320 KB
