@@ -67,8 +67,10 @@ async def on_error(update: Update, exception: Exception):
         logger.error('Update %s caused %s: %s', update, type(error), error)
         traceback.print_exc()
         if not isinstance(error, TelegramAPIError):
-            await update.message.reply('Error: ' +
-                                       escape(str(error), quote=False))
+            error_type = type(error).__name__
+            error_msg = escape(str(error), quote=False)
+            await update.message.reply(f'Error: ({error_type}) {error_msg}')
+
     return True
 
 def main():
