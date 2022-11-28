@@ -28,7 +28,7 @@ class File:
         return os.path.join(TEMP_DIR, self.name)
 
     @property
-    def destination(self) -> os.PathLike:
+    def destination(self) -> pathlib.Path:
         """
         Destination directory in storage, without file name,
         as relative path to `STORAGE_DIR` (should not begin with `/`),
