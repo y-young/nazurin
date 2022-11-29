@@ -7,7 +7,7 @@ from nazurin.config import NAZURIN_DATA, STORAGE_DIR, env
 from nazurin.database import Database
 from nazurin.models import File
 from nazurin.utils import Request, logger
-from nazurin.utils.decorators import network_retry
+from nazurin.utils.decorators import Cache, network_retry
 from nazurin.utils.exceptions import NazurinError
 from nazurin.utils.helpers import read_by_chunks, sanitize_path
 
@@ -93,6 +93,7 @@ class OneDrive:
         return result['id']
 
     @network_retry
+    @Cache.lru()
     async def ensure_existence(self, path: str):
         """
         Ensure the given path exists under `OD_FOLDER` and return the ID of the innermost folder.

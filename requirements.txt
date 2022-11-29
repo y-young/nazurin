@@ -5,6 +5,7 @@ aiofiles~=0.8.0
 aiojobs~=0.3.0
 tenacity~=5.1.5
 environs~=9.3.4
+async_lru~=1.0.3
 
 pixivpy~=3.5.11
 beautifulsoup4~=4.10.0
