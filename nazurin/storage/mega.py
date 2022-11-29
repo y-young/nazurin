@@ -9,7 +9,7 @@ from nazurin.config import NAZURIN_DATA, env
 from nazurin.database import Database
 from nazurin.models import File
 from nazurin.utils import logger
-from nazurin.utils.decorators import async_wrap, network_retry
+from nazurin.utils.decorators import Cache, async_wrap, network_retry
 from nazurin.utils.exceptions import NazurinError
 
 MEGA_USER = env.str('MEGA_USER')
@@ -92,6 +92,7 @@ class Mega:
         await asyncio.gather(*tasks)
 
     @network_retry
+    @Cache.lru()
     async def ensure_existence(self, path: str) -> str:
         result = await Mega.create_folder(path)
         if result.get(path):

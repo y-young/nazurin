@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import asyncio
+import os
 import shutil
 import traceback
 from html import escape
@@ -11,7 +12,7 @@ from aiohttp import ClientResponseError
 
 from nazurin import config, dp
 from nazurin.utils import logger
-from nazurin.utils.decorators import chat_action
+from nazurin.utils.decorators import Cache, chat_action
 from nazurin.utils.exceptions import NazurinError
 
 @dp.message_handler(commands=['start', 'help'])
@@ -43,7 +44,9 @@ async def ping(message: Message):
 @dp.message_handler(IDFilter(config.ADMIN_ID), commands=['clear_cache'])
 async def clear_cache(message: Message):
     try:
-        shutil.rmtree(config.TEMP_DIR)
+        if os.path.exists(config.TEMP_DIR):
+            shutil.rmtree(config.TEMP_DIR)
+        Cache.clear()
         await message.reply("Cache cleared successfully.")
     except PermissionError:
         await message.reply("Permission denied.")

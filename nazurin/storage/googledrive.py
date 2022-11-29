@@ -11,7 +11,7 @@ from pydrive2.drive import GoogleDriveFile
 from nazurin.config import STORAGE_DIR, env
 from nazurin.models import File
 from nazurin.utils import logger
-from nazurin.utils.decorators import async_wrap
+from nazurin.utils.decorators import Cache, async_wrap
 from nazurin.utils.exceptions import NazurinError
 
 GD_FOLDER = env.str('GD_FOLDER')
@@ -79,6 +79,7 @@ class GoogleDrive:
 
     @staticmethod
     @async_wrap
+    @Cache.lru()
     def find_folder(name: str, parent: str = None) -> str:
         query = {
             'q': f"mimeType='{FOLDER_MIME}' and "\

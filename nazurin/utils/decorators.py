@@ -1,4 +1,5 @@
 import asyncio
+import functools
 import logging
 from functools import partial, wraps
 
@@ -6,6 +7,7 @@ import tenacity
 from aiogram.types import ChatActions, Message
 from aiogram.utils.exceptions import RetryAfter
 from aiohttp import ClientError, ClientResponseError
+from async_lru import alru_cache
 from tenacity import retry_if_exception, stop_after_attempt, wait_exponential
 
 from nazurin import config
@@ -71,3 +73,25 @@ def retry_after(func):
                 await asyncio.sleep(error.timeout + 1)
 
     return decorator
+
+class Cache:
+    cached_functions = []
+
+    @staticmethod
+    def lru(*args, **kwargs):
+        """Least-recently-used cache decorator."""
+        def decorator(func):
+            if asyncio.iscoroutinefunction(func):
+                func = alru_cache(cache_exceptions=False, *args,
+                                  **kwargs)(func)
+            else:
+                func = functools.lru_cache(*args, **kwargs)(func)
+            Cache.cached_functions.append(func)
+            return func
+
+        return decorator
+
+    @staticmethod
+    def clear():
+        for func in Cache.cached_functions:
+            func.cache_clear()
