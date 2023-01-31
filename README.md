@@ -39,6 +39,7 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 |       Weibo       |      <https://weibo.com/>      |          |      ✔     |
 |     DeviantArt    |  <https://www.deviantart.com/> |          |      ✔     |
 |       Lofter      |    <https://www.lofter.com/>   |          |      ✔     |
+|     miHoYo BBS    |    <https://bbs.mihoyo.com/>   |          |      ✔     |
 
 ### Supported Databases
 
