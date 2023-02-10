@@ -1,0 +1,6 @@
+nav:
+  - ... | regex=index(.zh)?.md
+  - Getting Started: getting-started
+  - site
+  - storage
+  - database
