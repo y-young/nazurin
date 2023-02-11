@@ -31,3 +31,4 @@ pylint --output-format="colorized" "$2" "$1"
 exit_code=$?
 
 echo "Pylint exited with code $exit_code"
+exit $exit_code

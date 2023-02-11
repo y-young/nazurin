@@ -34,5 +34,5 @@ jobs:
       - name: Lint
         uses: ./.github/actions/pylint
         with:
-          python-root-list: "./nazurin"
-          extra-pylint-options: --fail-on=F,E
+          python-root-list: ./nazurin
+          extra-pylint-options: --fail-on=F,E --fail-under=9.5
