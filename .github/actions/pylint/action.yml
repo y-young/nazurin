@@ -23,13 +23,18 @@ runs:
     - name: Windows install pylint
       if: ${{ runner.os == 'Windows' }}
       run: |
+        echo "::group::Install pylint"
         pip install pylint==${{ inputs.pylint-version }}
         echo "path_sep=" >> $GITHUB_ENV
+        echo "::endgroup::"
       shell: pwsh
 
     - name: Posix install pylint
       if: ${{ runner.os != 'Windows' }}
-      run: pip install pylint==${{ inputs.pylint-version }}
+      run: |
+        echo "::group::Install pylint"
+        pip install pylint==${{ inputs.pylint-version }}
+        echo "::endgroup::"
       shell: bash
 
     - name: Lint on Windows

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Parameters
 #
@@ -27,7 +27,7 @@ export TERM=xterm
 
 echo "Running: pylint $2 $1"
 
-pylint --output-format="colorized" $2 $1
+pylint --output-format="colorized" "$2" "$1"
 exit_code=$?
 
 echo "Pylint exited with code $exit_code"
