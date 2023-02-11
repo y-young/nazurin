@@ -35,6 +35,7 @@ class NazurinBot(Bot):
                                 reply_to: Optional[int] = None):
         await self.send_chat_action(chat_id, ChatActions.UPLOAD_PHOTO)
         media = []
+        # test pylint
         for img in imgs:
             media.append(InputMediaPhoto(await img.display_url()))  # TODO
         media[0].caption = caption
