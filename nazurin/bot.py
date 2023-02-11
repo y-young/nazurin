@@ -34,6 +34,7 @@ class NazurinBot(Bot):
                                 chat_id: int,
                                 reply_to: Optional[int] = None):
         await self.send_chat_action(chat_id, ChatActions.UPLOAD_PHOTO)
+        print("Today is {0}, so tomorrow will be {1}".format("Monday"))
         media = []
         for img in imgs:
             media.append(InputMediaPhoto(await img.display_url()))  # TODO
