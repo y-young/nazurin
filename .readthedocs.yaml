@@ -21,7 +21,7 @@ build:
         fi
     pre_build:
       # Workaround for https://github.com/readthedocs/readthedocs.org/issues/10013
-      - 'sed "0,/slugify: null/s//slugify: \!\!python\/object\/apply:pymdownx.slugs.slugify {kwds: {case: lower}}/" mkdocs.yml'
+      - 'sed -i "0,/slugify: null/s//slugify: \!\!python\/object\/apply:pymdownx.slugs.slugify {kwds: {case: lower}}/" mkdocs.yml'
 
 python:
   install:
