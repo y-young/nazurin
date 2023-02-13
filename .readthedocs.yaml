@@ -8,20 +8,22 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.8"
-  jobs:
-    post_checkout:
-      # Cancel building pull requests when there aren't changed in the docs directory or YAML file.
-      #
-      # If there are no changes (git diff exits with 0) we force the command to return with 183.
-      # This is a special exit code on Read the Docs that will cancel the build immediately.
-      - |
-        if [ "$READTHEDOCS_VERSION_TYPE" = "external" ] && git diff --quiet origin/master -- docs/ mkdocs.yml .readthedocs.yaml;
-        then
-          exit 183;
-        fi
-    pre_build:
-      # Workaround for https://github.com/readthedocs/readthedocs.org/issues/10013
-      - 'sed -i "0,/slugify: null/s//slugify: \!\!python\/object\/apply:pymdownx.slugs.slugify {kwds: {case: lower}}/" mkdocs.yml'
+  # jobs:
+  #   post_checkout:
+  #     # Cancel building pull requests when there aren't changed in the docs directory or YAML file.
+  #     #
+  #     # If there are no changes (git diff exits with 0) we force the command to return with 183.
+  #     # This is a special exit code on Read the Docs that will cancel the build immediately.
+  #     - |
+  #       if [ "$READTHEDOCS_VERSION_TYPE" = "external" ] && git diff --quiet origin/master -- docs/ mkdocs.yml .readthedocs.yaml;
+  #       then
+  #         exit 183;
+  #       fi
+  # Workaround for https://github.com/readthedocs/readthedocs.org/issues/10013
+  commands:
+    - pip install mkdocs
+    - pip install -r docs/requirements.txt
+    - mkdocs build --clean --site-dir ./_readthedocs/html --config-file mkdocs.yml
 
 python:
   install:
