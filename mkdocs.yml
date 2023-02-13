@@ -1,9 +1,13 @@
 site_name: Nazurin
+repo_url: https://github.com/y-young/nazurin
+repo_name: y-young/nazurin
 
 theme:
   name: material
   logo: assets/icon.svg
   favicon: assets/favicon.ico
+  icon:
+    repo: fontawesome/brands/github
   palette:
     - scheme: default
       toggle:
@@ -18,6 +22,8 @@ theme:
     - navigation.top
     - navigation.tracking
     - search.highlight
+    - content.action.edit
+    - content.action.view
 extra_css:
   - stylesheets/extra.css
 
@@ -36,6 +42,8 @@ plugins:
           Storage: 存储
           Database: 数据库
   - search
+  - git-revision-date-localized:
+      enable_creation_date: true
 
 markdown_extensions:
   - admonition
