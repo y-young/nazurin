@@ -8,7 +8,6 @@
 echo "python-root-list:          $1"
 echo "extra-pylint-options:      $2"
 
-# actions path has the copy of this actions repo
 echo "Running on $RUNNER_OS"
 if [ "$RUNNER_OS" = 'Windows' ]
 then
@@ -25,9 +24,12 @@ done
 echo "TERM: changing from $TERM -> xterm"
 export TERM=xterm
 
-echo "Running: pylint $2 $1"
+# Split the extra options into an array
+read -r -a extra_options <<< "$2"
 
-pylint --output-format="colorized" "$2" "$1"
+echo "Running: pylint ${extra_options[@]} $1"
+
+pylint --output-format="colorized" "${extra_options[@]}" "$1"
 exit_code=$?
 
 echo "Pylint exited with code $exit_code"
