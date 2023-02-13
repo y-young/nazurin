@@ -34,7 +34,7 @@ jobs:
           pip install -r requirements.txt
           echo "::endgroup::"
       - name: Lint
-        uses: ./.github/actions/pylint
+        uses: y-young/python-lint-annotate@v1
         with:
           python-root-list: ./nazurin
           extra-pylint-options: --fail-on=F,E --fail-under=9.5
