@@ -1,6 +1,5 @@
 site_name: Nazurin
-repo_url: https://github.com/y-young/nazurin
-repo_name: y-young/nazurin
+repo_url: https://github.com/y-young/nazurin/
 
 theme:
   name: material
