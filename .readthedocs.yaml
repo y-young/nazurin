@@ -21,9 +21,12 @@ build:
   #       fi
   # Workaround for https://github.com/readthedocs/readthedocs.org/issues/10013
   commands:
-    - pip install mkdocs
-    - pip install -r docs/requirements.txt
-    - mkdocs build --clean --site-dir ./_readthedocs/html --config-file mkdocs.yml
+    - python3.8 -mvirtualenv $READTHEDOCS_VIRTUALENV_PATH
+    - $READTHEDOCS_VIRTUALENV_PATH/bin/python -m pip install mkdocs
+    - $READTHEDOCS_VIRTUALENV_PATH/bin/python -m pip install -r docs/requirements.txt
+    - cat ./docs/includes/readthedocs.yml >> mkdocs.yml
+    - cat mkdocs.yml
+    - $READTHEDOCS_VIRTUALENV_PATH/bin/python -m mkdocs build --clean --site-dir ./_readthedocs/html --config-file mkdocs.yml
 
 python:
   install:
