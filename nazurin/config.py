@@ -28,7 +28,7 @@ NAZURIN_DATA = 'nazurin'
 # Ignored items in image caption
 CAPTION_IGNORE = env.list('CAPTION_IGNORE', subcast=str, default=[])
 
-GALLERY_ID = env.int('GALLERY_ID')
+GALLERY_ID = env.int('GALLERY_ID', default=None)
 
 ADMIN_ID = env.int('ADMIN_ID')
 IS_PUBLIC = env.bool('IS_PUBLIC', default=False)

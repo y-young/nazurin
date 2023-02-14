@@ -112,18 +112,23 @@ class NazurinBot(Bot):
         illust = await self.sites.handle_update(result)
 
         # Send / Forward to gallery & Save to album
-        # If there're multiple images, then send a new message instead of
-        # forwarding an existing one, since we currently can't forward albums correctly.
-        if message and message.is_forward(
-        ) and not illust.has_multiple_images():
-            save = asyncio.create_task(message.forward(config.GALLERY_ID))
-        elif not illust.has_image():
-            save = asyncio.create_task(
-                self.send_message(config.GALLERY_ID, '\n'.join(urls)))
-        else:
-            save = asyncio.create_task(
-                self.send_illust(illust, message, config.GALLERY_ID))
         download = asyncio.create_task(illust.download())
-        await asyncio.gather(save, download)
+
+        if config.GALLERY_ID:
+            # If there're multiple images, then send a new message instead of
+            # forwarding an existing one, since we currently can't forward albums correctly.
+            if message and message.is_forward(
+            ) and not illust.has_multiple_images():
+                save = asyncio.create_task(message.forward(config.GALLERY_ID))
+            elif not illust.has_image():
+                save = asyncio.create_task(
+                    self.send_message(config.GALLERY_ID, '\n'.join(urls)))
+            else:
+                save = asyncio.create_task(
+                    self.send_illust(illust, message, config.GALLERY_ID))
+            await asyncio.gather(save, download)
+        else:
+            await download
+
         await self.storage.store(illust)
         return True
