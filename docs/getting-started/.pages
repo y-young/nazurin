@@ -1,0 +1,5 @@
+nav:
+  - ... | regex=configuration(.zh)?.md
+  - ... | regex=deploy(.zh)?.md
+  - ... | regex=usage(.zh)?.md
+  - ... | regex=upgrade-from-v1-to-v2(.zh)?.md

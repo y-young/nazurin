@@ -1,0 +1,64 @@
+site_name: Nazurin
+repo_url: https://github.com/y-young/nazurin/
+
+theme:
+  name: material
+  logo: assets/icon.svg
+  favicon: assets/favicon.ico
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - content.action.edit
+    - content.action.view
+extra_css:
+  - stylesheets/extra.css
+
+plugins:
+  - awesome-pages
+  - i18n:
+      default_language: en
+      languages:
+        en: English
+        zh: 中文（简体）
+      nav_translations:
+        zh:
+          Home: 首页
+          Getting Started: 开始使用
+          Site: 图源
+          Storage: 存储
+          Database: 数据库
+  - search
+  - git-revision-date-localized:
+      enable_creation_date: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - toc:
+      permalink: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - def_list
