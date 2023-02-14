@@ -1,11 +1,5 @@
 :root,
 [data-md-color-scheme="default"] {
-  /* --md-primary-fg-color: #ff724b;
-  --md-primary-fg-color--light: #ffb89c;
-  --md-primary-fg-color--dark: #b33822;
-
-  --md-accent-fg-color: #e84824; */
-
   --md-primary-fg-color: #ff5a2d;
   --md-primary-fg-color--light: #ffa480;
   --md-primary-fg-color--dark: #b3270e;
