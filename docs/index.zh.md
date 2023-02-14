@@ -15,11 +15,11 @@ title: 首页
 
 ## 功能特性
 
-- View/Download artwork from [various sites](#支持的图源网站)
-- Add images to your collection via Telegram
-- Store your collection in Telegram channels
-- Store images on [multiple types](#支持的存储方式) of storage
-- Store image metadata in [multiple types](#支持的数据库) of database
+- 从 [各种网站](#支持的图源网站) 浏览和下载图片
+- 通过 Telegram 将图片添加到你的收藏中
+- 将图片收藏保存在 Telegram 频道中
+- 使用 [多种方式](#支持的存储方式) 存储图片
+- 使用 [多种数据库](#支持的数据库) 存储图片元数据
 
 ### 支持的图源网站
 
