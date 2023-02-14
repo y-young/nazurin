@@ -61,15 +61,14 @@ class Bilibili:
         for index, pic in enumerate(pics):
             url = pic['img_src']
             destination, filename = Bilibili.get_storage_dest(card, pic, index)
+            size = pic['img_size'] * 1024  # size returned by API is in KB
+            # Sometimes it returns a wrong size that is not in whole bytes,
+            # in this case we just ignore it.
+            if size % 1 != 0:
+                size = None
             imgs.append(
-                Image(
-                    filename,
-                    url,
-                    destination,
-                    url + '@518w.jpg',
-                    pic['img_size'] * 1024,  # size returned by API is in KB
-                    pic['img_width'],
-                    pic['img_height']))
+                Image(filename, url, destination, url + '@518w.jpg', size,
+                      pic['img_width'], pic['img_height']))
         return imgs
 
     @staticmethod
