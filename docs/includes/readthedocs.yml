@@ -1,8 +1,0 @@
-extra_css:
-  - stylesheets/extra.css
-  - /_/static/css/badge_only.css
-  - /_/static/css/readthedocs-doc-embed.css
-extra_javascript:
-  - readthedocs-data.js
-  - /_/static/core/js/readthedocs-doc-embed.js
-  - /_/static/javascript/readthedocs-analytics.js
