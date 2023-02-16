@@ -4,7 +4,7 @@
 ![](https://img.shields.io/badge/python->%3D%203.7-blue)
 ![](https://img.shields.io/badge/-Telegram-blue.svg?logo=telegram)
 
-English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
+[Documentation](https://nazurin.readthedocs.io/) | [中文文档](https://nazurin.readthedocs.io/zh/)
 
 小さな小さな賢将, a Telegram bot that helps you collect ACG illustrations from various sites.
 
@@ -14,60 +14,60 @@ English | [中文](https://blog.gpx.moe/2020/07/20/nazurin/)
 
 ## Features
 
--   View/Download artwork from [various sites](#supported-sites)
--   Add images to your collection via Telegram
--   Store your collection in Telegram channels
--   Store images on [multiple types](#supported-storage) of storage
--   Store image metadata in [multiple types](#supported-databases) of database
+- View/Download artwork from [various sites](#supported-sites)
+- Add images to your collection via Telegram
+- Store your collection in Telegram channels
+- Store images on [multiple types](#supported-storage) of storage
+- Store image metadata in [multiple types](#supported-databases) of database
 
 ### Supported Sites
 
-|        Name       |               URL              | Commands | Collection |
+|       Name        |              URL               | Commands | Collection |
 | :---------------: | :----------------------------: | :------: | :--------: |
-|       Pixiv       |    <https://www.pixiv.net/>    |     ✔    |      ✔     |
-|      Danbooru     |  <https://danbooru.donmai.us/> |     ✔    |      ✔     |
-|     Safebooru     | <https://safebooru.donmai.us/> |          |      ✔     |
-|      yandere      |       <https://yande.re/>      |     ✔    |      ✔     |
-|      Konachan     |     <https://konachan.com/>    |     ✔    |      ✔     |
-|     Lolibooru     |    <https://lolibooru.moe/>    |          |      ✔     |
-|      Zerochan     |   <https://www.zerochan.net/>  |     ✔    |      ✔     |
-|      Gelbooru     |     <https://gelbooru.com/>    |          |      ✔     |
-|      Twitter      |     <https://twitter.com/>     |          |      ✔     |
-|     ArtStation    |  <https://www.artstation.com/> |          |      ✔     |
-|     Wallhaven     |     <https://wallhaven.cc/>    |          |      ✔     |
-| Bilibili Dynamics |    <https://t.bilibili.com/>   |          |      ✔     |
-|       Weibo       |      <https://weibo.com/>      |          |      ✔     |
-|     DeviantArt    |  <https://www.deviantart.com/> |          |      ✔     |
-|       Lofter      |    <https://www.lofter.com/>   |          |      ✔     |
+|       Pixiv       |    <https://www.pixiv.net/>    |    ✔     |     ✔      |
+|     Danbooru      | <https://danbooru.donmai.us/>  |    ✔     |     ✔      |
+|     Safebooru     | <https://safebooru.donmai.us/> |          |     ✔      |
+|      yandere      |      <https://yande.re/>       |    ✔     |     ✔      |
+|     Konachan      |    <https://konachan.com/>     |    ✔     |     ✔      |
+|     Lolibooru     |    <https://lolibooru.moe/>    |          |     ✔      |
+|     Zerochan      |  <https://www.zerochan.net/>   |    ✔     |     ✔      |
+|     Gelbooru      |    <https://gelbooru.com/>     |          |     ✔      |
+|      Twitter      |     <https://twitter.com/>     |          |     ✔      |
+|    ArtStation     | <https://www.artstation.com/>  |          |     ✔      |
+|     Wallhaven     |    <https://wallhaven.cc/>     |          |     ✔      |
+| Bilibili Dynamics |   <https://t.bilibili.com/>    |          |     ✔      |
+|       Weibo       |      <https://weibo.com/>      |          |     ✔      |
+|    DeviantArt     | <https://www.deviantart.com/>  |          |     ✔      |
+|      Lofter       |   <https://www.lofter.com/>    |          |     ✔      |
 
 ### Supported Databases
 
-|   Driver  |                          URL                         |                           Usage                           |           Note          |
-| :-------: | :--------------------------------------------------: | :-------------------------------------------------------: | :---------------------: |
-|   TinyDB  | <https://tinydb.readthedocs.io/en/stable/index.html> |   [Wiki](https://github.com/y-young/nazurin/wiki/TinyDB)  |         Default         |
-| Firestore |   <https://firebase.google.com/products/firestore>   | [Wiki](https://github.com/y-young/nazurin/wiki/Firestore) |                         |
-|  MongoDB  |              <https://www.mongodb.com/>              |  [Wiki](https://github.com/y-young/nazurin/wiki/MongoDB)  | MongoDB Atlas supported |
-|  Cloudant |         <https://www.ibm.com/cloud/cloudant>         |  [Wiki](https://github.com/y-young/nazurin/wiki/Cloudant) |                         |
+|                           Driver                            |                             Usage                              | Config Value |                           Note                           |
+| :---------------------------------------------------------: | :------------------------------------------------------------: | :----------: | :------------------------------------------------------: |
+|     [TinyDB](https://tinydb.readthedocs.io/en/latest/)      |    [TinyDB](https://nazurin.readthedocs.io/database/tinydb)    |   `Local`    |                         Default                          |
+| [Firestore](https://firebase.google.com/products/firestore) | [Firestore](https://nazurin.readthedocs.io/database/firestore) |  `Firebase`  |                                                          |
+|             [MongoDB](https://www.mongodb.com/)             |   [MongoDB](https://nazurin.readthedocs.io/database/mongodb)   |   `Mongo`    | [MongoDB Atlas](https://www.mongodb.com/atlas) supported |
+|       [Cloudant](https://www.ibm.com/cloud/cloudant)        |  [Cloudant](https://nazurin.readthedocs.io/database/cloudant)  |  `Cloudant`  |                                                          |
 
 You can also implement your own database driver by creating a file under `database` folder, and set this option to the name of driver class.
 
 ### Supported Storage
 
-|     Name     |              URL             |                             Usage                            |     Note    |
-| :----------: | :--------------------------: | :----------------------------------------------------------: | :---------: |
-|     Local    |                              |                     Set `STORAGE = Local`                    |   Default   |
-|   Telegram   |    <https://telegram.org/>   |   [Wiki](https://github.com/y-young/nazurin/wiki/Telegram)   | Added in v2 |
-|     MEGA     |      <https://mega.nz/>      |     [Wiki](https://github.com/y-young/nazurin/wiki/MEGA)     |             |
-| Google Drive |  <https://drive.google.com/> | [Wiki](https://github.com/y-young/nazurin/wiki/Google-Drive) |             |
-|   OneDrive   | <https://onedrive.live.com/> |   [Wiki](https://github.com/y-young/nazurin/wiki/OneDrive)   |             |
+|                                          Name                                           |                                Usage                                | Config Value  |    Note     |
+| :-------------------------------------------------------------------------------------: | :-----------------------------------------------------------------: | :-----------: | :---------: |
+|                                          Local                                          |        [Local](https://nazurin.readthedocs.io/storage/local)        |    `Local`    |   Default   |
+|                            [Telegram](https://telegram.org/)                            |     [Telegram](https://nazurin.readthedocs.io/storage/telegram)     |  `Telegram`   | Added in v2 |
+|                                [MEGA](https://mega.io/)                                 |         [MEGA](https://nazurin.readthedocs.io/storage/mega)         |    `Mega`     |             |
+|                        [Google Drive](https://drive.google.com/)                        | [Google Drive](https://nazurin.readthedocs.io/storage/google-drive) | `GoogleDrive` |             |
+| [OneDrive](https://www.microsoft.com/en-us/microsoft-365/onedrive/online-cloud-storage) |     [OneDrive](https://nazurin.readthedocs.io/storage/onedrive)     |  `OneDrive`   |             |
 
 ## Configuration
 
-For more information, see [Wiki](https://github.com/y-young/nazurin/wiki/Configuration).
+For more information, see [Documentation](https://nazurin.readthedocs.io/getting-started/configuration/).
 
 ## Deploy
 
-> For more deploy options, checkout [Wiki](https://github.com/y-young/nazurin/wiki/Deploy).
+> For more deploy options, checkout [Documentation](https://nazurin.readthedocs.io/getting-started/deploy/).
 
 ### Manual
 
@@ -86,20 +86,20 @@ For more information, see [Wiki](https://github.com/y-young/nazurin/wiki/Configu
 
 Commands:
 
--   `/ping` - pong
--   `/pixiv <id>` - view pixiv artwork
--   `/pixiv_download <id>` - download pixiv artwork
--   `/danbooru <id>` - view danbooru post
--   `/danbooru_download <id>` - download danbooru post
--   `/yandere <id>` - view yandere post
--   `/yandere_download <id>` - download yandere post
--   `/konachan <id>` - view konachan post
--   `/konachan_download <id>` - download konachan post
--   `/zerochan <id>` - view zerochan post
--   `/zerochan_download <id>` - download zerochan post
--   `/bookmark <id>` - bookmark pixiv artwork
--   `/clear_cache` - clear download cache
--   `/help` - get help text
+- `/ping` - pong
+- `/pixiv <id>` - view pixiv artwork
+- `/pixiv_download <id>` - download pixiv artwork
+- `/danbooru <id>` - view danbooru post
+- `/danbooru_download <id>` - download danbooru post
+- `/yandere <id>` - view yandere post
+- `/yandere_download <id>` - download yandere post
+- `/konachan <id>` - view konachan post
+- `/konachan_download <id>` - download konachan post
+- `/zerochan <id>` - view zerochan post
+- `/zerochan_download <id>` - download zerochan post
+- `/bookmark <id>` - bookmark pixiv artwork
+- `/clear_cache` - clear download cache
+- `/help` - get help text
 
 ### How to update your collection
 
