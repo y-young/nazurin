@@ -23,6 +23,14 @@ API token of your bot, can be obtained from [@BotFather](https://t.me/BotFather)
 
 Webhook URL to be set for Telegram server, the bot server should be accessible on this URL, should end with `/`, e.g. `https://xxx.fly.dev/`.
 
+## HOST
+
+:material-exclamation-thick: Required if using webhook mode
+
+The host to bind to, defaults to `0.0.0.0`. Set to `127.0.0.1` if you are using a reverse proxy.
+
+If you are using Docker, configure [container networking](https://docs.docker.com/config/containers/container-networking/#published-ports) instead.
+
 ## PORT
 
 :material-exclamation-thick: Required if using webhook mode

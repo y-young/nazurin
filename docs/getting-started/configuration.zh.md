@@ -23,6 +23,14 @@ Nazurin 有以下两种配置方式可选：
 
 发送到 Telegram 服务器的 Webhook URL，机器人的服务器应能通过此 URL 访问，应以 `/` 结尾，例如 `https://xxx.fly.dev/`。
 
+## HOST
+
+:material-exclamation-thick: 如使用 Webhook 模式则必需
+
+要绑定到的主机地址，默认为 `0.0.0.0`。使用反向代理时请设置为 `127.0.0.1`。
+
+如在 Docker 容器中部署，建议使用 [容器网络](https://docs.docker.com/config/containers/container-networking/#published-ports)。
+
 ## PORT
 
 :material-exclamation-thick: 如使用 Webhook 模式则必需

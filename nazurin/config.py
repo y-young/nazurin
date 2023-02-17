@@ -16,6 +16,7 @@ TOKEN = env.str('TOKEN')
 
 # Webhook url, eg: https://xxx.fly.dev/, should end with '/'
 WEBHOOK_URL = env.str('WEBHOOK_URL', default=None)
+HOST = env.str('HOST', default='0.0.0.0')
 # Port is automatically set if on Heroku or fly.io
 PORT = env.int('PORT', default=80)
 

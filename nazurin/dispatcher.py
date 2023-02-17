@@ -48,7 +48,7 @@ class NazurinDispatcher(Dispatcher):
             # otherwise bot commands will run in a different loop
             # from main thread functions and classes like Mongo and Mega.api_upload,
             # resulting in RuntimeError: Task attached to different loop
-            self.executor.run_app(host="0.0.0.0",
+            self.executor.run_app(host=config.HOST,
                                   port=config.PORT,
                                   loop=asyncio.get_event_loop())
         else:
