@@ -78,8 +78,8 @@ class GoogleDrive:
         await asyncio.gather(*tasks)
 
     @staticmethod
-    @async_wrap
     @Cache.lru()
+    @async_wrap
     def find_folder(name: str, parent: str = None) -> str:
         query = {
             'q': f"mimeType='{FOLDER_MIME}' and "\
@@ -119,5 +119,10 @@ class GoogleDrive:
             folder = await GoogleDrive.find_folder(segment, current)
             if not folder:
                 folder = await GoogleDrive.create_folder(segment, current)
+                # Since `find_folder` cached return value `None`
+                # and Google Drive allows duplicate folder names,
+                # we need to invalidate the cache
+                # to avoid duplicate folders being created.
+                GoogleDrive.find_folder.invalidate(segment, current)
             current = folder
         return current
