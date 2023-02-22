@@ -1,6 +1,7 @@
 # Nazurin
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/5cbfed1b51a644b187ed5d9521a4ea95)](https://www.codacy.com/manual/y-young/nazurin?utm_source=github.com&utm_medium=referral&utm_content=y-young/nazurin&utm_campaign=Badge_Grade)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fy-young%2Fnazurin.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fy-young%2Fnazurin?ref=badge_shield)
 ![](https://img.shields.io/badge/python->%3D%203.7-blue)
 ![](https://img.shields.io/badge/-Telegram-blue.svg?logo=telegram)
 
@@ -106,3 +107,7 @@ Commands:
 Send the bot a message with a link of [supported sites](#supported-sites), this message will be forwarded to `GALLERY` channel, the bot will then download the original images from the site, send the files to `ALBUM` channel, and finally store to your custom destinations.
 
 > Tips: On mobile you can use the _share_ button in apps, as long as the final message contains a link.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fy-young%2Fnazurin.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fy-young%2Fnazurin?ref=badge_large)
