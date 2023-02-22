@@ -40,6 +40,54 @@ Example: `zh-CN`, `en-US`
 
 Bookmark visibility, `public` or `private`.
 
+## Customizing Storage Path & File Name
+
+For more information, refer to [Customizing Storage Path & File Name](../#customizing-storage-path--file-name).
+
+### PIXIV_FILE_PATH
+
+:material-lightbulb-on: Optional, defaults to `Pixiv`
+
+Storage path for downloaded artworks.
+
+### PIXIV_FILE_NAME
+
+:material-lightbulb-on: Optional, defaults to `{filename} - {title} - {user[name]}({user[id]})`
+
+File name for downloaded artworks.
+
+### Available Variables
+
+_Only common used ones are listed._
+
+```json
+{
+  "create_date": "Creation date",
+  "series": "Series",
+  "page_count": "Total image count",
+  "height": "Height of first image",
+  "total_view": "Total view count",
+  "id": "Artwork ID",
+  "title": "Artwork title",
+  "width": "Width of first image",
+  "type": "Artwork type, e.g. illust, manga",
+  "tags": [
+    {
+      "name": "Tag name",
+      "translated_name": "Translated tag name"
+    }
+  ],
+  "user": {
+    "account": "Illustrator username",
+    "id": "Illustrator user ID",
+    "name": "Illustrator name"
+  },
+  "total_bookmarks": "Total bookmark count",
+  "filename": "Original filename without extension, e.g. 12345_p0",
+  "page": "Single image position among all images, starting from 0"
+}
+```
+
 ## Ugoira support
 
 To support Pixiv ugoira GIF preview (sent as MP4) in Telegram, you should have **ffmpeg** installed (already included in Docker image).

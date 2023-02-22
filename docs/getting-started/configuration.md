@@ -37,6 +37,8 @@ If you are using Docker, configure [container networking](https://docs.docker.co
 
 Webhook port, automatically set if on Heroku.
 
+If you are using Docker, configure [container networking](https://docs.docker.com/config/containers/container-networking/#published-ports) instead.
+
 ## DATABASE
 
 :material-exclamation-thick: Required, defaults to `Local`
@@ -71,7 +73,7 @@ Directory path in local storage or remote, will be created if not exists.
 
 ## GALLERY_ID
 
-:material-exclamation-thick: Required
+:material-lightbulb-on: Optional
 
 Telegram channel ID used for storing _messages_, messages containing links sent to bot will be forwarded here for reviewing.
 

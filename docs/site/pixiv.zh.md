@@ -34,6 +34,54 @@
 
 例如：`zh-CN`, `en-US`
 
+## 自定义存储路径和文件名
+
+更多信息请查阅 [自定义存储路径和文件名](../#customizing-storage-path--file-name)。
+
+### PIXIV_FILE_PATH
+
+:material-lightbulb-on: 可选，默认为 `Pixiv`
+
+存储路径。
+
+### PIXIV_FILE_NAME
+
+:material-lightbulb-on: 可选，默认为 `{filename} - {title} - {user[name]}({user[id]})`
+
+文件名称。
+
+### 可用变量
+
+_此处只列出常用项。_
+
+```json
+{
+  "create_date": "创建日期",
+  "series": "系列名称",
+  "page_count": "图片总数",
+  "height": "第一张图片的高度",
+  "total_view": "总浏览量",
+  "id": "作品ID",
+  "title": "作品标题",
+  "width": "第一张图片的宽度高度",
+  "type": "作品类型，例如illust、manga",
+  "tags": [
+    {
+      "name": "标签名",
+      "translated_name": "标签名翻译"
+    }
+  ],
+  "user": {
+    "account": "画师用户名",
+    "id": "画师用户ID",
+    "name": "画师名称"
+  },
+  "total_bookmarks": "收藏总数",
+  "filename": "原始文件名称，不含扩展名，如12345_p0",
+  "page": "单张图片在所有图片中的顺序，从零开始"
+}
+```
+
 ## Ugoira（动图）支持
 
 若想在 Telegram 中支持 Pixiv ugoira GIF 预览（以 MP4 发送），你需要安装 ffmpeg（已包含在 Docker 镜像中）。

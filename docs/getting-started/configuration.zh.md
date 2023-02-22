@@ -37,6 +37,8 @@ Nazurin 有以下两种配置方式可选：
 
 Webhook 端口，使用 Heroku 时自动设定。
 
+如在 Docker 容器中部署，建议使用 [容器网络](https://docs.docker.com/config/containers/container-networking/#published-ports)。
+
 ## DATABASE
 
 :material-exclamation-thick: 必需，默认为 `Local`
@@ -71,7 +73,7 @@ _在 v2 中变更。_
 
 ## GALLERY_ID
 
-:material-exclamation-thick: 必需
+:material-lightbulb-on: 可选
 
 用于存储**信息**的 Telegram 频道 ID，含有链接的信息将被转发到此处以便之后查阅。
 
