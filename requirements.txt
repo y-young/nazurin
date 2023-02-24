@@ -15,7 +15,7 @@ Pybooru~=4.2.2
 # Local:
 tinydb~=4.5.2
 # Firebase:
-firebase-admin~=5.1.0
+firebase-admin~=6.1.0
 # Mongo:
 motor~=2.5.1
 dnspython~=2.1.0
@@ -26,4 +26,4 @@ cloudant~=2.15.0
 # Mega:
 git+https://github.com/y-young/mega.py@f8de74a#egg=mega.py
 # Google Drive:
-PyDrive2~=1.10.0
+PyDrive2~=1.15.1

@@ -59,6 +59,7 @@ target/
 
 .idea/
 .vscode/
+.venv/
 .env
 
 data/*
