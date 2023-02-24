@@ -7,7 +7,7 @@ tenacity~=5.1.5
 environs~=9.3.4
 async_lru~=1.0.3
 
-pixivpy~=3.5.11
+pixivpy3~=3.7.2
 beautifulsoup4~=4.10.0
 Pybooru~=4.2.2
 
