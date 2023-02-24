@@ -16,7 +16,7 @@ class Storage:
             driver = importlib.import_module('nazurin.storage.' +
                                              driver_name.lower())
             self.disks.append(getattr(driver, driver_name)())
-        logger.info("Loaded %s storage(s), using: %s", len(self.disks),
+        logger.info("Loaded {} storage(s), using: {}", len(self.disks),
                     STORAGE)
 
     async def store(self, illust: Illust):

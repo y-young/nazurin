@@ -34,7 +34,7 @@ class SiteManager:
                 handle = getattr(module, 'handle')
                 self.sources.append((PRIORITY, patterns, handle, module_name))
             self.sources.sort(key=lambda s: s[0], reverse=True)
-        logger.info("Loaded %s sites", len(self.sites))
+        logger.info("Loaded {} sites", len(self.sites))
 
     def api(self, site):
         return self.sites[site]

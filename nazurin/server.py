@@ -1,11 +1,15 @@
 import asyncio
 import traceback
+from json import JSONDecodeError
 
 import aiohttp_cors
 import aiojobs
 from aiohttp import web
 
 from nazurin import config
+from nazurin.utils import logger
+from nazurin.utils.exceptions import NazurinError
+from nazurin.utils.helpers import format_error
 
 class NazurinServer(web.Application):
     def __init__(self, bot):
@@ -21,26 +25,40 @@ class NazurinServer(web.Application):
             })
         self.on_startup.append(self.init_jobs)
         self.on_shutdown.append(self.shutdown_jobs)
+        self.request_id = 1
 
     def start(self):
-        web.run_app(self)
+        web.run_app(self, access_log_format=config.ACCESS_LOG_FORMAT)
 
     async def do_update(self, url):
         try:
+            logger.info("API request: {}", url)
             await self.bot.update_collection([url])
             await self.bot.send_message(config.ADMIN_ID,
                                         f'Successfully collected {url}')
-        # pylint: disable=broad-except
+        except NazurinError as error:
+            await self.bot.send_message(
+                config.ADMIN_ID,
+                f'Error processing {url}: {format_error(error)}')
+        # pylint: disable-next=broad-exception-caught
         except Exception as error:
             traceback.print_exc()
             if isinstance(error, asyncio.TimeoutError):
                 error = 'Timeout, please try again.'
             await self.bot.send_message(
-                config.ADMIN_ID, f'Error processing {url}: {str(error)}')
+                config.ADMIN_ID,
+                f'Error processing {url}: {format_error(error)}')
 
     async def update_handler(self, request):
-        data = await request.json()
-        await request.app['jobs'].spawn(self.do_update(data.get('url')))
+        try:
+            data = await request.json()
+        except JSONDecodeError:
+            return web.HTTPBadRequest()
+        if 'url' not in data:
+            return web.HTTPBadRequest()
+        with logger.contextualize(request=f"request:{self.request_id}"):
+            await request.app['jobs'].spawn(self.do_update(data.get('url')))
+        self.request_id += 1
         return web.json_response({'error': 0})
 
     async def init_jobs(self, app):

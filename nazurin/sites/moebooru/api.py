@@ -50,8 +50,8 @@ class Moebooru:
             info = json.loads(info)
             post = info['posts'][0]
             tags = info['tags']
-        except json.decoder.JSONDecodeError as err:
-            logger.error(err)
+        except json.decoder.JSONDecodeError:
+            logger.exception("Failed to decode JSON")
         return post, tags
 
     async def view(self, post_id: int) -> Illust:

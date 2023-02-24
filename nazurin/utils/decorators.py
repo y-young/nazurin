@@ -1,6 +1,5 @@
 import asyncio
 import functools
-import logging
 from functools import partial, wraps
 
 import tenacity
@@ -11,10 +10,12 @@ from async_lru import alru_cache
 from tenacity import retry_if_exception, stop_after_attempt, wait_exponential
 
 from nazurin import config
+from nazurin.utils import logger
+
 
 def after_log(retry_state):
-    logging.getLogger('tenacity').log(
-        logging.INFO, '%s during %s execution, %s of %s attempted.',
+    # Set frame depth to get the real caller
+    logger.opt(depth=3).info('{} during {} execution, {} of {} attempted.',
         repr(retry_state.outcome.exception()),
         tenacity._utils.get_callback_name(retry_state.fn),
         retry_state.attempt_number, config.RETRIES)
@@ -67,8 +68,8 @@ def retry_after(func):
                 result = await func(*args, **kwargs)
                 return result
             except RetryAfter as error:
-                logging.getLogger('nazurin').warning(
-                    'Hit flood limit, retry after %d seconds',
+                logger.opt(depth=1).warning(
+                    'Hit flood limit, retry after {} seconds',
                     error.timeout + 1)
                 await asyncio.sleep(error.timeout + 1)
 

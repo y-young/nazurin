@@ -1,7 +1,4 @@
-import logging
-
+from .logging import logger
 from .network import Request
-
-logger = logging.getLogger('nazurin')
 
 __all__ = ['logger', 'Request']

@@ -58,7 +58,7 @@ class OneDrive:
         tasks = [
             self.ensure_existence(destination) for destination in destinations
         ]
-        logger.info("Creating folders: %s", destinations)
+        logger.info("Creating folders: {}", destinations)
         await asyncio.gather(*tasks)
 
         tasks = [self.upload(file) for file in files]
@@ -183,7 +183,7 @@ class OneDrive:
         async with Request(headers=_headers) as session:
             async with session.request(method, url, **kwargs) as response:
                 if not response.ok:
-                    logger.info(await response.text())
+                    logger.error(await response.text())
                 response.raise_for_status()
                 if 'application/json' in response.headers['Content-Type']:
                     return await response.json()
@@ -194,7 +194,7 @@ class OneDrive:
         async def upload_chunk(url: str, chunk: bytes):
             async with session.put(url, data=chunk) as response:
                 if not response.ok:
-                    logger.info(await response.text())
+                    logger.error(await response.text())
                 response.raise_for_status()
 
         # Must be a multiple of 320 KB
@@ -202,7 +202,7 @@ class OneDrive:
         headers = self.with_credentials()
         range_start = 0
         total_size = await file.size()
-        logger.info("Uploading file, total size: %s...", total_size)
+        logger.info("Uploading file, total size: {}...", total_size)
 
         async with Request(headers=headers) as session:
             async for chunk in read_by_chunks(file.path, CHUNK_SIZE):
@@ -214,7 +214,7 @@ class OneDrive:
                 })
                 await upload_chunk(url, chunk)
                 range_start += content_length
-                logger.info("Uploaded %s", range_start)
+                logger.info("Uploaded {}", range_start)
         logger.info("Upload completed")
 
     def with_credentials(self, headers: dict = None) -> dict:

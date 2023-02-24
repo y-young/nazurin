@@ -129,7 +129,7 @@ class Pixiv:
             logger.error(response)
             raise NazurinError(response.error.user_message
                                or response.error.message)
-        logger.info('Bookmarked artwork %s, privacy = %s', artwork_id,
+        logger.info('Bookmarked artwork {}, privacy = {}', artwork_id,
                     privacy.value)
         return True
 
@@ -171,14 +171,14 @@ class Pixiv:
             # thus we convert to YUV420P colorspace for better compatibility.
             cmd = f'ffmpeg -i "{config.path}" -vcodec libx264 -pix_fmt yuv420p '\
                   f'-vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -y "{output.path}"'
-            logger.info('Calling FFmpeg with command: %s', cmd)
+            logger.info('Calling FFmpeg with command: {}', cmd)
             args = shlex.split(cmd)
             try:
                 output = subprocess.check_output(args,
                                                  stderr=subprocess.STDOUT,
                                                  shell=False)
             except subprocess.CalledProcessError as error:
-                logger.error('FFmpeg failed with code %s, output:\n %s',
+                logger.error('FFmpeg failed with code {}, output:\n {}',
                              error.returncode, error.output.decode())
                 raise NazurinError(
                     'Failed to convert ugoira to mp4.') from None
@@ -303,7 +303,7 @@ class Pixiv:
                 if retry:
                     random_ua = f"PixivAndroidApp/6.{random.randrange(0, 60)}.0"
                     logger.info(
-                        "Blocked by CloudFlare, retry with random UA: %s",
+                        "Blocked by CloudFlare, retry with random UA: {}",
                         random_ua)
                     Pixiv.api.additional_headers = {"User-Agent": random_ua}
                     return await self.auth(retry=False)

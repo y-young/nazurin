@@ -214,5 +214,5 @@ class DeviantArt:
                 # CSRF token must be used along with the cookies returned,
                 # otherwise will be considered invalid
                 DeviantArt.cookies = response.cookies
-                logger.info("Fetched CSRF token: %s, cookies: %s",
+                logger.info("Fetched CSRF token: {}, cookies: {}",
                             DeviantArt.csrf_token, DeviantArt.cookies)

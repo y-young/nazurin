@@ -3,7 +3,6 @@ import asyncio
 import os
 import shutil
 import traceback
-from html import escape
 
 from aiogram.dispatcher.filters import IDFilter
 from aiogram.types import ChatActions, Message, Update
@@ -14,6 +13,7 @@ from nazurin import config, dp
 from nazurin.utils import logger
 from nazurin.utils.decorators import Cache, chat_action
 from nazurin.utils.exceptions import NazurinError
+from nazurin.utils.helpers import format_error
 
 @dp.message_handler(commands=['start', 'help'])
 @chat_action(ChatActions.TYPING)
@@ -67,12 +67,9 @@ async def on_error(update: Update, exception: Exception):
         traceback.print_exc()
         await update.message.reply('Error: Timeout, please try again.')
     except Exception as error:  # pylint: disable=broad-except
-        logger.error('Update %s caused %s: %s', update, type(error), error)
-        traceback.print_exc()
+        logger.exception('Update {} caused {}: {}', update, type(error), error)
         if not isinstance(error, TelegramAPIError):
-            error_type = type(error).__name__
-            error_msg = escape(str(error), quote=False)
-            await update.message.reply(f'Error: ({error_type}) {error_msg}')
+            await update.message.reply(f'Error: {format_error(error)}')
 
     return True
 

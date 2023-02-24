@@ -106,7 +106,7 @@ class NazurinBot(Bot):
         result = self.sites.match(urls)
         if not result:
             raise NazurinError('No source matched')
-        logger.info('Collection update: site=%s, match=%s', result['site'],
+        logger.info('Collection update: site={}, match={}', result['site'],
                     result['match'].groups())
 
         illust = await self.sites.handle_update(result)

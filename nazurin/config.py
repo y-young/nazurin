@@ -1,11 +1,6 @@
-import logging
 from os import path
 
 from environs import Env
-
-logging.basicConfig(
-    format='%(asctime)s - %(name)s.%(module)s - %(levelname)s - %(message)s',
-    level=logging.INFO)
 
 env = Env()
 # read config from .env file if exists
@@ -49,3 +44,4 @@ UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
 # Local directory to store database and temporary files
 DATA_DIR = 'data'
 TEMP_DIR = path.join(DATA_DIR, 'temp')
+ACCESS_LOG_FORMAT = '%a "%r" %s %b "%{Referer}i" "%{User-Agent}i"'

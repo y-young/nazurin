@@ -2,7 +2,7 @@ import asyncio
 from typing import List
 
 from aiogram import Dispatcher, executor
-from aiogram.types import AllowedUpdates, ContentType, Message
+from aiogram.types import AllowedUpdates, ContentType, Message, Update
 from aiogram.utils.executor import Executor
 
 from nazurin import config
@@ -10,13 +10,14 @@ from nazurin.utils import logger
 from nazurin.utils.filters import URLFilter
 
 from .bot import NazurinBot
-from .middleware import AuthMiddleware
+from .middleware import AuthMiddleware, LoggingMiddleware
 from .server import NazurinServer
 
 class NazurinDispatcher(Dispatcher):
     def __init__(self, bot: NazurinBot):
         super().__init__(bot)
         self.middleware.setup(AuthMiddleware())
+        self.middleware.setup(LoggingMiddleware())
         self.filters_factory.bind(URLFilter,
                                   event_handlers=[self.message_handlers])
         self.server = NazurinServer(bot)
@@ -35,8 +36,13 @@ class NazurinDispatcher(Dispatcher):
                                                 *args, **kwargs)
 
     async def on_startup(self, *_args):
-        await self.bot.set_webhook(config.WEBHOOK_URL + config.TOKEN,
-                                   allowed_updates=AllowedUpdates.MESSAGE)
+        if config.ENV == 'production':
+            await self.bot.set_webhook(config.WEBHOOK_URL + config.TOKEN,
+                                       allowed_updates=AllowedUpdates.MESSAGE)
+
+    async def process_update(self, update: Update):
+        with logger.contextualize(request=f"update:{update.update_id}"):
+            return await super().process_update(update)
 
     def start(self):
         self.init()
@@ -50,7 +56,8 @@ class NazurinDispatcher(Dispatcher):
             # resulting in RuntimeError: Task attached to different loop
             self.executor.run_app(host=config.HOST,
                                   port=config.PORT,
-                                  loop=asyncio.get_event_loop())
+                                  loop=asyncio.get_event_loop(),
+                                  access_log_format=config.ACCESS_LOG_FORMAT)
         else:
             # self.server.start()
             executor.start_polling(self, skip_updates=True)

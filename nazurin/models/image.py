@@ -34,14 +34,17 @@ class Image(File):
                     not self.height) or self.width + self.height > 10000:
                 self._chosen_url = self.thumbnail
                 logger.info(
-                    'Use thumbnail (Unkown image size or width + height > 10000 [%s, %s]): %s',
-                    self.width, self.height, self._chosen_url)
+                    'Use thumbnail (Unkown image size or width + height > 10000 '
+                    '[{width}, {height}]): {url}',
+                    width=self.width,
+                    height=self.height,
+                    url=self._chosen_url)
             else:
                 size = await self.size()
                 if (not size) or size > 5 * 1024 * 1024:
                     self._chosen_url = self.thumbnail
                     logger.info(
-                        'Use thumbnail (Unknown size or size > 5MB [%s]): %s',
+                        'Use thumbnail (Unknown size or size > 5MB [{}]): {}',
                         size, self._chosen_url)
         return self._chosen_url
 
@@ -54,7 +57,7 @@ class Image(File):
                 headers = response.headers
                 if 'Content-Length' in headers:
                     self._size = int(headers['Content-Length'])
-                    logger.info('Got image size: %s', self._size)
+                    logger.info('Got image size: {}', self._size)
                 else:
                     logger.info('Failed to get image size')
                 return self._size

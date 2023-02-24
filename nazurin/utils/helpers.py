@@ -19,7 +19,7 @@ from nazurin.models import Caption
 from . import logger
 
 async def handle_bad_request(message: Message, error: BadRequest):
-    logger.error('BadRequest exception: %s', error)
+    logger.error('BadRequest exception: {}', error)
     if not message:
         return
     if isinstance(error, (WrongFileIdentifier, InvalidHTTPUrlContent)):
@@ -152,3 +152,8 @@ def fromasctimeformat(date: str):
     """
 
     return datetime.strptime(date, '%a %b %d %H:%M:%S %z %Y')
+
+def format_error(error: Exception) -> str:
+    error_type = type(error).__name__
+    error_msg = escape(str(error), quote=False)
+    return f'({error_type}) {error_msg}'

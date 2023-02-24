@@ -82,7 +82,7 @@ class Mega:
         tasks = [
             self.ensure_existence(destination) for destination in destinations
         ]
-        logger.info("Creating folders: %s", destinations)
+        logger.info("Creating folders: {}", destinations)
         folder_ids = await asyncio.gather(*tasks)
         folders = {}
         for destination, folder_id in zip(destinations, folder_ids):
