@@ -9,8 +9,10 @@ from nazurin.models import Illust
 from nazurin.utils import logger
 from nazurin.utils.helpers import snake_to_pascal
 
+
 class SiteManager:
     """Site plugin manager."""
+
     def __init__(self):
         """Initialize."""
         self.sites = {}
@@ -18,20 +20,21 @@ class SiteManager:
 
     def load(self):
         """Dynamically load all site plugins."""
-        module_paths = glob('nazurin/sites/*/')
+        module_paths = glob("nazurin/sites/*/")
         for module_path in module_paths:
             module_name = path.basename(path.normpath(module_path))
-            if module_name.startswith('__'):
+            if module_name.startswith("__"):
                 continue
 
-            module = import_module('nazurin.sites.' + module_name)
+            module = import_module("nazurin.sites." + module_name)
             # Store site API class
             self.sites[module_name.lower()] = getattr(
-                module, snake_to_pascal(module_name))()
-            if hasattr(module, 'patterns') and hasattr(module, 'handle'):
-                PRIORITY = getattr(module, 'PRIORITY')
-                patterns = getattr(module, 'patterns')
-                handle = getattr(module, 'handle')
+                module, snake_to_pascal(module_name)
+            )()
+            if hasattr(module, "patterns") and hasattr(module, "handle"):
+                PRIORITY = getattr(module, "PRIORITY")
+                patterns = getattr(module, "patterns")
+                handle = getattr(module, "handle")
                 self.sources.append((PRIORITY, patterns, handle, module_name))
             self.sources.sort(key=lambda s: s[0], reverse=True)
         logger.info("Loaded {} sites", len(self.sites))
@@ -41,7 +44,7 @@ class SiteManager:
 
     def match(self, urls: List[str]):
         sources = self.sources
-        urls = str.join(',', urls)
+        urls = str.join(",", urls)
         result = None
         matched_priority = 0
 
@@ -52,11 +55,7 @@ class SiteManager:
             for pattern in patterns:
                 match = search(pattern, urls)
                 if match:
-                    result = {
-                        'match': match,
-                        'site': site_name,
-                        'handler': handle
-                    }
+                    result = {"match": match, "site": site_name, "handler": handle}
                     matched_priority = priority
                     break
 
@@ -65,5 +64,5 @@ class SiteManager:
         return result
 
     async def handle_update(self, result) -> Illust:
-        handle = result['handler']
-        return await handle(result['match'])
+        handle = result["handler"]
+        return await handle(result["match"])

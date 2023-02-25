@@ -14,17 +14,16 @@ from nazurin.utils.helpers import is_image
 
 from .config import DESTINATION, FILENAME
 
+
 class Danbooru:
-    def __init__(self, site='danbooru'):
+    def __init__(self, site="danbooru"):
         """Set Danbooru site."""
         self.site = site
         self.api = danbooru(site)
         self.post_show = async_wrap(self.api.post_show)
         self.post_list = async_wrap(self.api.post_list)
 
-    async def get_post(self,
-                       post_id: Optional[int] = None,
-                       md5: Optional[str] = None):
+    async def get_post(self, post_id: Optional[int] = None, md5: Optional[str] = None):
         """Fetch a post."""
         try:
             if post_id:
@@ -33,17 +32,18 @@ class Danbooru:
                 post = await self.post_list(md5=md5)
         except PybooruHTTPError as err:
             # pylint: disable=protected-access
-            if 'Not Found' in err._msg:
-                raise NazurinError('Post not found') from None
-        if 'file_url' not in post:
+            if "Not Found" in err._msg:
+                raise NazurinError("Post not found") from None
+        if "file_url" not in post:
             raise NazurinError(
-                'You may need a gold account to view this post\nSource: ' +
-                post['source'])
+                "You may need a gold account to view this post\nSource: "
+                + post["source"]
+            )
         return post
 
-    async def view(self,
-                   post_id: Optional[int] = None,
-                   md5: Optional[str] = None) -> Illust:
+    async def view(
+        self, post_id: Optional[int] = None, md5: Optional[str] = None
+    ) -> Illust:
         post = await self.get_post(post_id, md5)
         illust = self.parse_post(post)
         return illust
@@ -51,35 +51,43 @@ class Danbooru:
     def parse_post(self, post) -> Illust:
         """Get images and build caption."""
         # Get images
-        url = post['file_url']
-        artists = post['tag_string_artist']
+        url = post["file_url"]
+        artists = post["tag_string_artist"]
         title, filename = self._get_names(post)
         imgs = []
         files = []
         if is_image(url):
             destination, filename = self.get_storage_dest(post, filename)
             imgs.append(
-                Image(filename, url, destination, post['large_file_url'],
-                      post['file_size'], post['image_width'],
-                      post['image_height']))
+                Image(
+                    filename,
+                    url,
+                    destination,
+                    post["large_file_url"],
+                    post["file_size"],
+                    post["image_width"],
+                    post["image_height"],
+                )
+            )
         else:  # danbooru has non-image posts, such as #animated
             files.append(File(filename, url))
 
         # Build media caption
-        tags = post['tag_string'].split(' ')
+        tags = post["tag_string"].split(" ")
         tag_string = str()
         for character in tags:
-            tag_string += '#' + character + ' '
-        caption = Caption({
-            'title': title,
-            'artists': artists,
-            'url': 'https://' + self.site + '.donmai.us/posts/' +
-            str(post['id']),
-            'tags': tag_string,
-            'parent_id': post['parent_id'],
-            'pixiv_id': post['pixiv_id'],
-            'has_children': post['has_children']
-        })
+            tag_string += "#" + character + " "
+        caption = Caption(
+            {
+                "title": title,
+                "artists": artists,
+                "url": "https://" + self.site + ".donmai.us/posts/" + str(post["id"]),
+                "tags": tag_string,
+                "parent_id": post["parent_id"],
+                "pixiv_id": post["pixiv_id"],
+                "has_children": post["has_children"],
+            }
+        )
         return Illust(imgs, caption, post, files)
 
     @staticmethod
@@ -88,19 +96,21 @@ class Danbooru:
         Format destination and filename.
         """
 
-        created_at = datetime.fromisoformat(post['created_at'])
-        updated_at = datetime.fromisoformat(post['updated_at'])
+        created_at = datetime.fromisoformat(post["created_at"])
+        updated_at = datetime.fromisoformat(post["updated_at"])
         filename, extension = os.path.splitext(filename)
         context = {
             **post,
             # Human-friendly filename, without extension
-            'filename': filename,
-            'created_at': created_at,
-            'updated_at': updated_at,
-            'extension': extension
+            "filename": filename,
+            "created_at": created_at,
+            "updated_at": updated_at,
+            "extension": extension,
         }
-        return (DESTINATION.format_map(context),
-                FILENAME.format_map(context) + extension)
+        return (
+            DESTINATION.format_map(context),
+            FILENAME.format_map(context) + extension,
+        )
 
     @staticmethod
     def _get_names(post) -> Tuple[str, str]:
@@ -109,68 +119,67 @@ class Danbooru:
         usually in the form of "{characters} ({copyrights}) drawn by {artists}".
         """
 
-        characters = Danbooru._format_characters(post['tag_string_character'])
-        copyrights = Danbooru._format_copyrights(post['tag_string_copyright'])
-        artists = Danbooru._format_artists(post['tag_string_artist'])
-        extension = path.splitext(post['file_url'])[1]
+        characters = Danbooru._format_characters(post["tag_string_character"])
+        copyrights = Danbooru._format_copyrights(post["tag_string_copyright"])
+        artists = Danbooru._format_artists(post["tag_string_artist"])
+        extension = path.splitext(post["file_url"])[1]
         filename = str()
 
         if characters:
-            filename += characters + ' '
+            filename += characters + " "
         if copyrights:
             if characters:
-                copyrights = '(' + copyrights + ')'
-            filename += copyrights + ' '
+                copyrights = "(" + copyrights + ")"
+            filename += copyrights + " "
         title = filename
         if artists:
-            filename += 'drawn by ' + artists
+            filename += "drawn by " + artists
         return title, filename + extension
 
     @staticmethod
     def _format_characters(characters: str) -> str:
         if not characters:
-            return ''
-        characters = characters.split(' ')
+            return ""
+        characters = characters.split(" ")
         characters = list(map(Danbooru._normalize, characters))
         size = len(characters)
         if size <= 5:
             result = Danbooru._sentence(characters)
         else:
             characters = characters[:5]
-            result = Danbooru._sentence(characters) + ' and ' + str(
-                size - 1) + ' more'
+            result = Danbooru._sentence(characters) + " and " + str(size - 1) + " more"
         return result
 
     @staticmethod
     def _format_copyrights(copyrights: str) -> str:
         if not copyrights:
-            return ''
-        copyrights = copyrights.split(' ')
+            return ""
+        copyrights = copyrights.split(" ")
         copyrights = list(map(Danbooru._normalize, copyrights))
         size = len(copyrights)
         if size == 1:
             result = copyrights[0]
         else:
-            result = copyrights[0] + ' and ' + str(size - 1) + ' more'
+            result = copyrights[0] + " and " + str(size - 1) + " more"
         return result
 
     @staticmethod
     def _format_artists(artists: str) -> str:
         if not artists:
-            return ''
-        return Danbooru._normalize(Danbooru._sentence(artists.split(' ')))
+            return ""
+        return Danbooru._normalize(Danbooru._sentence(artists.split(" ")))
 
     @staticmethod
     def _sentence(names: List[str]) -> str:
         if len(names) == 1:
             return names[0]
-        sentence = ' '.join(names[:-1])
-        sentence += ' and ' + names[-1]
+        sentence = " ".join(names[:-1])
+        sentence += " and " + names[-1]
         return sentence
 
     @staticmethod
     def _normalize(name: str) -> str:
-        name = re.sub(r'_\(.*\)', '', name)  # replace _(...)
-        name = name.replace('_', ' ')
-        name = re.sub(r'[\\\/]', ' ', name)  # replace / and \
+        name = re.sub(r"_\(.*\)", "", name)  # replace _(...)
+        name = name.replace("_", " ")
+        name = re.sub(r"[\\\/]", " ", name)  # replace / and \
         return name

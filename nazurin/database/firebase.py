@@ -6,14 +6,16 @@ from google.cloud.firestore import AsyncClient
 
 from nazurin.config import env
 
+
 class Firebase:
     """Firestore driver of Firebase."""
+
     db: AsyncClient
 
     def __init__(self):
         """Load credentials and initialize Firebase app."""
-        cert = env.str('GOOGLE_APPLICATION_CREDENTIALS')
-        if cert.startswith('{'):
+        cert = env.str("GOOGLE_APPLICATION_CREDENTIALS")
+        if cert.startswith("{"):
             cert = json.loads(cert)
         cred = credentials.Certificate(cert)
         if len(firebase_admin._apps) == 0:

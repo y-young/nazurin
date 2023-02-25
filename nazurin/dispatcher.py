@@ -13,13 +13,13 @@ from .bot import NazurinBot
 from .middleware import AuthMiddleware, LoggingMiddleware
 from .server import NazurinServer
 
+
 class NazurinDispatcher(Dispatcher):
     def __init__(self, bot: NazurinBot):
         super().__init__(bot)
         self.middleware.setup(AuthMiddleware())
         self.middleware.setup(LoggingMiddleware())
-        self.filters_factory.bind(URLFilter,
-                                  event_handlers=[self.message_handlers])
+        self.filters_factory.bind(URLFilter, event_handlers=[self.message_handlers])
         self.server = NazurinServer(bot)
         self.server.on_startup.append(self.on_startup)
         self.executor = Executor(self)
@@ -29,16 +29,20 @@ class NazurinDispatcher(Dispatcher):
         self.register_message_handler(
             self.update_collection,
             URLFilter(),
-            content_types=[ContentType.TEXT, ContentType.PHOTO])
+            content_types=[ContentType.TEXT, ContentType.PHOTO],
+        )
 
     def register_message_handler(self, callback, *args, **kwargs):
-        return super().register_message_handler(self.async_task(callback),
-                                                *args, **kwargs)
+        return super().register_message_handler(
+            self.async_task(callback), *args, **kwargs
+        )
 
     async def on_startup(self, *_args):
-        if config.ENV == 'production':
-            await self.bot.set_webhook(config.WEBHOOK_URL + config.TOKEN,
-                                       allowed_updates=AllowedUpdates.MESSAGE)
+        if config.ENV == "production":
+            await self.bot.set_webhook(
+                config.WEBHOOK_URL + config.TOKEN,
+                allowed_updates=AllowedUpdates.MESSAGE,
+            )
 
     async def process_update(self, update: Update):
         with logger.contextualize(request=f"update:{update.update_id}"):
@@ -46,22 +50,25 @@ class NazurinDispatcher(Dispatcher):
 
     def start(self):
         self.init()
-        if config.ENV == 'production':
-            logger.info('Set webhook')
-            self.executor.set_webhook(webhook_path='/' + config.TOKEN,
-                                      web_app=self.server)
+        if config.ENV == "production":
+            logger.info("Set webhook")
+            self.executor.set_webhook(
+                webhook_path="/" + config.TOKEN, web_app=self.server
+            )
             # Tell aiohttp to use main thread event loop instead of creating a new one
             # otherwise bot commands will run in a different loop
             # from main thread functions and classes like Mongo and Mega.api_upload,
             # resulting in RuntimeError: Task attached to different loop
-            self.executor.run_app(host=config.HOST,
-                                  port=config.PORT,
-                                  loop=asyncio.get_event_loop(),
-                                  access_log_format=config.ACCESS_LOG_FORMAT)
+            self.executor.run_app(
+                host=config.HOST,
+                port=config.PORT,
+                loop=asyncio.get_event_loop(),
+                access_log_format=config.ACCESS_LOG_FORMAT,
+            )
         else:
             # self.server.start()
             executor.start_polling(self, skip_updates=True)
 
     async def update_collection(self, message: Message, urls: List[str]):
         await self.bot.update_collection(urls, message)
-        await message.reply('Done!')
+        await message.reply("Done!")

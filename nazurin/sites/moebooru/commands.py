@@ -7,56 +7,60 @@ from .api import Moebooru
 
 moebooru = Moebooru()
 
-@dp.message_handler(Command(['yandere']))
+
+@dp.message_handler(Command(["yandere"]))
 async def yandere_view(message: Message, command: Command.CommandObj):
     try:
         post_id = int(command.args)
     except (IndexError, ValueError, TypeError):
-        await message.reply('Usage: /yandere POST_ID')
+        await message.reply("Usage: /yandere POST_ID")
         return
     if post_id < 0:
-        await message.reply('Invalid post id!')
+        await message.reply("Invalid post id!")
         return
-    illust = await moebooru.site('yande.re').view(post_id)
+    illust = await moebooru.site("yande.re").view(post_id)
     await bot.send_illust(illust, message)
 
-@dp.message_handler(Command(['yandere_download']))
+
+@dp.message_handler(Command(["yandere_download"]))
 async def yandere_download(message: Message, command: Command.CommandObj):
     try:
         post_id = int(command.args)
     except (IndexError, ValueError, TypeError):
-        await message.reply('Usage: /yandere_download POST_ID')
+        await message.reply("Usage: /yandere_download POST_ID")
         return
     if post_id <= 0:
-        await message.reply('Invalid post id!')
+        await message.reply("Invalid post id!")
         return
-    illust = await moebooru.site('yande.re').view(post_id)
+    illust = await moebooru.site("yande.re").view(post_id)
     await illust.download()
     await bot.send_docs(illust, message)
 
-@dp.message_handler(Command(['konachan']))
+
+@dp.message_handler(Command(["konachan"]))
 async def konachan_view(message: Message, command: Command.CommandObj):
     try:
         post_id = int(command.args)
     except (IndexError, ValueError, TypeError):
-        await message.reply('Usage: /konachan POST_ID')
+        await message.reply("Usage: /konachan POST_ID")
         return
     if post_id < 0:
-        await message.reply('Invalid post id!')
+        await message.reply("Invalid post id!")
         return
-    illust = await moebooru.site('konachan.com').view(post_id)
+    illust = await moebooru.site("konachan.com").view(post_id)
     await bot.send_illust(illust, message)
 
-@dp.message_handler(Command(['konachan_download']))
+
+@dp.message_handler(Command(["konachan_download"]))
 async def konachan_download(message: Message, command: Command.CommandObj):
     try:
         post_id = int(command.args)
     except (IndexError, ValueError, TypeError):
-        await message.reply('Usage: /konachan_download POST_ID')
+        await message.reply("Usage: /konachan_download POST_ID")
         return
     if post_id <= 0:
-        await message.reply('Invalid post id!')
+        await message.reply("Invalid post id!")
         return
-    illust = await moebooru.site('konachan.com').view(post_id)
+    illust = await moebooru.site("konachan.com").view(post_id)
     await illust.download()
     await bot.send_docs(illust, message)

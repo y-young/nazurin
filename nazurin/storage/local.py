@@ -8,6 +8,7 @@ from nazurin.models import File
 from nazurin.utils.decorators import async_wrap
 from nazurin.utils.helpers import ensure_existence, ensure_existence_async
 
+
 class Local:
     def __init__(self):
         ensure_existence(os.path.join(DATA_DIR, STORAGE_DIR))
@@ -16,8 +17,8 @@ class Local:
     @async_wrap
     def move_file(file: File):
         shutil.copyfile(
-            file.path,
-            os.path.join(os.path.join(DATA_DIR, file.destination), file.name))
+            file.path, os.path.join(os.path.join(DATA_DIR, file.destination), file.name)
+        )
 
     async def store(self, files: List[File]):
         destinations = {file.destination for file in files}

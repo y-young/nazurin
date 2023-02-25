@@ -8,14 +8,18 @@ import aiohttp
 
 from nazurin.config import STORAGE_DIR, TEMP_DIR
 from nazurin.utils.decorators import network_retry
-from nazurin.utils.helpers import (ensure_existence_async, sanitize_filename,
-                                   sanitize_path)
+from nazurin.utils.helpers import (
+    ensure_existence_async,
+    sanitize_filename,
+    sanitize_path,
+)
+
 
 @dataclass
 class File:
     name: str
     url: str = None
-    _destination: str = ''
+    _destination: str = ""
 
     def __post_init__(self):
         self.name = sanitize_filename(self.name)
@@ -50,8 +54,10 @@ class File:
             return stat.st_size
 
     async def exists(self) -> bool:
-        if os.path.exists(self.path) and (await aiofiles.os.stat(
-                self.path)).st_size != 0:
+        if (
+            os.path.exists(self.path)
+            and (await aiofiles.os.stat(self.path)).st_size != 0
+        ):
             return True
         return False
 
@@ -61,5 +67,5 @@ class File:
             return True
         await ensure_existence_async(TEMP_DIR)
         async with session.get(self.url) as response:
-            async with aiofiles.open(self.path, 'wb') as f:
+            async with aiofiles.open(self.path, "wb") as f:
                 await f.write(await response.read())

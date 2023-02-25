@@ -9,26 +9,28 @@ from nazurin.utils.exceptions import NazurinError
 
 from .config import API_KEY, DESTINATION, FILENAME
 
+
 class Wallhaven:
     @network_retry
     async def get_wallpaper(self, wallpaper_id: str):
         """Get wallpaper information from API."""
-        api = 'https://wallhaven.cc/api/v1/w/' + wallpaper_id
+        api = "https://wallhaven.cc/api/v1/w/" + wallpaper_id
         if API_KEY:
-            api += '?apikey=' + API_KEY
+            api += "?apikey=" + API_KEY
         async with Request() as request:
             async with request.get(api) as response:
                 if response.status == 404:
                     raise NazurinError("Wallpaper doesn't exist.")
                 if response.status == 401:
                     raise NazurinError(
-                        'You need to log in to view this wallpaper. ' +
-                        'Please ensure that you have set a valid API key.')
+                        "You need to log in to view this wallpaper. "
+                        + "Please ensure that you have set a valid API key."
+                    )
                 response.raise_for_status()
                 wallpaper = await response.json()
-                if 'error' in wallpaper:
-                    raise NazurinError(wallpaper['error'])
-                return wallpaper['data']
+                if "error" in wallpaper:
+                    raise NazurinError(wallpaper["error"])
+                return wallpaper["data"]
 
     async def fetch(self, wallpaper_id: str) -> Illust:
         """Fetch & return wallpaper image and information."""
@@ -39,13 +41,19 @@ class Wallhaven:
 
     @staticmethod
     def get_images(wallpaper) -> List[Image]:
-        url = wallpaper['path']
-        thumbnail = wallpaper['thumbs']['large']
+        url = wallpaper["path"]
+        thumbnail = wallpaper["thumbs"]["large"]
         destination, filename = Wallhaven.get_storage_dest(wallpaper)
         return [
-            Image(filename, url, destination, thumbnail,
-                  wallpaper['file_size'], wallpaper['dimension_x'],
-                  wallpaper['dimension_y'])
+            Image(
+                filename,
+                url,
+                destination,
+                thumbnail,
+                wallpaper["file_size"],
+                wallpaper["dimension_x"],
+                wallpaper["dimension_y"],
+            )
         ]
 
     @staticmethod
@@ -55,22 +63,17 @@ class Wallhaven:
         """
 
         # Wallhaven uses UTC time
-        created_at = datetime.fromisoformat(wallpaper['created_at'] + "+00:00")
-        _, extension = os.path.splitext(os.path.basename(wallpaper['path']))
-        context = {
-            **wallpaper, 'created_at': created_at,
-            'extension': extension
-        }
+        created_at = datetime.fromisoformat(wallpaper["created_at"] + "+00:00")
+        _, extension = os.path.splitext(os.path.basename(wallpaper["path"]))
+        context = {**wallpaper, "created_at": created_at, "extension": extension}
         filename = FILENAME.format_map(context)
         return (DESTINATION.format_map(context), filename + extension)
 
     @staticmethod
     def build_caption(wallpaper) -> Caption:
         tags = str()
-        for tag in wallpaper['tags']:
-            tags += '#' + tag['name'].strip().replace(' ', '_') + ' '
-        return Caption({
-            'url': wallpaper['url'],
-            'source': wallpaper['source'],
-            'tags': tags
-        })
+        for tag in wallpaper["tags"]:
+            tags += "#" + tag["name"].strip().replace(" ", "_") + " "
+        return Caption(
+            {"url": wallpaper["url"], "source": wallpaper["source"], "tags": tags}
+        )

@@ -3,8 +3,10 @@ import sys
 
 from loguru import logger
 
+
 class InterceptHandler(logging.Handler):
     """Intercept Python logging and forward to Loguru."""
+
     def emit(self, record):
         # Get corresponding Loguru level if it exists.
         try:
@@ -18,8 +20,10 @@ class InterceptHandler(logging.Handler):
             frame = frame.f_back
             depth += 1
 
-        logger.opt(depth=depth,
-                   exception=record.exc_info).log(level, record.getMessage())
+        logger.opt(depth=depth, exception=record.exc_info).log(
+            level, record.getMessage()
+        )
+
 
 def configure_logging():
     # Remove default handler
@@ -32,7 +36,5 @@ def configure_logging():
         "{extra[request]} - {message}",
         level="DEBUG",
     )
-    logger.configure(extra={'request': ''})
-    logging.basicConfig(handlers=[InterceptHandler()],
-                        level=logging.INFO,
-                        force=True)
+    logger.configure(extra={"request": ""})
+    logging.basicConfig(handlers=[InterceptHandler()], level=logging.INFO, force=True)

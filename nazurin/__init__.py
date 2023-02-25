@@ -9,4 +9,4 @@ configure_logging()
 bot = NazurinBot(token=config.TOKEN, proxy=config.PROXY)
 dp = NazurinDispatcher(bot)
 
-__all__ = ['bot', 'dp']
+__all__ = ["bot", "dp"]

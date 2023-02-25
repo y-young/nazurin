@@ -6,11 +6,13 @@ from pymongo.errors import DuplicateKeyError
 from nazurin.config import env
 from nazurin.utils.exceptions import NazurinError
 
+
 class Mongo:
     """MongoDB driver for MongoDB Atlas or local server."""
+
     def __init__(self):
         """Load credentials and initialize client."""
-        URI = env.str('MONGO_URI', default='mongodb://localhost:27017/nazurin')
+        URI = env.str("MONGO_URI", default="mongodb://localhost:27017/nazurin")
         self.client = AsyncIOMotorClient(URI)
         self.db = self.client.get_default_database()
         self._collection = None
@@ -25,27 +27,27 @@ class Mongo:
         return self
 
     async def get(self) -> Optional[dict]:
-        return await self._collection.find_one({'_id': self._document})
+        return await self._collection.find_one({"_id": self._document})
 
     async def exists(self) -> bool:
-        count = await self._collection.count_documents({'_id': self._document},
-                                                       limit=1)
+        count = await self._collection.count_documents({"_id": self._document}, limit=1)
         return count > 0
 
     async def insert(self, key: Optional[Union[str, int]], data: dict) -> bool:
         if key:
-            data['_id'] = key
+            data["_id"] = key
         try:
             result = await self._collection.insert_one(data)
             return result.acknowledged
         except DuplicateKeyError as error:
-            raise NazurinError('Already exists in database.') from error
+            raise NazurinError("Already exists in database.") from error
 
     async def update(self, data: dict) -> bool:
-        result = await self._collection.update_one({'_id': self._document},
-                                                   {'$set': data})
+        result = await self._collection.update_one(
+            {"_id": self._document}, {"$set": data}
+        )
         return result.modified_count == 1
 
     async def delete(self) -> bool:
-        result = await self._collection.delete_one({'_id': self._document})
+        result = await self._collection.delete_one({"_id": self._document})
         return result.deleted_count == 1
