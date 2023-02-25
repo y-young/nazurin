@@ -8,8 +8,9 @@ from .config import COLLECTION
 
 patterns = [
     # https://username.lofter.com/post/1a2b3c4d_1a2b3c4d5
-    r'(\w+)\.lofter\.com/post/(\w+)'
+    r"(\w+)\.lofter\.com/post/(\w+)"
 ]
+
 
 async def handle(match) -> Illust:
     username = match.group(1)
@@ -18,6 +19,6 @@ async def handle(match) -> Illust:
     collection = db.collection(COLLECTION)
 
     post = await Lofter().fetch(username, permalink)
-    post.metadata['collected_at'] = time()
-    await collection.insert(int(post.metadata['id']), post.metadata)
+    post.metadata["collected_at"] = time()
+    await collection.insert(int(post.metadata["id"]), post.metadata)
     return post

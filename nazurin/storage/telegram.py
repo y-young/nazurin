@@ -5,7 +5,8 @@ from nazurin import bot
 from nazurin.config import env
 from nazurin.models import File
 
-ALBUM_ID = env.int('ALBUM_ID')
+ALBUM_ID = env.int("ALBUM_ID")
+
 
 class Telegram:
     async def store(self, files: List[File]):

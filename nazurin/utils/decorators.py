@@ -15,28 +15,36 @@ from nazurin.utils import logger
 
 def after_log(retry_state):
     # Set frame depth to get the real caller
-    logger.opt(depth=3).info('{} during {} execution, {} of {} attempted.',
+    logger.opt(depth=3).info(
+        "{} during {} execution, {} of {} attempted.",
         repr(retry_state.outcome.exception()),
         tenacity._utils.get_callback_name(retry_state.fn),
-        retry_state.attempt_number, config.RETRIES)
+        retry_state.attempt_number,
+        config.RETRIES,
+    )
+
 
 def exception_predicate(exception):
     """Predicate to check if we should retry when an exception occurs."""
-    if not isinstance(exception,
-                      (ClientError, asyncio.exceptions.TimeoutError)):
+    if not isinstance(exception, (ClientError, asyncio.exceptions.TimeoutError)):
         return False
     if isinstance(exception, ClientResponseError):
         return exception.status in [408, 429, 500, 502, 503, 504]
     return True
 
-network_retry = tenacity.retry(reraise=True,
-                               stop=stop_after_attempt(config.RETRIES),
-                               after=after_log,
-                               retry=retry_if_exception(exception_predicate),
-                               wait=wait_exponential(multiplier=1, max=8))
+
+network_retry = tenacity.retry(
+    reraise=True,
+    stop=stop_after_attempt(config.RETRIES),
+    after=after_log,
+    retry=retry_if_exception(exception_predicate),
+    wait=wait_exponential(multiplier=1, max=8),
+)
+
 
 def chat_action(action: str):
     """Sends `action` while processing."""
+
     def decorator(func):
         @wraps(func)
         async def wrapped_func(message: Message, *args, **kwargs):
@@ -48,8 +56,10 @@ def chat_action(action: str):
 
     return decorator
 
+
 def async_wrap(func):
     """Transform a synchronous function to an asynchronous one."""
+
     @wraps(func)
     async def run(*args, loop=None, executor=None, **kwargs):
         if loop is None:
@@ -59,8 +69,10 @@ def async_wrap(func):
 
     return run
 
+
 def retry_after(func):
     """Retry after hitting flood limit."""
+
     @wraps(func)
     async def decorator(*args, **kwargs):
         while True:
@@ -69,11 +81,12 @@ def retry_after(func):
                 return result
             except RetryAfter as error:
                 logger.opt(depth=1).warning(
-                    'Hit flood limit, retry after {} seconds',
-                    error.timeout + 1)
+                    "Hit flood limit, retry after {} seconds", error.timeout + 1
+                )
                 await asyncio.sleep(error.timeout + 1)
 
     return decorator
+
 
 class Cache:
     cached_functions = []
@@ -81,10 +94,10 @@ class Cache:
     @staticmethod
     def lru(*args, **kwargs):
         """Least-recently-used cache decorator."""
+
         def decorator(func):
             if asyncio.iscoroutinefunction(func):
-                func = alru_cache(cache_exceptions=False, *args,
-                                  **kwargs)(func)
+                func = alru_cache(cache_exceptions=False, *args, **kwargs)(func)
             else:
                 func = functools.lru_cache(*args, **kwargs)(func)
             Cache.cached_functions.append(func)

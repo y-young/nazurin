@@ -4,6 +4,7 @@ from .caption import Caption
 from .file import File
 from .illust import Illust
 
+
 @dataclass(init=False)
 class Ugoira(Illust):
     video: File = None

@@ -8,6 +8,7 @@ from .caption import Caption
 from .file import File
 from .image import Image
 
+
 @dataclass
 class Illust:
     images: List[Image] = field(default_factory=list)

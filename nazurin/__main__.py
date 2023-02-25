@@ -15,10 +15,12 @@ from nazurin.utils.decorators import Cache, chat_action
 from nazurin.utils.exceptions import NazurinError
 from nazurin.utils.helpers import format_error
 
-@dp.message_handler(commands=['start', 'help'])
+
+@dp.message_handler(commands=["start", "help"])
 @chat_action(ChatActions.TYPING)
 async def show_help(message: Message):
-    await message.reply('''
+    await message.reply(
+        """
     小さな小さな賢将, can help you collect images from various sites.
     Commands:
     /ping - pong
@@ -34,14 +36,17 @@ async def show_help(message: Message):
     /clear_cache - clear download cache
     /help - get this help text
     PS: Send Pixiv/Danbooru/Yandere/Konachan/Twitter URL to download image(s)
-    ''')
+    """
+    )
 
-@dp.message_handler(commands=['ping'])
+
+@dp.message_handler(commands=["ping"])
 @chat_action(ChatActions.TYPING)
 async def ping(message: Message):
-    await message.reply('pong!')
+    await message.reply("pong!")
 
-@dp.message_handler(IDFilter(config.ADMIN_ID), commands=['clear_cache'])
+
+@dp.message_handler(IDFilter(config.ADMIN_ID), commands=["clear_cache"])
 async def clear_cache(message: Message):
     try:
         if os.path.exists(config.TEMP_DIR):
@@ -53,28 +58,30 @@ async def clear_cache(message: Message):
     except OSError as error:
         await message.reply(error.strerror)
 
+
 @dp.errors_handler()
 async def on_error(update: Update, exception: Exception):
     try:
         raise exception
     except ClientResponseError as error:
         traceback.print_exc()
-        await update.message.reply(
-            f'Response Error: {error.status} {error.message}')
+        await update.message.reply(f"Response Error: {error.status} {error.message}")
     except NazurinError as error:
         await update.message.reply(error.msg)
     except asyncio.TimeoutError:
         traceback.print_exc()
-        await update.message.reply('Error: Timeout, please try again.')
+        await update.message.reply("Error: Timeout, please try again.")
     except Exception as error:  # pylint: disable=broad-except
-        logger.exception('Update {} caused {}: {}', update, type(error), error)
+        logger.exception("Update {} caused {}: {}", update, type(error), error)
         if not isinstance(error, TelegramAPIError):
-            await update.message.reply(f'Error: {format_error(error)}')
+            await update.message.reply(f"Error: {format_error(error)}")
 
     return True
+
 
 def main():
     dp.start()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

@@ -5,6 +5,7 @@ from nazurin.utils.exceptions import NazurinError
 
 from .file import File
 
+
 @dataclass
 class Image(File):
     thumbnail: str = None
@@ -20,32 +21,39 @@ class Image(File):
         return await self.chosen_url()
 
     async def chosen_url(self) -> str:
-        # Conform with limitations of sending photos: https://core.telegram.org/bots/api#sendphoto
+        # Conform with limitations of sending photos:
+        # https://core.telegram.org/bots/api#sendphoto
         if self._chosen_url:
             return self._chosen_url
         if self.height != 0 and self.width / self.height > 20:
             raise NazurinError(
-                'Width and height ratio of image exceeds 20, try download option.'
+                "Width and height ratio of image exceeds 20, try download option."
             )
         self._chosen_url = self.url
         if self.thumbnail:
             # For safety reasons, use thumbnail when image size is unknown
-            if (not self.width) or (
-                    not self.height) or self.width + self.height > 10000:
+            if (
+                (not self.width)
+                or (not self.height)
+                or self.width + self.height > 10000
+            ):
                 self._chosen_url = self.thumbnail
                 logger.info(
-                    'Use thumbnail (Unkown image size or width + height > 10000 '
-                    '[{width}, {height}]): {url}',
+                    "Use thumbnail (Unkown image size or width + height > 10000 "
+                    "[{width}, {height}]): {url}",
                     width=self.width,
                     height=self.height,
-                    url=self._chosen_url)
+                    url=self._chosen_url,
+                )
             else:
                 size = await self.size()
                 if (not size) or size > 5 * 1024 * 1024:
                     self._chosen_url = self.thumbnail
                     logger.info(
-                        'Use thumbnail (Unknown size or size > 5MB [{}]): {}',
-                        size, self._chosen_url)
+                        "Use thumbnail (Unknown size or size > 5MB [{}]): {}",
+                        size,
+                        self._chosen_url,
+                    )
         return self._chosen_url
 
     async def size(self, **kwargs) -> int:
@@ -55,11 +63,11 @@ class Image(File):
         async with Request(**kwargs) as request:
             async with request.head(self.url) as response:
                 headers = response.headers
-                if 'Content-Length' in headers:
-                    self._size = int(headers['Content-Length'])
-                    logger.info('Got image size: {}', self._size)
+                if "Content-Length" in headers:
+                    self._size = int(headers["Content-Length"])
+                    logger.info("Got image size: {}", self._size)
                 else:
-                    logger.info('Failed to get image size')
+                    logger.info("Failed to get image size")
                 return self._size
 
     def __post_init__(self):
@@ -69,5 +77,5 @@ class Image(File):
 
     def set_size(self, value: int):
         if value % 1 != 0:
-            raise TypeError('Image size must be an integer')
+            raise TypeError("Image size must be an integer")
         self._size = int(value)

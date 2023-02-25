@@ -14,16 +14,20 @@ from nazurin.utils import logger
 from nazurin.utils.decorators import Cache, async_wrap
 from nazurin.utils.exceptions import NazurinError
 
-GD_FOLDER = env.str('GD_FOLDER')
-GD_CREDENTIALS = env.str('GD_CREDENTIALS',
-                         default=env.str('GOOGLE_APPLICATION_CREDENTIALS'))
-FOLDER_MIME = 'application/vnd.google-apps.folder'
+GD_FOLDER = env.str("GD_FOLDER")
+GD_CREDENTIALS = env.str(
+    "GD_CREDENTIALS", default=env.str("GOOGLE_APPLICATION_CREDENTIALS")
+)
+FOLDER_MIME = "application/vnd.google-apps.folder"
+
 
 class GoogleDrive:
     """Google Drive driver."""
+
     drive = GDrive()
     create_file: Callable[[dict], Awaitable[GoogleDriveFile]] = async_wrap(
-        drive.CreateFile)
+        drive.CreateFile
+    )
 
     def __init__(self):
         """Initialize and log in."""
@@ -32,28 +36,28 @@ class GoogleDrive:
     @staticmethod
     def auth():
         gauth = GoogleAuth()
-        scope = ['https://www.googleapis.com/auth/drive']
-        gauth.auth_method = 'service'
+        scope = ["https://www.googleapis.com/auth/drive"]
+        gauth.auth_method = "service"
         if GD_CREDENTIALS:
-            if GD_CREDENTIALS.startswith('{'):
+            if GD_CREDENTIALS.startswith("{"):
                 credentials = json.loads(GD_CREDENTIALS)
                 gauth.credentials = ServiceAccountCredentials.from_json_keyfile_dict(
-                    credentials, scope)
+                    credentials, scope
+                )
             else:
                 gauth.credentials = ServiceAccountCredentials.from_json_keyfile_name(
-                    GD_CREDENTIALS, scope)
+                    GD_CREDENTIALS, scope
+                )
         else:
-            raise NazurinError(
-                'Credentials not found for Google Drive storage.')
+            raise NazurinError("Credentials not found for Google Drive storage.")
         GoogleDrive.drive.auth = gauth
 
     @staticmethod
     async def upload(file: File, folders: dict = None):
         # Compute relative path to STORAGE_DIR, which is GD_FOLDER
         path = file.destination.relative_to(STORAGE_DIR).as_posix()
-        parent = folders[
-            path] if folders else await GoogleDrive.create_folders(path)
-        metadata = {'title': file.name, 'parents': [{'id': parent}]}
+        parent = folders[path] if folders else await GoogleDrive.create_folders(path)
+        metadata = {"title": file.name, "parents": [{"id": parent}]}
         f = await GoogleDrive.create_file(metadata)
         f.SetContentFile(file.path)
         f.Upload()
@@ -65,9 +69,7 @@ class GoogleDrive:
             file.destination.relative_to(STORAGE_DIR).as_posix()
             for file in files
         }
-        tasks = [
-            self.create_folders(destination) for destination in destinations
-        ]
+        tasks = [self.create_folders(destination) for destination in destinations]
         logger.info("Creating folders: {}", destinations)
         folder_ids = await asyncio.gather(*tasks)
         folders = {}
@@ -82,28 +84,26 @@ class GoogleDrive:
     @async_wrap
     def find_folder(name: str, parent: str = None) -> str:
         query = {
-            'q': f"mimeType='{FOLDER_MIME}' and "\
-                 f"title='{name}' and "\
-                 f"'{parent or GD_FOLDER}' in parents",
-            'spaces': 'drive'
+            "q": f"mimeType='{FOLDER_MIME}' and "
+            f"title='{name}' and "
+            f"'{parent or GD_FOLDER}' in parents",
+            "spaces": "drive",
         }
         result = GoogleDrive.drive.ListFile(query).GetList()
         if not result:
             return None
-        return result[0].get('id')
+        return result[0].get("id")
 
     @staticmethod
     async def create_folder(name: str, parent: str = None) -> str:
         metadata = {
-            'title': name,
-            'mimeType': FOLDER_MIME,
-            'parents': [{
-                'id': parent or GD_FOLDER
-            }]
+            "title": name,
+            "mimeType": FOLDER_MIME,
+            "parents": [{"id": parent or GD_FOLDER}],
         }
         folder = await GoogleDrive.create_file(metadata)
         folder.Upload()
-        return folder.get('id')
+        return folder.get("id")
 
     @staticmethod
     async def create_folders(path: str, parent: str = None) -> str:

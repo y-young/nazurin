@@ -12,9 +12,10 @@ from nazurin.utils import logger
 from nazurin.utils.decorators import Cache, async_wrap, network_retry
 from nazurin.utils.exceptions import NazurinError
 
-MEGA_USER = env.str('MEGA_USER')
-MEGA_PASS = env.str('MEGA_PASS')
-MEGA_DOCUMENT = 'mega'
+MEGA_USER = env.str("MEGA_USER")
+MEGA_PASS = env.str("MEGA_PASS")
+MEGA_DOCUMENT = "mega"
+
 
 class Mega:
     api = mega()
@@ -32,43 +33,46 @@ class Mega:
         await Mega.api_login(MEGA_USER, MEGA_PASS)
         if initialize:
             await Mega.collection.insert(
-                MEGA_DOCUMENT, {
-                    'sid': Mega.api.sid,
-                    'master_key': list(Mega.api.master_key),
-                    'root_id': Mega.api.root_id
-                })
+                MEGA_DOCUMENT,
+                {
+                    "sid": Mega.api.sid,
+                    "master_key": list(Mega.api.master_key),
+                    "root_id": Mega.api.root_id,
+                },
+            )
         else:
-            await Mega.document.update({
-                'sid': Mega.api.sid,
-                'master_key': list(Mega.api.master_key),
-                'root_id': Mega.api.root_id
-            })
-        logger.info('MEGA tokens cached')
+            await Mega.document.update(
+                {
+                    "sid": Mega.api.sid,
+                    "master_key": list(Mega.api.master_key),
+                    "root_id": Mega.api.root_id,
+                }
+            )
+        logger.info("MEGA tokens cached")
 
     async def require_auth(self):
         if not Mega.api.sid:
             tokens = await Mega.document.get()
-            if tokens and 'sid' in tokens:
-                Mega.api.sid = tokens['sid']
-                Mega.api.master_key = tuple(tokens['master_key'])
-                Mega.api.root_id = tokens['root_id']
-                logger.info('MEGA logged in through cached tokens')
+            if tokens and "sid" in tokens:
+                Mega.api.sid = tokens["sid"]
+                Mega.api.master_key = tuple(tokens["master_key"])
+                Mega.api.root_id = tokens["root_id"]
+                logger.info("MEGA logged in through cached tokens")
             else:  # Initialize database
                 await self.login(initialize=True)
 
     @network_retry
-    async def upload(self,
-                     file: File,
-                     folders: dict = None,
-                     retry: bool = False):
+    async def upload(self, file: File, folders: dict = None, retry: bool = False):
         path = file.destination.as_posix()
         try:
-            destination = folders[
-                path] if folders else await self.ensure_existence(path)
+            destination = (
+                folders[path] if folders else await self.ensure_existence(path)
+            )
             await Mega.api_upload(file.path, destination)
         except RequestError as error:
-            # mega.errors.RequestError: ESID, Invalid or expired user session, please relogin
-            if 'relogin' in error.message and not retry:
+            # mega.errors.RequestError:
+            # ESID, Invalid or expired user session, please relogin
+            if "relogin" in error.message and not retry:
                 logger.info(error)
                 Mega.api.sid = None
                 await self.login()
@@ -79,9 +83,7 @@ class Mega:
 
         # Create necessary folders in advance
         destinations = {file.destination.as_posix() for file in files}
-        tasks = [
-            self.ensure_existence(destination) for destination in destinations
-        ]
+        tasks = [self.ensure_existence(destination) for destination in destinations]
         logger.info("Creating folders: {}", destinations)
         folder_ids = await asyncio.gather(*tasks)
         folders = {}
@@ -97,4 +99,4 @@ class Mega:
         result = await Mega.create_folder(path)
         if result.get(path):
             return result[path]
-        raise NazurinError('Failed to create folder: ' + path)
+        raise NazurinError("Failed to create folder: " + path)

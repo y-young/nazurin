@@ -5,15 +5,17 @@ from tinydb import Query, TinyDB
 from nazurin.config import DATA_DIR
 from nazurin.utils.helpers import ensure_existence
 
+
 class Local:
     """Local database driver using TinyDB."""
+
     def __init__(self):
         ensure_existence(DATA_DIR)
         self.db = None
         self._key = None
 
     def collection(self, key):
-        self.db = TinyDB(path.join(DATA_DIR, key + '.json'))
+        self.db = TinyDB(path.join(DATA_DIR, key + ".json"))
         return self
 
     def document(self, key):
@@ -29,7 +31,7 @@ class Local:
 
     async def insert(self, key, data):
         if key:
-            data['key'] = key
+            data["key"] = key
         return self.db.insert(data)
 
     async def update(self, data):
