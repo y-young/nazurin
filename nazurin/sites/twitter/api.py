@@ -1,7 +1,7 @@
 import os
 from typing import List, Tuple
 
-from nazurin.models import Caption, Illust, Image
+from nazurin.models import Caption, File, Illust, Image, Ugoira
 from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
@@ -33,6 +33,8 @@ class Twitter:
     async def fetch(self, status_id: int) -> Illust:
         """Fetch & return tweet images and information."""
         tweet = await self.get_tweet(status_id)
+        if "video" in tweet:
+            return await self.get_video(tweet)
         imgs = self.get_images(tweet)
         caption = self.build_caption(tweet)
         return Illust(imgs, caption, tweet)
@@ -57,6 +59,29 @@ class Twitter:
                 )
             )
         return imgs
+
+    async def get_video(self, tweet) -> Ugoira:
+        variants = tweet["mediaDetails"][0]["video_info"]["variants"]
+        max_bitrate = -1
+        best_variant = None
+
+        for variant in variants:
+            if variant["content_type"] != "video/mp4":
+                continue
+            # https://video.twimg.com/amplify_video/1625137841473982464/vid/720x954/YzLr5Rw4xODqTpkm.mp4?tag=16
+            bitrate = variant["bitrate"] if "bitrate" in variant else 0
+            if bitrate > max_bitrate:
+                max_bitrate = variant["bitrate"]
+                best_variant = variant["url"]
+        if not best_variant:
+            raise NazurinError("Failed to select best video variant.")
+
+        filename = os.path.basename(best_variant.split("?")[0])
+        destination, filename = self.get_storage_dest(filename, tweet)
+        file = File(filename, best_variant, destination)
+        async with Request() as session:
+            await file.download(session)
+        return Ugoira(file, self.build_caption(tweet), tweet)
 
     @staticmethod
     def get_storage_dest(filename: str, tweet: dict, index: int = 0) -> Tuple[str, str]:
@@ -83,8 +108,8 @@ class Twitter:
     def build_caption(tweet) -> Caption:
         return Caption(
             {
-                "url": f"https://twitter.com/{tweet['user']['screen_name']}\
-                         /status/{tweet['id_str']}",
+                "url": f"https://twitter.com/{tweet['user']['screen_name']}"
+                f"/status/{tweet['id_str']}",
                 "author": f"{tweet['user']['name']} #{tweet['user']['screen_name']}",
                 "text": tweet["text"],
             }
