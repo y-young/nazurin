@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 import os
 import random
@@ -8,6 +7,7 @@ import subprocess
 import time
 import zipfile
 from datetime import datetime
+from pathlib import Path
 from typing import Callable, List, Tuple
 
 import aiofiles
@@ -175,16 +175,27 @@ class Pixiv:
 
         @async_wrap
         def convert(config: File, output: File):
+            # FFmpeg only recognizes POSIX path
+            config_path = Path(config.path).as_posix()
             # For some illustrations like https://www.pixiv.net/artworks/44298467,
             # the output video is in YUV444P colorspace,
             # which can't be played on some devices,
             # thus we convert to YUV420P colorspace for better compatibility.
-            cmd = (
-                f'ffmpeg -i "{config.path}" -vcodec libx264 -pix_fmt yuv420p '
-                f'-vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -y "{output.path}"'
-            )
+            args = [
+                "ffmpeg",
+                "-i",
+                config_path,
+                "-vcodec",
+                "libx264",
+                "-pix_fmt",
+                "yuv420p",
+                "-vf",
+                "pad=ceil(iw/2)*2:ceil(ih/2)*2",
+                "-y",
+                output.path,
+            ]
+            cmd = shlex.join(args)
             logger.info("Calling FFmpeg with command: {}", cmd)
-            args = shlex.split(cmd)
             try:
                 output = subprocess.check_output(
                     args, stderr=subprocess.STDOUT, shell=False
@@ -205,10 +216,13 @@ class Pixiv:
         ffconcat = "ffconcat version 1.0\n"
         # no need to specify duration for the last frame
         for frame in ugoira_metadata.frames[:-1]:
-            frame.file = folder + "/" + frame.file
+            # FFmpeg only recognizes POSIX path
+            frame.file = Path(folder, frame.file).as_posix()
             ffconcat += "file " + frame.file + "\n"
             ffconcat += "duration " + str(float(frame.delay) / 1000) + "\n"
-        ffconcat += "file " + folder + "/" + ugoira_metadata.frames[-1].file + "\n"
+        ffconcat += (
+            "file " + Path(folder, ugoira_metadata.frames[-1].file).as_posix() + "\n"
+        )
         input_config = File(folder + ".ffconcat")
         async with aiofiles.open(input_config.path, "w") as f:
             await f.write(ffconcat)
@@ -320,7 +334,10 @@ class Pixiv:
                 # Reset UA after bypassing successfully
                 Pixiv.api.additional_headers = {}
         except PixivError as error:
-            if "challenge_basic_security" in error.reason:
+            if (
+                "challenge_basic_security" in error.reason
+                or "Captcha challenge" in error.reason
+            ):
                 # Blocked by CloudFlare, try to bypass by changing UA
                 if retry:
                     random_ua = f"PixivAndroidApp/6.{random.randrange(0, 60)}.0"
