@@ -14,7 +14,7 @@ class Request(ClientSession):
         headers.update({"User-Agent": UA})
         connector = None
         if PROXY:
-            connector = TCPConnector(verify_ssl=False)
+            connector = TCPConnector(ssl=False)
         super().__init__(
             connector=connector,
             cookies=cookies,
