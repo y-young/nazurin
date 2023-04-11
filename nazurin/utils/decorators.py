@@ -97,7 +97,7 @@ class Cache:
 
         def decorator(func):
             if asyncio.iscoroutinefunction(func):
-                func = alru_cache(cache_exceptions=False, *args, **kwargs)(func)
+                func = alru_cache(*args, **kwargs)(func)
             else:
                 func = functools.lru_cache(*args, **kwargs)(func)
             Cache.cached_functions.append(func)

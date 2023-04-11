@@ -2,6 +2,36 @@
 
 <https://twitter.com/>
 
+## Configuration
+
+### TWITTER_API
+
+:material-lightbulb-on: Optional, defaults to `web`
+
+API to use, `web` or `syndication`. Web API comes from web page, while Syndication API comes from <https://publish.twitter.com>.
+
+Tweets marked as sensitive cannot be fetched through Syndication API, but can be fetched through Web API if [`TWITTER_AUTH_TOKEN`](#twitter_auth_token) is set.
+
+When Web API is unavailable, you may switch to Syndication API.
+
+_Added in v2.4.0_
+
+### TWITTER_AUTH_TOKEN
+
+:material-lightbulb-on: Optional, required to fetch tweets marked as sensitive
+
+Authorization token for Web API.
+
+To get one, follow these steps:
+
+1. Open <https://twitter.com/> in your browser
+2. Open Developer Tools (<kbd>F12</kbd>)
+3. Navigate to `Application` tab
+4. Expand `Cookies` section in the sidebar and click `https://twitter.com`
+5. Copy the value of `auth_token` cookie
+
+_Added in v2.4.0_
+
 ## Customizing Storage Path & File Name
 
 For more information, refer to [Customizing Storage Path & File Name](../#customizing-storage-path--file-name).

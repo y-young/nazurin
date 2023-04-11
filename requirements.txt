@@ -5,7 +5,7 @@ aiofiles~=0.8.0
 aiojobs~=0.3.0
 tenacity~=5.1.5
 environs~=9.3.4
-async_lru~=1.0.3
+async_lru~=2.0.2
 loguru~=0.6.0
 
 pixivpy3~=3.7.2
