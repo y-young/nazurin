@@ -8,7 +8,7 @@
 |  Lolibooru   |    <https://lolibooru.moe/>    |      |    ✔     |
 |   Zerochan   |  <https://www.zerochan.net/>   |  ✔   |    ✔     |
 |   Gelbooru   |    <https://gelbooru.com/>     |      |    ✔     |
-|   Twitter    |     <https://twitter.com/>     |      |    ✔     |
+|   Twitter    |     <https://twitter.com/>     |  ✔   |    ✔     |
 |  ArtStation  | <https://www.artstation.com/>  |      |    ✔     |
 |  Wallhaven   |    <https://wallhaven.cc/>     |      |    ✔     |
 | 哔哩哔哩动态 |   <https://t.bilibili.com/>    |      |    ✔     |
