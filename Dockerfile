@@ -3,9 +3,9 @@ ARG PYTHON_VERSION=3.8
 FROM jrottenberg/ffmpeg:4.2-scratch as ffmpeg
 
 # Builder
-FROM python:${PYTHON_VERSION}-slim as builder
+FROM python:${PYTHON_VERSION}-alpine as builder
 
-RUN apt-get update && apt-get install -y --no-install-recommends git
+RUN apk add --update curl git build-base libffi-dev
 
 WORKDIR /root
 
@@ -14,7 +14,7 @@ COPY requirements.txt /root
 RUN pip install --prefix="/install" --no-warn-script-location -r requirements.txt
 
 # Runtime
-FROM python:${PYTHON_VERSION}-slim
+FROM python:${PYTHON_VERSION}-alpine
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
