@@ -1,6 +1,8 @@
 import os
 import pathlib
 import re
+import shutil
+import time
 from datetime import datetime
 from html import escape
 from mimetypes import guess_type
@@ -173,3 +175,18 @@ def format_error(error: Exception) -> str:
     error_type = type(error).__name__
     error_msg = escape(str(error), quote=False)
     return f"({error_type}) {error_msg}"
+
+
+async def remove_files_older_than(path: str, days: int):
+    """Remove files in `path` whose last access time is older than `days`."""
+    if not await aiofiles.os.path.exists(path):
+        return
+    now = time.time()
+    deadline = now - days * 86400
+    entries = await aiofiles.os.scandir(path)
+    for entry in entries:
+        if entry.stat().st_atime < deadline:
+            if entry.is_file():
+                await aiofiles.os.remove(entry.path)
+            elif entry.is_dir():
+                shutil.rmtree(entry.path)

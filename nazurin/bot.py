@@ -13,7 +13,11 @@ from nazurin.storage import Storage
 from nazurin.utils import logger
 from nazurin.utils.decorators import retry_after
 from nazurin.utils.exceptions import NazurinError
-from nazurin.utils.helpers import handle_bad_request, sanitize_caption
+from nazurin.utils.helpers import (
+    handle_bad_request,
+    remove_files_older_than,
+    sanitize_caption,
+)
 
 
 class NazurinBot(Bot):
@@ -23,10 +27,18 @@ class NazurinBot(Bot):
         super().__init__(parse_mode=ParseMode.HTML, *args, **kwargs)
         self.sites = SiteManager()
         self.storage = Storage()
+        self.cleanup_task = None
 
     def init(self):
         self.sites.load()
         self.storage.load()
+
+    async def on_startup(self):
+        self.cleanup_task = asyncio.create_task(self.cleanup_temp_dir())
+
+    async def on_shutdown(self):
+        if self.cleanup_task:
+            self.cleanup_task.cancel()
 
     @retry_after
     async def send_single_group(
@@ -139,3 +151,16 @@ class NazurinBot(Bot):
 
         await self.storage.store(illust)
         return True
+
+    async def cleanup_temp_dir(self):
+        if config.CLEANUP_INTERVAL == 0:
+            return
+        while True:
+            logger.info("Cleaning up temporary directory")
+            try:
+                await remove_files_older_than(config.TEMP_DIR, 1)
+                logger.info("Cleaned up temporary directory")
+            # pylint: disable=broad-except
+            except Exception as error:
+                logger.error("Failed to clean up temporary directory: {}", error)
+            await asyncio.sleep(config.CLEANUP_INTERVAL * 86400)

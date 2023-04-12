@@ -46,4 +46,5 @@ UA = (
 # Local directory to store database and temporary files
 DATA_DIR = "data"
 TEMP_DIR = path.join(DATA_DIR, "temp")
+CLEANUP_INTERVAL = env.int("CLEANUP_INTERVAL", default=7)
 ACCESS_LOG_FORMAT = '%a "%r" %s %b "%{Referer}i" "%{User-Agent}i"'

@@ -177,3 +177,11 @@ Proxy URL for network requests, e.g. `http://127.0.0.1:7890`, will follow your e
 Items to ignore in image caption, separated by commas, e.g. `bookmarked`.
 
 _Added in v2._
+
+## CLEANUP_INTERVAL
+
+:material-lightbulb-on: Optional, defaults to `7`
+
+Temporary directory cleanup interval, in days. Files whose access time is older than 1 day will be deleted during cleanup. Automatic cleanup will be disabled if set to `0`.
+
+_Added in v2.4.1._

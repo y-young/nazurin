@@ -3,8 +3,9 @@ import traceback
 from json import JSONDecodeError
 
 import aiohttp_cors
-import aiojobs
 from aiohttp import web
+from aiojobs.aiohttp import setup as setup_jobs
+from aiojobs.aiohttp import spawn
 
 from nazurin import config
 from nazurin.utils import logger
@@ -26,8 +27,7 @@ class NazurinServer(web.Application):
                 )
             },
         )
-        self.on_startup.append(self.init_jobs)
-        self.on_shutdown.append(self.shutdown_jobs)
+        setup_jobs(self)
         self.request_id = 1
 
     def start(self):
@@ -61,12 +61,6 @@ class NazurinServer(web.Application):
         if "url" not in data:
             return web.HTTPBadRequest()
         with logger.contextualize(request=f"request:{self.request_id}"):
-            await request.app["jobs"].spawn(self.do_update(data.get("url")))
+            await spawn(request, self.do_update(data.get("url")))
         self.request_id += 1
         return web.json_response({"error": 0})
-
-    async def init_jobs(self, app):
-        app["jobs"] = await aiojobs.create_scheduler()
-
-    async def shutdown_jobs(self, app):
-        await app["jobs"].close()

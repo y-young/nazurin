@@ -1,7 +1,7 @@
 import asyncio
 from typing import List
 
-from aiogram import Dispatcher, executor
+from aiogram import Dispatcher
 from aiogram.types import AllowedUpdates, ContentType, Message, Update
 from aiogram.utils.executor import Executor
 
@@ -17,12 +17,14 @@ from .server import NazurinServer
 class NazurinDispatcher(Dispatcher):
     def __init__(self, bot: NazurinBot):
         super().__init__(bot)
+        self.bot: NazurinBot = bot
         self.middleware.setup(AuthMiddleware())
         self.middleware.setup(LoggingMiddleware())
         self.filters_factory.bind(URLFilter, event_handlers=[self.message_handlers])
         self.server = NazurinServer(bot)
-        self.server.on_startup.append(self.on_startup)
-        self.executor = Executor(self)
+        self.executor = Executor(self, skip_updates=True)
+        self.executor.on_startup(self.on_startup)
+        self.executor.on_shutdown(self.on_shutdown)
 
     def init(self):
         self.bot.init()
@@ -43,6 +45,10 @@ class NazurinDispatcher(Dispatcher):
                 config.WEBHOOK_URL + config.TOKEN,
                 allowed_updates=AllowedUpdates.MESSAGE,
             )
+        await self.bot.on_startup()
+
+    async def on_shutdown(self, *_args):
+        await self.bot.on_shutdown()
 
     async def process_update(self, update: Update):
         with logger.contextualize(request=f"update:{update.update_id}"):
@@ -67,7 +73,7 @@ class NazurinDispatcher(Dispatcher):
             )
         else:
             # self.server.start()
-            executor.start_polling(self, skip_updates=True)
+            self.executor.start_polling()
 
     async def update_collection(self, message: Message, urls: List[str]):
         await self.bot.update_collection(urls, message)
