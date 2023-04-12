@@ -170,13 +170,16 @@ class WebAPI(BaseAPI):
     @Cache.lru(ttl=3600)
     async def _get_guest_token(self):
         logger.info("Fetching guest token")
+        WebAPI.headers[Headers.GUEST_TOKEN] = ""
+        WebAPI.cookies["gt"] = ""
         api = "https://api.twitter.com/1.1/guest/activate.json"
         response = await self._request("POST", api)
         token = response.get("guest_token")
         if not token:
             raise NazurinError(f"Failed to get guest token: {response}")
         WebAPI.headers[Headers.GUEST_TOKEN] = token
-        logger.success("Fetched guest token: {}", token)
+        WebAPI.cookies["gt"] = token
+        logger.info("Fetched guest token: {}", token)
         return token
 
     def _process_response(self, response: dict):
