@@ -121,7 +121,13 @@ class WebAPI(BaseAPI):
         }
         await self._require_auth()
         response = await self._request("GET", api, params=params)
-        return self._process_response(response)
+        try:
+            return self._process_response(response)
+        except KeyError as error:
+            msg = "Failed to parse response:"
+            logger.error("{} {}", msg, error)
+            logger.info("{}", response)
+            raise NazurinError(f"{msg} {error}") from error
 
     async def _require_auth(self):
         if not WebAPI.headers.get(Headers.AUTH_TYPE):
@@ -203,8 +209,16 @@ class WebAPI(BaseAPI):
             if entry["entryId"].startswith("tweet-"):
                 tweet = entry["content"]["itemContent"]["tweet_results"]["result"]
                 break
+
+        if not tweet:
+            error = "Failed to find tweet detail in response"
+            logger.error(error)
+            logger.info("{}", response)
+            raise NazurinError(error)
+
         # Check if tweet is available
-        if tweet and tweet.get("__typename") == "TweetTombstone":
+        typename = tweet.get("__typename")
+        if typename == "TweetTombstone":
             tombstone = tweet["tombstone"]["text"]
             logger.error("Encountered tweet tombstone: {}", tombstone)
             text = tombstone["text"]
@@ -213,6 +227,11 @@ class WebAPI(BaseAPI):
                     "Age-restricted adult content. Please set Twitter auth token."
                 )
             raise NazurinError(text)
+
+        # When using auth token, and e.g. the user limited who can reply,
+        # the result is not a direct tweet type, the real tweet is nested.
+        if typename == "TweetWithVisibilityResults" or tweet.get("tweet"):
+            tweet = tweet["tweet"]
 
         tweet = WebAPI.normalize_tweet(tweet)
         # Return original tweet if it's a retweet
