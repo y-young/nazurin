@@ -122,7 +122,7 @@ class WebAPI(BaseAPI):
         await self._require_auth()
         response = await self._request("GET", api, params=params)
         try:
-            return self._process_response(response)
+            return self._process_response(response, tweet_id)
         except KeyError as error:
             msg = "Failed to parse response:"
             logger.error("{} {}", msg, error)
@@ -188,7 +188,7 @@ class WebAPI(BaseAPI):
         logger.info("Fetched guest token: {}", token)
         return token
 
-    def _process_response(self, response: dict):
+    def _process_response(self, response: dict, tweet_id: str):
         if "errors" in response:
             logger.error(response)
             raise NazurinError(
@@ -206,7 +206,7 @@ class WebAPI(BaseAPI):
         # Find tweet in timeline instructions
         tweet = None
         for entry in entries:
-            if entry["entryId"].startswith("tweet-"):
+            if entry["entryId"] == f"tweet-{tweet_id}":
                 tweet = entry["content"]["itemContent"]["tweet_results"]["result"]
                 break
 

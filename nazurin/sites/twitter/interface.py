@@ -21,5 +21,5 @@ async def handle(match) -> Illust:
     collection = db.collection(COLLECTION)
     illust = await Twitter().fetch(status_id)
     illust.metadata["collected_at"] = time()
-    await collection.insert(int(status_id), illust.metadata)
+    await collection.insert(int(illust.metadata["id_str"]), illust.metadata)
     return illust
