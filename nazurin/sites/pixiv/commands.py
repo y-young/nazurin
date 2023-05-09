@@ -4,6 +4,7 @@ from aiogram.dispatcher.filters import Command, Regexp
 from aiogram.types import Message
 
 from nazurin import bot, dp
+from nazurin.utils.exceptions import InvalidCommandUsage
 
 from .api import Pixiv
 from .config import PixivPrivacy
@@ -11,13 +12,14 @@ from .config import PixivPrivacy
 pixiv = Pixiv()
 
 
-@dp.message_handler(Command(["pixiv"]))
+@dp.message_handler(
+    Command(["pixiv"]), args="ARTWORK_ID", description="View Pixiv artwork"
+)
 async def pixiv_view(message: Message, command: Command.CommandObj):
     try:
         artwork_id = int(command.args)
-    except (IndexError, ValueError, TypeError):
-        await message.reply("Usage: /pixiv ARTWORK_ID")
-        return
+    except (IndexError, ValueError, TypeError) as e:
+        raise InvalidCommandUsage("pixiv") from e
     if artwork_id < 0:
         await message.reply("Invalid artwork id!")
         return
@@ -25,13 +27,14 @@ async def pixiv_view(message: Message, command: Command.CommandObj):
     await bot.send_illust(illust, message)
 
 
-@dp.message_handler(Command(["pixiv_download"]))
+@dp.message_handler(
+    Command(["pixiv_download"]), args="ARTWORK_ID", description="Download Pixiv artwork"
+)
 async def pixiv_download(message: Message, command: Command.CommandObj):
     try:
         artwork_id = int(command.args)
-    except (IndexError, ValueError, TypeError):
-        await message.reply("Usage: /pixiv_download ARTWORK_ID")
-        return
+    except (IndexError, ValueError, TypeError) as e:
+        raise InvalidCommandUsage("pixiv_download") from e
     if artwork_id < 0:
         await message.reply("Invalid artwork id!")
         return
@@ -40,13 +43,16 @@ async def pixiv_download(message: Message, command: Command.CommandObj):
     await bot.send_docs(illust, message)
 
 
-@dp.message_handler(Command(["pixiv_bookmark", "pixiv_bookmark_private"]))
+@dp.message_handler(
+    Command(["pixiv_bookmark", "pixiv_bookmark_private"]),
+    args="ARTWORK_ID",
+    description="Bookmark Pixiv artwork",
+)
 async def pixiv_bookmark(message: Message, command: Command.CommandObj):
     try:
         artwork_id = int(command.args)
-    except (IndexError, ValueError, TypeError):
-        await message.reply("Usage: /pixiv_bookmark ARTWORK_ID")
-        return
+    except (IndexError, ValueError, TypeError) as e:
+        raise InvalidCommandUsage("pixiv_bookmark") from e
     if artwork_id < 0:
         await message.reply("Invalid artwork id!")
         return

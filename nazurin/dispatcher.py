@@ -10,21 +10,27 @@ from nazurin.utils import logger
 from nazurin.utils.filters import URLFilter
 
 from .bot import NazurinBot
+from .commands import CommandsManager
 from .middleware import AuthMiddleware, LoggingMiddleware
 from .server import NazurinServer
 
 
 class NazurinDispatcher(Dispatcher):
     def __init__(self, bot: NazurinBot):
-        super().__init__(bot)
+        super().__init__(bot, run_tasks_by_default=True)
         self.bot: NazurinBot = bot
+        self.filters_factory.bind(URLFilter, event_handlers=[self.message_handlers])
+
         self.middleware.setup(AuthMiddleware())
         self.middleware.setup(LoggingMiddleware())
-        self.filters_factory.bind(URLFilter, event_handlers=[self.message_handlers])
+
         self.server = NazurinServer(bot)
+
         self.executor = Executor(self, skip_updates=True)
         self.executor.on_startup(self.on_startup)
         self.executor.on_shutdown(self.on_shutdown)
+
+        self.commands = CommandsManager()
 
     def init(self):
         self.bot.init()
@@ -34,9 +40,43 @@ class NazurinDispatcher(Dispatcher):
             content_types=[ContentType.TEXT, ContentType.PHOTO],
         )
 
-    def register_message_handler(self, callback, *args, **kwargs):
-        return super().register_message_handler(
-            self.async_task(callback), *args, **kwargs
+    def message_handler(
+        self,
+        *custom_filters,
+        commands=None,
+        regexp=None,
+        content_types=None,
+        state=None,
+        args="",
+        description="",
+        help_text="",
+        **kwargs,
+    ):
+        """
+        Register message handler with commands and description.
+        For more information see aiogram documentation.
+
+        Parameters
+        ----------
+            args: Arguments string
+            description: Description
+            help_text: Help text
+        """
+
+        self.commands.register(
+            *custom_filters,
+            commands=commands,
+            args=args,
+            description=description,
+            help_text=help_text,
+        )
+        return super().message_handler(
+            *custom_filters,
+            commands=commands,
+            regexp=regexp,
+            content_types=content_types,
+            state=state,
+            **kwargs,
         )
 
     async def on_startup(self, *_args):

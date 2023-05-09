@@ -7,3 +7,13 @@ class NazurinError(Exception):
     def __str__(self):
         """Returns the string representation of this exception."""
         return self.msg
+
+
+class InvalidCommandUsage(NazurinError):
+    """Raised when a command is used incorrectly."""
+
+    command: str
+
+    def __init__(self, command):
+        self.command = command
+        super().__init__(f"Invalid usage of command {command}")

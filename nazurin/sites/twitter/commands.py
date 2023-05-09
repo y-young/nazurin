@@ -2,19 +2,19 @@ from aiogram.dispatcher.filters import Command
 from aiogram.types import Message
 
 from nazurin import bot, dp
+from nazurin.utils.exceptions import InvalidCommandUsage
 
 from .api import Twitter
 
 twitter = Twitter()
 
 
-@dp.message_handler(Command(["twitter"]))
+@dp.message_handler(Command(["twitter"]), args="STATUS_ID", description="View tweet")
 async def twitter_view(message: Message, command: Command.CommandObj):
     try:
         status_id = int(command.args)
-    except (IndexError, ValueError, TypeError):
-        await message.reply("Usage: /twitter STATUS_ID")
-        return
+    except (IndexError, ValueError, TypeError) as e:
+        raise InvalidCommandUsage("twitter") from e
     if status_id < 0:
         await message.reply("Invalid status id.")
         return
@@ -22,13 +22,14 @@ async def twitter_view(message: Message, command: Command.CommandObj):
     await bot.send_illust(illust, message)
 
 
-@dp.message_handler(Command(["twitter_download"]))
+@dp.message_handler(
+    Command(["twitter_download"]), args="STATUS_ID", description="Download tweet"
+)
 async def twitter_download(message: Message, command: Command.CommandObj):
     try:
         status_id = int(command.args)
-    except (IndexError, ValueError, TypeError):
-        await message.reply("Usage: /twitter_download STATUS_ID")
-        return
+    except (IndexError, ValueError, TypeError) as e:
+        raise InvalidCommandUsage("twitter_download") from e
     if status_id < 0:
         await message.reply("Invalid status id.")
         return

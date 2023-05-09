@@ -2,19 +2,21 @@ from aiogram.dispatcher.filters import Command
 from aiogram.types import Message
 
 from nazurin import bot, dp
+from nazurin.utils.exceptions import InvalidCommandUsage
 
 from .api import Moebooru
 
 moebooru = Moebooru()
 
 
-@dp.message_handler(Command(["yandere"]))
+@dp.message_handler(
+    Command(["yandere"]), args="POST_ID", description="View yandere post"
+)
 async def yandere_view(message: Message, command: Command.CommandObj):
     try:
         post_id = int(command.args)
-    except (IndexError, ValueError, TypeError):
-        await message.reply("Usage: /yandere POST_ID")
-        return
+    except (IndexError, ValueError, TypeError) as e:
+        raise InvalidCommandUsage("yandere") from e
     if post_id < 0:
         await message.reply("Invalid post id!")
         return
@@ -22,13 +24,14 @@ async def yandere_view(message: Message, command: Command.CommandObj):
     await bot.send_illust(illust, message)
 
 
-@dp.message_handler(Command(["yandere_download"]))
+@dp.message_handler(
+    Command(["yandere_download"]), args="POST_ID", description="Download yandere post"
+)
 async def yandere_download(message: Message, command: Command.CommandObj):
     try:
         post_id = int(command.args)
-    except (IndexError, ValueError, TypeError):
-        await message.reply("Usage: /yandere_download POST_ID")
-        return
+    except (IndexError, ValueError, TypeError) as e:
+        raise InvalidCommandUsage("yandere_download") from e
     if post_id <= 0:
         await message.reply("Invalid post id!")
         return
@@ -37,13 +40,14 @@ async def yandere_download(message: Message, command: Command.CommandObj):
     await bot.send_docs(illust, message)
 
 
-@dp.message_handler(Command(["konachan"]))
+@dp.message_handler(
+    Command(["konachan"]), args="POST_ID", description="Download Konachan post"
+)
 async def konachan_view(message: Message, command: Command.CommandObj):
     try:
         post_id = int(command.args)
-    except (IndexError, ValueError, TypeError):
-        await message.reply("Usage: /konachan POST_ID")
-        return
+    except (IndexError, ValueError, TypeError) as e:
+        raise InvalidCommandUsage("konachan") from e
     if post_id < 0:
         await message.reply("Invalid post id!")
         return
@@ -51,13 +55,14 @@ async def konachan_view(message: Message, command: Command.CommandObj):
     await bot.send_illust(illust, message)
 
 
-@dp.message_handler(Command(["konachan_download"]))
+@dp.message_handler(
+    Command(["konachan_download"]), args="POST_ID", description="Download Konachan post"
+)
 async def konachan_download(message: Message, command: Command.CommandObj):
     try:
         post_id = int(command.args)
-    except (IndexError, ValueError, TypeError):
-        await message.reply("Usage: /konachan_download POST_ID")
-        return
+    except (IndexError, ValueError, TypeError) as e:
+        raise InvalidCommandUsage("konachan_download") from e
     if post_id <= 0:
         await message.reply("Invalid post id!")
         return
