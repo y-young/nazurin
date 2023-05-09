@@ -287,7 +287,7 @@ class Pixiv:
         caption = Caption(
             {
                 "title": illust.title,
-                "author": illust.user.name,
+                "author": "#" + illust.user.name,
                 "tags": tags,
                 "total_bookmarks": illust.total_bookmarks,
                 "url": "pixiv.net/i/" + str(illust.id),
