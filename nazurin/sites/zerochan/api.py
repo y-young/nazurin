@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import List, Tuple
 from urllib.parse import unquote
 
@@ -32,11 +32,7 @@ class Zerochan:
         info = json.loads("".join(info).replace("\\'", "'"))
 
         name = info["name"].split(" #")[0]
-        created_at = int(
-            datetime.strptime(info["datePublished"], "%c")
-            .replace(tzinfo=timezone.utc)
-            .timestamp()
-        )
+        created_at = info["datePublished"]
         size = int(info["contentSize"][:-2]) * 1024
         tags = {}
         for tag in soup.find("ul", id="tags").find_all("li"):
@@ -86,7 +82,7 @@ class Zerochan:
         Format destination and filename.
         """
 
-        created_at = datetime.fromtimestamp(post["created_at"])
+        created_at = datetime.fromisoformat(post["created_at"])
         filename, extension = os.path.splitext(os.path.basename(post["file_url"]))
         context = {
             **post,
