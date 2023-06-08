@@ -85,6 +85,10 @@ Before you start, you'll need to install `git`, `Python 3` and a browser.
 
 ## Configuration
 
+!!! warning "Notice"
+
+    Since OneDrive access token and refresh token are cached in database, after switching account, you'll need to delete `onedrive` document in `nazurin` collection from the database.
+
 ### STORAGE
 
 Append `OneDrive`. For more information, see [Configuration](../../start/configuration/#storage).

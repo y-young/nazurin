@@ -8,6 +8,10 @@
 
     从 2021 年 2 月 9 日起，Pixiv 不再支持用户名密码认证。你需要提前获取一个 Refresh Token。（详见 [#9](https://github.com/y-young/nazurin/issues/9)）
 
+!!! warning "注意"
+
+    由于 Pixiv 的 Access Token 和 Refresh Token 被缓存在数据库中，切换账号后，你需要从数据库中删除 `nazurin` 集合中的 `pixiv` 文档。
+
 ### PIXIV_TOKEN
 
 :material-exclamation-thick: 必填，除非在数据库中已有缓存

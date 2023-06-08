@@ -8,6 +8,10 @@
 
     Pixiv no longer supports username & password authorization from Feb 9, 2021. You'll have to obtain a refresh token in advance. (see [#9](https://github.com/y-young/nazurin/issues/9))
 
+!!! warning "Notice"
+
+    Since Pixiv access token and refresh token are cached in database, after switching account, you'll need to delete `pixiv` document in `nazurin` collection from the database.
+
 ### PIXIV_TOKEN
 
 :material-exclamation-thick: Required unless Nazurin has cached one in your database

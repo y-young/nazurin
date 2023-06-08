@@ -4,6 +4,10 @@
 
 ## Configuration
 
+!!! warning "Notice"
+
+    Since authentication tokens are cached in database, after switching MEGA account, you'll need to delete `mega` document in `nazurin` collection from the database.
+
 ### STORAGE
 
 Append `Mega`. For more information, see [Configuration](../../start/configuration/#storage).

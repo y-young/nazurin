@@ -85,6 +85,10 @@
 
 ## 配置
 
+!!! warning "注意"
+
+    由于 OneDrive 的 Access Token 和 Refresh Token 被缓存在数据库中，切换账号后，你需要从数据库中删除 `nazurin` 集合中的 `onedrive` 文档。
+
 ### STORAGE
 
 追加 `OneDrive`，详见 [配置](../../start/configuration/#storage)。

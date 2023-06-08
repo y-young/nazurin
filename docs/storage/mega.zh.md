@@ -4,6 +4,10 @@
 
 ## 配置
 
+!!! warning "注意"
+
+    由于登录凭据被缓存在数据库中，切换 MEGA 账号后，你需要从数据库中删除 `nazurin` 集合中的 `mega` 文档。
+
 ### STORAGE
 
 追加 `Mega`，详见 [配置](../../start/configuration/#storage)。
