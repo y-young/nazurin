@@ -1,4 +1,6 @@
 import asyncio
+import os
+import pathlib
 import time
 from typing import List, Optional
 from urllib.parse import quote
@@ -16,6 +18,7 @@ OD_CLIENT = env.str("OD_CLIENT")
 OD_SECRET = env.str("OD_SECRET")
 OD_RF_TOKEN = env.str("OD_RF_TOKEN")  # Refresh token for first-time auth
 OD_DOCUMENT = "onedrive"
+BASE_URL = "https://graph.microsoft.com/v1.0"
 
 
 class OneDrive:
@@ -31,28 +34,24 @@ class OneDrive:
     folder_id = None
 
     async def upload(self, file: File):
-        # https://docs.microsoft.com/zh-cn/graph/api/driveitem-createuploadsession?view=graph-rest-1.0
-        # create drive item
-        logger.info("Creating drive item...")
-        create_file_url = (
-            "https://graph.microsoft.com/v1.0/me/drive"
-            f"/items/root:{self.encode_path(file.destination)}:/children"
-        )
-        size = await file.size()
-        body = {
-            "name": file.name,
-            "size": size,
-            "file": {},
-            "@microsoft.graph.conflictBehavior": "replace",
-        }
-        response = await self._request("POST", create_file_url, json=body)
+        """
+        Resumable multipart upload.
+        Docs:\
+        https://docs.microsoft.com/zh-cn/graph/api/driveitem-createuploadsession?view=graph-rest-1.0
+        """
+
         # create upload session
         logger.info("Creating upload session...")
+        body = {
+            "item": {
+                "@microsoft.graph.conflictBehavior": "replace",
+            }
+        }
+        path = self.encode_path(pathlib.Path(file.destination, file.name))
         create_session_url = (
-            "https://graph.microsoft.com/v1.0/me/drive"
-            f'/items/{response["id"]}/createUploadSession'
+            f"{BASE_URL}/me/drive/items/root:{path}:/createUploadSession"
         )
-        response = await self._request("POST", create_session_url)
+        response = await self._request("POST", create_session_url, json=body)
         # upload
         await self.stream_upload(file, response["uploadUrl"])
 
@@ -72,7 +71,7 @@ class OneDrive:
     async def find_folder(self, name: str) -> Optional[str]:
         await self.require_auth()
         # https://docs.microsoft.com/zh-cn/graph/api/driveitem-list-children?view=graph-rest-1.0&tabs=http
-        url = "https://graph.microsoft.com/v1.0/me/drive/root/children"
+        url = f"{BASE_URL}/me/drive/root/children"
         folders = dict(await self._request("GET", url))
         folders = folders.get("value")
         for folder in folders:
@@ -91,7 +90,7 @@ class OneDrive:
         """
 
         await self.require_auth()
-        url = f"https://graph.microsoft.com/v1.0/me/drive/items/{parent_id}/children"
+        url = f"{BASE_URL}/me/drive/items/{parent_id}/children"
         body = {"name": name, "folder": {}}
         result = await self._request("POST", url, json=body)
         return result["id"]
@@ -109,7 +108,7 @@ class OneDrive:
         await self.require_auth()
         # Hack to create nested folders in one go
         # https://stackoverflow.com/questions/56479865/creating-nested-folders-in-one-go-onedrive-api
-        url = f"https://graph.microsoft.com/v1.0/me/drive/items/root:{path}"
+        url = f"{BASE_URL}/me/drive/items/root:{path}"
         body = {"folder": {}, "@microsoft.graph.conflictBehavior": "replace"}
         result = await self._request("PATCH", url, json=body)
         return result["id"]
@@ -236,7 +235,7 @@ class OneDrive:
         return _headers
 
     @staticmethod
-    def encode_path(_path: str) -> str:
+    def encode_path(_path: os.PathLike) -> str:
         """
         Sanitize and encode the given path to a valid URL to address drive items.
 
