@@ -1,6 +1,6 @@
 ARG PYTHON_VERSION=3.8
 
-FROM jrottenberg/ffmpeg:4.2-scratch as ffmpeg
+FROM jrottenberg/ffmpeg:4.2-alpine as ffmpeg
 
 # Builder
 FROM python:${PYTHON_VERSION}-alpine as builder
