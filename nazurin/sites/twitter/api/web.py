@@ -252,7 +252,6 @@ class WebAPI(BaseAPI):
             {
                 "created_at": fromasctimeformat(tweet["created_at"]).isoformat(),
                 "user": WebAPI.normalize_user(data["core"]["user_results"]["result"]),
-                "edit_control": data["edit_control"],
                 "text": tweet["full_text"],
             }
         )
