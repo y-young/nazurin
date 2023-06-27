@@ -2,20 +2,17 @@
 
 ## Telegram 命令
 
-- `/ping` - pong
-- `/pixiv <id>` - 浏览 Pixiv 作品
-- `/pixiv_download <id>` - 下载 Pixiv 作品
-- `/danbooru <id>` - 浏览 Danbooru 图片
-- `/danbooru_download <id>` - 下载 Danbooru 图片
-- `/yandere <id>` - 浏览 yandere 图片
-- `/yandere_download <id>` - 下载 yandere 图片
-- `/konachan <id>` - 浏览 konachan 图片
-- `/konachan_download <id>` - 下载 konachan 图片
-- `/zerochan <id>` - 浏览 Zerochan 图片
-- `/zerochan_download <id>` - 下载 Zerochan 图片
-- `/bookmark <id>` - 收藏 Pixiv 作品
-- `/clear_cache` - 清除缓存
-- `/help` - 获取帮助
+使用 `/help` 命令获取所有可用命令的列表或某个具体命令的帮助，使用 `/set_commands` 在菜单中设置命令。
+
+一些系统命令如下：
+
+- `/clear_cache` — 清除缓存
+- `/help [COMMAND]` — 获取所有命令或某个命令的帮助
+- `/ping` — Pong
+- `/set_commands` — 设置命令
+- `/start` — 获取帮助
+
+_在 v2.5.0 中新增。_
 
 ## 收集图片
 
