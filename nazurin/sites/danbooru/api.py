@@ -56,8 +56,8 @@ class Danbooru:
         title, filename = self._get_names(post)
         imgs = []
         files = []
+        destination, filename = self.get_storage_dest(post, filename)
         if is_image(url):
-            destination, filename = self.get_storage_dest(post, filename)
             imgs.append(
                 Image(
                     filename,
@@ -70,7 +70,7 @@ class Danbooru:
                 )
             )
         else:  # danbooru has non-image posts, such as #animated
-            files.append(File(filename, url))
+            files.append(File(filename, url, destination))
 
         # Build media caption
         tags = post["tag_string"].split(" ")
