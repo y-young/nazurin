@@ -32,6 +32,8 @@ from .config import (
 )
 from .models import PixivIllust, PixivImage
 
+SANITY_LEVEL_LIMITED = "https://s.pximg.net/common/images/limit_sanity_level_360.png"
+
 
 class Pixiv:
     api = AppPixivAPI()
@@ -261,6 +263,13 @@ class Pixiv:
                 width = height = 0
         else:
             url = illust.meta_single_page.original_image_url
+            if url == SANITY_LEVEL_LIMITED:
+                logger.warning(
+                    "Artwork {} is not available due to sanity level limit: {}",
+                    illust.id,
+                    illust,
+                )
+                raise NazurinError("Artwork not available due to sanity level limit.")
             destination, filename = self.get_storage_dest(url, illust)
             imgs.append(
                 PixivImage(
