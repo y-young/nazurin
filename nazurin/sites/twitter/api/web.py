@@ -16,6 +16,7 @@ from .base import BaseAPI
 
 
 class Headers:
+    AUTHORIZATION = "Authorization"
     GUEST_TOKEN = "x-guest-token"
     CSRF_TOKEN = "x-csrf-token"
     AUTH_TYPE = "x-twitter-auth-type"
@@ -23,11 +24,29 @@ class Headers:
     RATE_LIMIT_RESET = "x-rate-limit-reset"
 
 
+class AuthorizationToken:
+    # From Fritter
+    GUEST = (
+        "Bearer AAAAAAAAAAAAAAAAAAAAAGHtAgAAAAAA%2Bx7ILXNILCqk"
+        "SGIzy6faIHZ9s3Q%3DQy97w6SIrzE7lQwPJEYQBsArEE2fC25caFwRBvAGi456G09vGR"
+    )
+    # Official
+    LOGGED_IN = (
+        "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH"
+        "5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
+    )
+
+
+class TweetDetailAPI:
+    # From Fritter
+    GUEST = "3XDB26fBve-MmjHaWTUZxA/TweetDetail"
+    LOGGED_IN = "q94uRCEn65LZThakYcPT6g/TweetDetail"
+
+
 class WebAPI(BaseAPI):
     auth_token = AUTH_TOKEN
     headers = {
-        "Authorization": "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH"
-        "5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",
+        "Authorization": AuthorizationToken.GUEST,
         "Origin": "https://twitter.com",
         "Referer": "https://twitter.com",
         Headers.GUEST_TOKEN: "",
@@ -48,8 +67,10 @@ class WebAPI(BaseAPI):
     }
     features = {
         "blue_business_profile_image_shape_enabled": False,
+        "rweb_lists_timeline_redesign_enabled": True,
         "responsive_web_graphql_exclude_directive_enabled": True,
         "verified_phone_label_enabled": False,
+        "creator_subscriptions_tweet_preview_api_enabled": True,
         "responsive_web_graphql_timeline_navigation_enabled": True,
         "responsive_web_graphql_skip_user_profile_image_extensions_enabled": False,
         "tweetypie_unmention_optimization_enabled": True,
@@ -58,15 +79,17 @@ class WebAPI(BaseAPI):
         "graphql_is_translatable_rweb_tweet_is_translatable_enabled": False,
         "view_counts_everywhere_api_enabled": True,
         "longform_notetweets_consumption_enabled": True,
+        "responsive_web_twitter_article_tweet_consumption_enabled": False,
         "tweet_awards_web_tipping_enabled": False,
-        "freedom_of_speech_not_reach_fetch_enabled": False,
+        "freedom_of_speech_not_reach_fetch_enabled": True,
         "standardized_nudges_misinfo": True,
-        (
-            "tweet_with_visibility_results_" "prefer_gql_limited_actions_policy_enabled"
-        ): False,
+        "tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled": True,
         "interactive_text_enabled": True,
         "responsive_web_text_conversations_enabled": False,
         "longform_notetweets_richtext_consumption_enabled": False,
+        "longform_notetweets_rich_text_read_enabled": True,
+        "longform_notetweets_inline_media_enabled": True,
+        "responsive_web_media_download_video_enabled": False,
         "responsive_web_enhance_cards_enabled": False,
     }
 
@@ -81,7 +104,12 @@ class WebAPI(BaseAPI):
 
     async def fetch(self, status_id: int) -> Illust:
         """Fetch & return tweet images and information."""
-        tweet = await self.tweet_detail(status_id)
+
+        if AUTH_TOKEN:
+            tweet = await self.tweet_detail(status_id)
+        else:
+            tweet = await self.tweet_result_by_rest_id(status_id)
+
         if "extended_entities" not in tweet:
             raise NazurinError("No photo found.")
         media = tweet["extended_entities"]["media"]
@@ -112,7 +140,16 @@ class WebAPI(BaseAPI):
 
     async def tweet_detail(self, tweet_id: str):
         logger.info("Fetching tweet {} from web API", tweet_id)
-        api = "https://twitter.com/i/api/graphql/1oIoGPTOJN2mSjbbXlQifA/TweetDetail"
+        api = "https://twitter.com/i/api/graphql/" + (
+            TweetDetailAPI.LOGGED_IN if AUTH_TOKEN else TweetDetailAPI.GUEST
+        )
+        self.headers.update(
+            {
+                Headers.AUTHORIZATION: AuthorizationToken.LOGGED_IN
+                if AUTH_TOKEN
+                else AuthorizationToken.GUEST
+            }
+        )
         variables = WebAPI.variables
         variables.update({"focalTweetId": tweet_id})
         params = {
@@ -123,6 +160,31 @@ class WebAPI(BaseAPI):
         response = await self._request("GET", api, params=params)
         try:
             return self._process_response(response, tweet_id)
+        except KeyError as error:
+            msg = "Failed to parse response:"
+            logger.error("{} {}", msg, error)
+            logger.info("{}", response)
+            raise NazurinError(f"{msg} {error}") from error
+
+    async def tweet_result_by_rest_id(self, tweet_id: str):
+        logger.info("Fetching tweet {} from web API /TweetResultByRestId", tweet_id)
+        api = "https://twitter.com/i/api/graphql/0hWvDhmW8YQ-S_ib3azIrw/TweetResultByRestId"
+        variables = WebAPI.variables
+        variables.update({"tweetId": tweet_id})
+        params = {
+            "variables": json.dumps(variables),
+            "features": json.dumps(WebAPI.features),
+        }
+        # This API uses the same token as logged-in TweetDetail
+        self.headers.update({Headers.AUTHORIZATION: AuthorizationToken.LOGGED_IN})
+        await self._require_auth()
+        response = await self._request("GET", api, params=params)
+        try:
+            tweetResult = response["data"]["tweetResult"]
+            if "result" not in tweetResult:
+                logger.warning("Empty tweet result: {}", response)
+                raise NazurinError("Tweet not found.")
+            return WebAPI.normalize_tweet(tweetResult["result"])
         except KeyError as error:
             msg = "Failed to parse response:"
             logger.error("{} {}", msg, error)
@@ -215,7 +277,15 @@ class WebAPI(BaseAPI):
         tweet = None
         for entry in entries:
             if entry["entryId"] == f"tweet-{tweet_id}":
-                tweet = entry["content"]["itemContent"]["tweet_results"]["result"]
+                tweet = entry["content"]["itemContent"]["tweet_results"]
+                if "result" not in tweet:
+                    logger.warning("Empty tweet result: {}", response)
+                    raise NazurinError(
+                        "Tweet result is empty, maybe it's a sensitive tweet "
+                        "or the author limited visibility, "
+                        "you may try setting an AUTH_TOKEN."
+                    )
+                tweet = tweet["result"]
                 break
 
         if not tweet:
@@ -240,7 +310,6 @@ class WebAPI(BaseAPI):
         # the result is not a direct tweet type, the real tweet is nested.
         if typename == "TweetWithVisibilityResults" or tweet.get("tweet"):
             tweet = tweet["tweet"]
-
         tweet = WebAPI.normalize_tweet(tweet)
         # Return original tweet if it's a retweet
         retweet_original = tweet.get("retweeted_status_result")
@@ -255,6 +324,9 @@ class WebAPI(BaseAPI):
         Transform tweet object from API to a normalized schema.
         """
 
+        if data.get("__typename") == "TweetUnavailable":
+            reason = WebAPI.error_message_by_reason(data.get("reason"))
+            raise NazurinError(f"Tweet is unavailable, reason: {reason}.")
         tweet = data["legacy"]
         tweet.update(
             {
@@ -281,3 +353,14 @@ class WebAPI(BaseAPI):
             }
         )
         return user
+
+    @staticmethod
+    def error_message_by_reason(reason: str):
+        MESSAGES = {
+            "NsfwLoggedOut": "NSFW tweet, please log in",
+            "Protected": "Protected tweet, you may try logging in if you have access",
+            "Suspended": "This account has been suspended",
+        }
+        if reason in MESSAGES:
+            return MESSAGES[reason]
+        return reason
