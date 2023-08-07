@@ -6,4 +6,4 @@ Local storage uses `STORAGE_DIR` in `data` directory to store files. This is the
 
 ### STORAGE
 
-Append `Local`. For more information, see [Configuration](../../start/configuration/#storage).
+Append `Local`. For more information, see [Configuration](../getting-started/configuration.md/#storage).

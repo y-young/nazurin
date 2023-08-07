@@ -16,7 +16,7 @@ _Added in v2.5.0._
 
 ## Collect Images
 
-Send the bot a message with a link of [supported sites](/site), this message will be forwarded to `GALLERY` channel, the bot will then download the original images from the site, and store to your custom destinations.
+Send the bot a message with a link of [supported sites](../site/index.md), this message will be forwarded to `GALLERY` channel, the bot will then download the original images from the site, and store to your custom destinations.
 
 !!! tip
 

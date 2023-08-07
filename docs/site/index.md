@@ -12,8 +12,8 @@ Nazurin supports customizing storage path and file name since v2.3.0, you can co
 
 For sites supporting this feature, it'll provide two configuration options:
 
-- Directory path (e.g. [`PIXIV_FILE_PATH`](pixiv/#pixiv_file_path)), relative to [`STORAGE_DIR`](../getting-started/configuration/#storage_dir)
-- File name (e.g. [`PIXIV_FILE_NAME`](pixiv/#pixiv_file_name))
+- Directory path (e.g. [`PIXIV_FILE_PATH`](pixiv.md/#pixiv_file_path)), relative to [`STORAGE_DIR`](../getting-started/configuration.md/#storage_dir)
+- File name (e.g. [`PIXIV_FILE_NAME`](pixiv.md/#pixiv_file_name))
 
 For each option, the value is a template string using Python's [Format String Syntax](https://docs.python.org/3/library/string.html#format-string-syntax).
 

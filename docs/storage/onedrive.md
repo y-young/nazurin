@@ -91,7 +91,7 @@ Before you start, you'll need to install `git`, `Python 3` and a browser.
 
 ### STORAGE
 
-Append `OneDrive`. For more information, see [Configuration](../../start/configuration/#storage).
+Append `OneDrive`. For more information, see [Configuration](../getting-started/configuration.md/#storage).
 
 ### OD_CLIENT
 

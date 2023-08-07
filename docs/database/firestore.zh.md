@@ -6,7 +6,7 @@
 
 ### DATABASE
 
-设置为 `Firebase`，详见 [配置](../../start/configuration/#database)。
+设置为 `Firebase`，详见 [配置](../getting-started/configuration.zh.md/#database)。
 
 ### GOOGLE_APPLICATION_CREDENTIALS
 

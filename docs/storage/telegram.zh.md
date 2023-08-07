@@ -10,7 +10,7 @@
 
 ### STORAGE
 
-追加 `Telegram`，详见 [配置](../../start/configuration/#storage)。
+追加 `Telegram`，详见 [配置](../getting-started/configuration.zh.md/#storage)。
 
 ### ALBUM_ID
 

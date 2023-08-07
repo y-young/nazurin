@@ -91,7 +91,7 @@
 
 ### STORAGE
 
-追加 `OneDrive`，详见 [配置](../../start/configuration/#storage)。
+追加 `OneDrive`，详见 [配置](../getting-started/configuration.zh.md/#storage)。
 
 ### OD_CLIENT
 

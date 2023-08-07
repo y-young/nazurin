@@ -10,7 +10,7 @@
 
 ### STORAGE
 
-追加 `Mega`，详见 [配置](../../start/configuration/#storage)。
+追加 `Mega`，详见 [配置](../getting-started/configuration.zh.md/#storage)。
 
 ### MEGA_USER
 

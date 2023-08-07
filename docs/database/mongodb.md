@@ -8,7 +8,7 @@ You can run your own MongoDB server or use a cloud service, like [MongoDB Atlas]
 
 ### DATABASE
 
-Set to `Mongo`. For more information, see [Configuration](../../start/configuration/#database).
+Set to `Mongo`. For more information, see [Configuration](../getting-started/configuration.md/#database).
 
 ### MONGO_URI
 
