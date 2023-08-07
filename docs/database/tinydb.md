@@ -10,6 +10,6 @@
 
 ### DATABASE
 
-Set to `Local`. For more information, see [Configuration](../../start/configuration/#database).
+Set to `Local`. For more information, see [Configuration](../getting-started/configuration.md/#database).
 
 This is the default type of database.

@@ -10,6 +10,6 @@
 
 ### DATABASE
 
-设置为 `Local`，详见 [配置](../../start/configuration/#database)。
+设置为 `Local`，详见 [配置](../getting-started/configuration.zh.md/#database)。
 
 这是默认的数据库类型。

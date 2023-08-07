@@ -34,7 +34,7 @@ _在 v2.4.0 中添加_
 
 ## 自定义存储路径和文件名
 
-更多信息请查阅 [自定义存储路径和文件名](../#customizing-storage-path--file-name)。
+更多信息请查阅 [自定义存储路径和文件名](./index.zh.md/#customizing-storage-path--file-name)。
 
 ### TWITTER_FILE_PATH
 

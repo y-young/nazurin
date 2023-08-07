@@ -12,8 +12,8 @@ Nazurin 自 v2.3.0 起支持自定义存储路径和文件名，你可以为每�
 
 支持此功能的图源插件将提供两个配置选项：
 
-- 存储目录路径（例如 [`PIXIV_FILE_PATH`](pixiv/#pixiv_file_path)），相对于 [`STORAGE_DIR`](../getting-started/configuration/#storage_dir)
-- 文件名（例如 [`PIXIV_FILE_NAME`](pixiv/#pixiv_file_name)）
+- 存储目录路径（例如 [`PIXIV_FILE_PATH`](pixiv.zh.md/#pixiv_file_path)），相对于 [`STORAGE_DIR`](../getting-started/configuration.zh.md/#storage_dir)
+- 文件名（例如 [`PIXIV_FILE_NAME`](pixiv.zh.md/#pixiv_file_name)）
 
 对于每个选项，它的值是使用 Python [格式字符串语法](https://docs.python.org/zh-cn/3/library/string.html#format-string-syntax) 的一个模板字符串。
 

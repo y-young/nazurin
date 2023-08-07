@@ -34,7 +34,7 @@ _Added in v2.4.0_
 
 ## Customizing Storage Path & File Name
 
-For more information, refer to [Customizing Storage Path & File Name](../#customizing-storage-path--file-name).
+For more information, refer to [Customizing Storage Path & File Name](./index.md/#customizing-storage-path--file-name).
 
 ### TWITTER_FILE_PATH
 

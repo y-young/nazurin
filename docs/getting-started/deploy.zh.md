@@ -78,4 +78,4 @@
 
 ### 手动部署
 
-根据 [配置指南](../configuration) 在 Heroku 上设置所有必需的环境变量，克隆这个仓库并推送到 Heroku，应用程序应当能正常工作。
+根据 [配置指南](./configuration.zh.md) 在 Heroku 上设置所有必需的环境变量，克隆这个仓库并推送到 Heroku，应用程序应当能正常工作。

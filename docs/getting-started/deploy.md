@@ -78,4 +78,4 @@
 
 ### Manual
 
-Set all required environment variables on Heroku according to [Configuration Guide](./configuration), clone this repository and push to Heroku, everything should be working properly.
+Set all required environment variables on Heroku according to [Configuration Guide](./configuration.md), clone this repository and push to Heroku, everything should be working properly.

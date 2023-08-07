@@ -37,12 +37,12 @@ title: Home
 
 ### Configuration
 
-For more information, see [here](./getting-started/configuration).
+For more information, see [here](./getting-started/configuration.md).
 
 ### Deploy
 
-For more information, see [here](./getting-started/deploy).
+For more information, see [here](./getting-started/deploy.md).
 
 ### Usage
 
-For more information, see [here](./getting-started/usage).
+For more information, see [here](./getting-started/usage.md).

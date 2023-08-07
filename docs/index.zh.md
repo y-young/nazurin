@@ -37,12 +37,12 @@ title: 首页
 
 ### 配置
 
-详见 [此处](./getting-started/configuration)。
+详见 [此处](./getting-started/configuration.zh.md)。
 
 ### 部署
 
-详见 [此处](./getting-started/deploy)。
+详见 [此处](./getting-started/deploy.zh.md)。
 
 ### 使用方法
 
-详见 [此处](./getting-started/usage)。
+详见 [此处](./getting-started/usage.zh.md)。

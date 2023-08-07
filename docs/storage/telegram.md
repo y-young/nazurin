@@ -10,7 +10,7 @@ Use a Telegram channel (album channel) to store downloaded files.
 
 ### STORAGE
 
-Append `Telegram`. For more information, see [Configuration](../../start/configuration/#storage).
+Append `Telegram`. For more information, see [Configuration](../getting-started/configuration.md/#storage).
 
 ### ALBUM_ID
 
