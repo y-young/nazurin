@@ -12,7 +12,7 @@ Wallhaven API 密钥，可在 [账号设置](https://wallhaven.cc/settings/accou
 
 ## 自定义存储路径和文件名
 
-更多信息请查阅 [自定义存储路径和文件名](../#customizing-storage-path--file-name)。
+更多信息请查阅 [自定义存储路径和文件名](./index.zh.md/#customizing-storage-path--file-name)。
 
 ### WALLHAVEN_FILE_PATH
 

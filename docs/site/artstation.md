@@ -4,7 +4,7 @@
 
 ## Customizing Storage Path & File Name
 
-For more information, refer to [Customizing Storage Path & File Name](../#customizing-storage-path--file-name).
+For more information, refer to [Customizing Storage Path & File Name](./index.md/#customizing-storage-path--file-name).
 
 ### ARTSTATION_FILE_PATH
 

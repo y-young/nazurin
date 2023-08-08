@@ -8,7 +8,7 @@
 
 ### DATABASE
 
-设置为 `Cloudant`，详见 [配置](../../start/configuration/#database)。
+设置为 `Cloudant`，详见 [配置](../getting-started/configuration.zh.md/#database)。
 
 ### CLOUDANT_USER
 

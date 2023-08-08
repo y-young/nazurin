@@ -6,7 +6,7 @@
 
 ### DATABASE
 
-Set to `Firebase`. For more information, see [Configuration](../../start/configuration/#database).
+Set to `Firebase`. For more information, see [Configuration](../getting-started/configuration.md/#database).
 
 ### GOOGLE_APPLICATION_CREDENTIALS
 

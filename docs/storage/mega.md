@@ -10,7 +10,7 @@
 
 ### STORAGE
 
-Append `Mega`. For more information, see [Configuration](../../start/configuration/#storage).
+Append `Mega`. For more information, see [Configuration](../getting-started/configuration.md/#storage).
 
 ### MEGA_USER
 

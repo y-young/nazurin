@@ -1,4 +1,5 @@
-mkdocs-material==9.0.3
-mkdocs-awesome-pages-plugin==2.8.0
-mkdocs-static-i18n==0.49
-mkdocs-git-revision-date-localized-plugin==1.1.0
+mkdocs==1.5.2
+mkdocs-material==9.1.21
+mkdocs-awesome-pages-plugin==2.9.1
+mkdocs-static-i18n==0.56
+mkdocs-git-revision-date-localized-plugin==1.2.0

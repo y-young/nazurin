@@ -27,7 +27,7 @@ Thus, if you're using a shared folder on your **Personal Drive**, there'll will 
 
 ### STORAGE
 
-Append `GoogleDrive`. For more information, see [Configuration](../../start/configuration/#storage).
+Append `GoogleDrive`. For more information, see [Configuration](../getting-started/configuration.md/#storage).
 
 ### GD_FOLDER
 
@@ -47,4 +47,4 @@ Path to the key file or the content of it.
 
 !!! tip
 
-    If you're using [Firestore](../../database/firestore) database and have already set `GOOGLE_APPLICATION_CREDENTIALS`, you don't need to do anything :)
+    If you're using [Firestore](../database/firestore.md) database and have already set `GOOGLE_APPLICATION_CREDENTIALS`, you don't need to do anything :)

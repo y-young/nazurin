@@ -8,7 +8,7 @@ Using [IAM authentication](https://cloud.ibm.com/docs/Cloudant?topic=Cloudant-ib
 
 ### DATABASE
 
-Set to `Cloudant`. For more information, see [Configuration](../../start/configuration/#database).
+Set to `Cloudant`. For more information, see [Configuration](../getting-started/configuration.md/#database).
 
 ### CLOUDANT_USER
 

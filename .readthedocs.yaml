@@ -21,7 +21,6 @@ build:
   #       fi
   # Workaround for https://github.com/readthedocs/readthedocs.org/issues/10013
   commands:
-    - pip install mkdocs
     - pip install -r docs/requirements.txt
     - mkdocs build --clean --site-dir ./_readthedocs/html --config-file mkdocs.yml
 

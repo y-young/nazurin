@@ -27,7 +27,7 @@ Google Drive 驱动使用 _服务账号_ 访问云端硬盘。由于 Google API 
 
 ### STORAGE
 
-追加 `GoogleDrive`，详见 [配置](../../start/configuration/#storage)。
+追加 `GoogleDrive`，详见 [配置](../getting-started/configuration.zh.md/#storage)。
 
 ### GD_FOLDER
 
@@ -47,4 +47,4 @@ Google Drive 驱动使用 _服务账号_ 访问云端硬盘。由于 Google API 
 
 !!! tip "提示"
 
-    如果你同时使用 [Firestore](../../database/firestore) 数据库并已配置了 `GOOGLE_APPLICATION_CREDENTIALS`，则无需任何操作 :)
+    如果你同时使用 [Firestore](../database/firestore.zh.md) 数据库并已配置了 `GOOGLE_APPLICATION_CREDENTIALS`，则无需任何操作 :)
