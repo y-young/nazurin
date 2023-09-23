@@ -17,13 +17,15 @@ S3_BUCKET = env.str("S3_BUCKET", default="nazurin")
 
 
 class S3:
-    '''S3 driver'''
-    client = Minio(endpoint=S3_ENDPOINT,
-                   access_key=S3_ACCESS_KEY,
-                   secret_key=S3_SECRET_KEY,
-                   region=S3_REGION,
-                   secure=S3_SECURE,
-                   )
+    """S3 driver"""
+
+    client = Minio(
+        endpoint=S3_ENDPOINT,
+        access_key=S3_ACCESS_KEY,
+        secret_key=S3_SECRET_KEY,
+        region=S3_REGION,
+        secure=S3_SECURE,
+    )
 
     async def check_bucket(self):
         if not S3.client.bucket_exists(S3_BUCKET):
@@ -31,13 +33,14 @@ class S3:
             logger.info("Bucket created: {}", S3_BUCKET)
 
     async def upload(self, file: File):
-        S3.client.fput_object(bucket_name=S3_BUCKET,
-                              object_name=file.name,
-                              file_path=file.path,
-                              metadata={
-                                  "destination": file.destination,
-                              }
-                              )
+        S3.client.fput_object(
+            bucket_name=S3_BUCKET,
+            object_name=file.name,
+            file_path=file.path,
+            metadata={
+                "destination": file.destination,
+            },
+        )
 
     async def store(self, files: List[File]):
         await self.check_bucket()
