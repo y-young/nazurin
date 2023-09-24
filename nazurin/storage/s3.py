@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import asyncio
 from typing import List
+import mimetypes
 
 from minio import Minio
 
@@ -37,6 +38,8 @@ class S3:
             bucket_name=S3_BUCKET,
             object_name=file.name,
             file_path=file.path,
+            content_type=mimetypes.guess_type(
+                file.name)[0] or "application/octet-stream",
             metadata={
                 "destination": file.destination,
             },
