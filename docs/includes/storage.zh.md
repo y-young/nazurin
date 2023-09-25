@@ -5,4 +5,4 @@
 |                                [MEGA](https://mega.io/)                                 |         [MEGA](/zh/storage/mega)         |    `Mega`     |              |
 |                        [Google Drive](https://drive.google.com/)                        | [Google Drive](/zh/storage/google-drive) | `GoogleDrive` |              |
 | [OneDrive](https://www.microsoft.com/zh-cn/microsoft-365/onedrive/online-cloud-storage) |     [OneDrive](/zh/storage/onedrive)     |  `OneDrive`   |              |
-| [S3](https://aws.amazon.com/s3/)                                                         |         [S3](/storage/s3)             |     `S3`      |             |
+| [S3](https://aws.amazon.com/s3/)                                                         |         [S3](/zh/storage/s3)             |     `S3`      |             |
