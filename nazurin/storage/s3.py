@@ -7,6 +7,7 @@ from minio import Minio
 from nazurin.config import env
 from nazurin.models import File
 from nazurin.utils import logger
+from nazurin.utils.decorators import async_wrap
 
 with env.prefixed("S3_"):
     ENDPOINT = env.str("ENDPOINT", default="s3.amazonaws.com")
@@ -28,11 +29,13 @@ class S3:
         secure=SECURE,
     )
 
+    @async_wrap
     async def check_bucket(self):
         if not S3.client.bucket_exists(BUCKET):
             S3.client.make_bucket(BUCKET)
             logger.info("Bucket created: {}", BUCKET)
 
+    @async_wrap
     async def upload(self, file: File):
         S3.client.fput_object(
             bucket_name=BUCKET,
