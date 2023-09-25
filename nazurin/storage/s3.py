@@ -36,13 +36,10 @@ class S3:
     async def upload(self, file: File):
         S3.client.fput_object(
             bucket_name=S3_BUCKET,
-            object_name=file.name,
+            object_name=f"{file.destination}/{file.name}",
             file_path=file.path,
             content_type=mimetypes.guess_type(file.name)[0]
-            or "application/octet-stream",
-            metadata={
-                "destination": file.destination,
-            },
+            or "application/octet-stream"
         )
 
     async def store(self, files: List[File]):
