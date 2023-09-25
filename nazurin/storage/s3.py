@@ -30,13 +30,13 @@ class S3:
     )
 
     @async_wrap
-    async def check_bucket(self):
+    def check_bucket(self):
         if not S3.client.bucket_exists(BUCKET):
             S3.client.make_bucket(BUCKET)
             logger.info("Bucket created: {}", BUCKET)
 
     @async_wrap
-    async def upload(self, file: File):
+    def upload(self, file: File):
         S3.client.fput_object(
             bucket_name=BUCKET,
             object_name=f"{file.destination}/{file.name}",
