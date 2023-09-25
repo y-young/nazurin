@@ -42,7 +42,7 @@ class S3:
             object_name=f"{file.destination}/{file.name}",
             file_path=file.path,
             content_type=mimetypes.guess_type(file.name)[0]
-            or "application/octet-stream"
+            or "application/octet-stream",
         )
 
     async def store(self, files: List[File]):
