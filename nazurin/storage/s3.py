@@ -14,7 +14,7 @@ with env.prefixed("S3_"):
     ACCESS_KEY = env.str("ACCESS_KEY")
     SECRET_KEY = env.str("SECRET_KEY")
     SECURE = env.bool("SECURE", default=True)
-    REGION = env.str("REGION", default="null")
+    REGION = env.str("REGION", default=None)
     BUCKET = env.str("BUCKET", default="nazurin")
 
 
