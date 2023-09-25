@@ -8,33 +8,34 @@ from nazurin.config import env
 from nazurin.models import File
 from nazurin.utils import logger
 
-S3_ENDPOINT = env.str("S3_ENDPOINT", default="s3.amazonaws.com")
-S3_ACCESS_KEY = env.str("S3_ACCESS_KEY")
-S3_SECRET_KEY = env.str("S3_SECRET_KEY")
-S3_SECURE = env.bool("S3_SECURE", default=True)
-S3_REGION = env.str("S3_REGION", default="null")
-S3_BUCKET = env.str("S3_BUCKET", default="nazurin")
+with env.prefixed("S3_"):
+    ENDPOINT = env.str("ENDPOINT", default="s3.amazonaws.com")
+    ACCESS_KEY = env.str("ACCESS_KEY")
+    SECRET_KEY = env.str("SECRET_KEY")
+    SECURE = env.bool("SECURE", default=True)
+    REGION = env.str("REGION", default="null")
+    BUCKET = env.str("BUCKET", default="nazurin")
 
 
 class S3:
     """S3 driver"""
 
     client = Minio(
-        endpoint=S3_ENDPOINT,
-        access_key=S3_ACCESS_KEY,
-        secret_key=S3_SECRET_KEY,
-        region=S3_REGION,
-        secure=S3_SECURE,
+        endpoint=ENDPOINT,
+        access_key=ACCESS_KEY,
+        secret_key=SECRET_KEY,
+        region=REGION,
+        secure=SECURE,
     )
 
     async def check_bucket(self):
-        if not S3.client.bucket_exists(S3_BUCKET):
-            S3.client.make_bucket(S3_BUCKET)
-            logger.info("Bucket created: {}", S3_BUCKET)
+        if not S3.client.bucket_exists(BUCKET):
+            S3.client.make_bucket(BUCKET)
+            logger.info("Bucket created: {}", BUCKET)
 
     async def upload(self, file: File):
         S3.client.fput_object(
-            bucket_name=S3_BUCKET,
+            bucket_name=BUCKET,
             object_name=f"{file.destination}/{file.name}",
             file_path=file.path,
             content_type=mimetypes.guess_type(file.name)[0]
