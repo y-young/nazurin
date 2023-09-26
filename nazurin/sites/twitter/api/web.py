@@ -168,7 +168,10 @@ class WebAPI(BaseAPI):
 
     async def tweet_result_by_rest_id(self, tweet_id: str):
         logger.info("Fetching tweet {} from web API /TweetResultByRestId", tweet_id)
-        api = "https://twitter.com/i/api/graphql/0hWvDhmW8YQ-S_ib3azIrw/TweetResultByRestId"
+        api = (
+            "https://twitter.com/i/api/graphql"
+            "/0hWvDhmW8YQ-S_ib3azIrw/TweetResultByRestId"
+        )
         variables = WebAPI.variables
         variables.update({"tweetId": tweet_id})
         params = {
@@ -180,11 +183,11 @@ class WebAPI(BaseAPI):
         await self._require_auth()
         response = await self._request("GET", api, params=params)
         try:
-            tweetResult = response["data"]["tweetResult"]
-            if "result" not in tweetResult:
+            tweet_result = response["data"]["tweetResult"]
+            if "result" not in tweet_result:
                 logger.warning("Empty tweet result: {}", response)
                 raise NazurinError("Tweet not found.")
-            return WebAPI.normalize_tweet(tweetResult["result"])
+            return WebAPI.normalize_tweet(tweet_result["result"])
         except KeyError as error:
             msg = "Failed to parse response:"
             logger.error("{} {}", msg, error)
