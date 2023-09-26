@@ -1,5 +1,6 @@
 import asyncio
 import mimetypes
+import pathlib
 from typing import List
 
 from minio import Minio
@@ -39,7 +40,7 @@ class S3:
     def upload(self, file: File):
         S3.client.fput_object(
             bucket_name=BUCKET,
-            object_name=f"{file.destination}/{file.name}",
+            object_name=pathlib.Path(file.destination, file.name).as_posix(),
             file_path=file.path,
             content_type=mimetypes.guess_type(file.name)[0]
             or "application/octet-stream",
