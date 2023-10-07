@@ -67,5 +67,6 @@ class File:
             return True
         await ensure_existence_async(TEMP_DIR)
         async with session.get(self.url) as response:
+            response.raise_for_status()
             async with aiofiles.open(self.path, "wb") as f:
                 await f.write(await response.read())
