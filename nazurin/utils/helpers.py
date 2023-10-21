@@ -126,12 +126,12 @@ def is_image(url: str) -> bool:
 
 def ensure_existence(path: str):
     if not os.path.exists(path):
-        os.makedirs(path)
+        os.makedirs(path, exist_ok=True)
 
 
 async def ensure_existence_async(path: str):
     if not await aiofiles.os.path.exists(path):
-        await aiofiles.os.makedirs(path)
+        await aiofiles.os.makedirs(path, exist_ok=True)
 
 
 def snake_to_pascal(name: str):
