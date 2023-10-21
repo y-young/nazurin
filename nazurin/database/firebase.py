@@ -5,9 +5,10 @@ from firebase_admin import credentials, firestore_async
 from google.cloud.firestore import AsyncClient
 
 from nazurin.config import env
+from nazurin.database import DatabaseDriver
 
 
-class Firebase:
+class Firebase(DatabaseDriver):
     """Firestore driver of Firebase."""
 
     db: AsyncClient

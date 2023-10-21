@@ -4,10 +4,11 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import DuplicateKeyError
 
 from nazurin.config import env
+from nazurin.database import DatabaseDriver
 from nazurin.utils.exceptions import NazurinError
 
 
-class Mongo:
+class Mongo(DatabaseDriver):
     """MongoDB driver for MongoDB Atlas or local server."""
 
     def __init__(self):
