@@ -20,5 +20,5 @@ async def handle(match) -> Illust:
 
     illust = await Misskey().fetch(site_url, post_id)
     illust.metadata["collected_at"] = time()
-    await collection.insert(int(post_id), illust.metadata)
+    await collection.insert(str(post_id), illust.metadata)
     return illust
