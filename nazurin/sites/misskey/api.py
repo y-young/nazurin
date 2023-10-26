@@ -19,12 +19,12 @@ class Misskey:
     async def get_note(self, site_url: str, note_id: str) -> dict:
         """Fetch a note from centain site's API."""
         api = f"https://{site_url}/api/notes/show"
-        data = {
+        json = {
             "noteId": note_id
         }
 
         async with Request() as request:
-            async with request.post(url=api, data=data) as response:
+            async with request.post(url=api, json=json) as response:
                 if response.status == 400:
                     raise NazurinError("Note not found")
                 response.raise_for_status()
