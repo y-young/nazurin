@@ -121,7 +121,8 @@ class Misskey:
         """
         Format destination and filename.
         """
-        created_at = datetime.fromisoformat(note["createdAt"])
+        # remove 'Z' to fit datetime.fromisoformat's needs
+        created_at = datetime.fromisoformat(note["createdAt"][:-1])
         filename, extension = os.path.splitext(filename)
         context = {
             **note,
