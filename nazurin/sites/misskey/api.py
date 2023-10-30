@@ -61,6 +61,7 @@ class Misskey:
                     "copy",
                     "-acodec",
                     "copy",
+                    "-y",
                     output.path,
                 ]
                 cmd = shlex.join(args)
