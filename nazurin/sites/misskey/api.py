@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 import shlex
 import subprocess
-from typing import Tuple
+from typing import List, Tuple
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.models.file import File
@@ -89,10 +89,10 @@ class Misskey:
 
     def parse_note(self, note: dict, site_url: str) -> Illust:
         """Get images and build caption."""
-        images = []
-        files = []
-        files = note["files"]
-        for file in files:
+        images: List[Image] = []
+        files: List[File] = []
+        file_dict = note["files"]
+        for file in file_dict:
             destination, filename = self.get_storage_dest(note, file["name"])
             if file["type"].startswith("image"):
                 images.append(
