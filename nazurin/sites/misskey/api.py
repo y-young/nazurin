@@ -37,10 +37,11 @@ class Misskey:
                 return data
 
     def build_caption(self, note: dict, site_url: str) -> Caption:
+        url = f"https://{site_url}/notes/{note['id']}"
         return Caption(
             {
-                "url": f"https://{site_url}/notes/{note['id']}",
-                "ori_url": note["uri"],
+                "url": url,
+                "ori_url": note.get("uri", url),
                 "author": f"{note['user']['username']} #{note['user']['name']}",
                 "text": note["text"],
             }
@@ -82,12 +83,12 @@ class Misskey:
                 await ori_video.download(session)
             filename, _ = os.path.splitext(filename)
             video = File(filename + ".mp4", "", destination)
-            convert(ori_video, video)
+            await convert(ori_video, video)
         else:
             video = File(filename, file["url"], destination)
         return video
 
-    def parse_note(self, note: dict, site_url: str) -> Illust:
+    async def parse_note(self, note: dict, site_url: str) -> Illust:
         """Get images and build caption."""
         images: List[Image] = []
         files: List[File] = []
@@ -107,14 +108,14 @@ class Misskey:
                     )
                 )
             elif file["type"].startswith("video"):
-                files.append(self.get_video(file, destination, filename))
+                files.append(await self.get_video(file, destination, filename))
         # Build note caption
         caption = self.build_caption(note, site_url)
         return Illust(images, caption, note, files)
 
     async def fetch(self, site_url: str, post_id: str) -> Illust:
         note = await self.get_note(site_url, post_id)
-        return self.parse_note(note, site_url)
+        return await self.parse_note(note, site_url)
 
     @staticmethod
     def get_storage_dest(note: dict, filename: str) -> Tuple[str, str]:
