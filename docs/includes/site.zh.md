@@ -15,3 +15,4 @@
 |     微博     |      <https://weibo.com/>      |      |    ✔     |
 |  DeviantArt  | <https://www.deviantart.com/>  |      |    ✔     |
 |    Lofter    |   <https://www.lofter.com/>    |      |    ✔     |
+|   Misskey    |            许多实例            |      |    ✔     |
