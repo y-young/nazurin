@@ -35,6 +35,7 @@ ALLOW_GROUP = env.list("ALLOW_GROUP", subcast=int, default=[])
 
 RETRIES = env.int("RETRIES", default=5)
 TIMEOUT = env.int("TIMEOUT", default=20)
+DOWNLOAD_CHUNK_SIZE = env.int("DOWNLOAD_CHUNK_SIZE", default=4096)
 PROXY = env.str("HTTP_PROXY", default=None)
 UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
