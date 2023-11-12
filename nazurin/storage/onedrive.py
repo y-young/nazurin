@@ -5,6 +5,8 @@ import time
 from typing import List, Optional
 from urllib.parse import quote
 
+from humanize import naturalsize
+
 from nazurin.config import NAZURIN_DATA, STORAGE_DIR, env
 from nazurin.database import Database
 from nazurin.models import File
@@ -206,7 +208,10 @@ class OneDrive:
         headers = self.with_credentials()
         range_start = 0
         total_size = await file.size()
-        logger.info("Uploading file, total size: {}...", total_size)
+        total_size_str = naturalsize(total_size, True)
+        logger.info(
+            "[File {}] Start upload, total size: {}...", file.name, total_size_str
+        )
 
         async with Request(headers=headers) as session:
             async for chunk in read_by_chunks(file.path, CHUNK_SIZE):
@@ -218,8 +223,13 @@ class OneDrive:
                 )
                 await upload_chunk(url, chunk)
                 range_start += content_length
-                logger.info("Uploaded {}", range_start)
-        logger.info("Upload completed")
+                logger.info(
+                    "[File {}] Uploaded {} / {}",
+                    file.name,
+                    naturalsize(range_start, True),
+                    total_size_str,
+                )
+        logger.info("[File {}] Upload completed", file.name)
 
     def with_credentials(self, headers: dict = None) -> dict:
         """

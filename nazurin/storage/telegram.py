@@ -1,6 +1,8 @@
 import asyncio
 from typing import List
 
+from humanize import naturalsize
+
 from nazurin import bot
 from nazurin.config import env
 from nazurin.models import File
@@ -18,9 +20,9 @@ class Telegram:
                 # Telegram bot currently only supports files up to 50MB
                 # https://core.telegram.org/bots/api#senddocument
                 logger.warning(
-                    "File {} exceeds size limit ({} bytes) and won't be save to Telegram",
+                    "File {} exceeds size limit ({}) and won't be save to Telegram",
                     file.name,
-                    size,
+                    naturalsize(size, True),
                 )
                 continue
             tasks.append(bot.send_doc(file, chat_id=ALBUM_ID))
