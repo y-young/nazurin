@@ -54,20 +54,24 @@ class Kemono:
         if not files:
             raise NazurinError("No files found")
 
+        image_index = 0
         for file in files:
             path: str = file["path"]
+            url = "https://c1.kemono.party/data" + path
 
             # Handle non-image files
-            url = "https://c1.kemono.party/data" + path
-            destination, filename = self.get_storage_dest(post, file["name"], path)
             if not self.is_image(path):
                 if post["service"] == "dlsite" and path.endswith(".html"):
                     # HTML files from DLSite seems useless
                     continue
+                destination, filename = self.get_storage_dest(post, file["name"], path)
                 download_files.append(File(filename, url, destination))
                 continue
 
             # Handle images
+            destination, filename = self.get_storage_dest(
+                post, f"{image_index} - {file['name']}", path
+            )
             thumbnail = "https://img.kemono.party/thumbnail/data" + path
             images.append(
                 Image(
@@ -77,6 +81,7 @@ class Kemono:
                     thumbnail,
                 )
             )
+            image_index += 1
 
         return Illust(images, caption, post, download_files)
 
