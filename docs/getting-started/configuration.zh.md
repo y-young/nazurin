@@ -164,6 +164,14 @@ _在 v2 中新增。_
 
 请求超时时间，以秒为单位。
 
+## DOWNLOAD_CHUNK_SIZE
+
+:material-lightbulb-on: 可选，默认为 `4096`
+
+写入下载文件时的块大小，以字节为单位。
+
+_在 v2.6.0 中新增。_
+
 ## HTTP_PROXY
 
 :material-lightbulb-on: 可选，默认遵循环境变量

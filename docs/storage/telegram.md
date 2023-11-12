@@ -6,6 +6,10 @@
 
 Use a Telegram channel (album channel) to store downloaded files.
 
+!!! warning
+
+    Due to the file size limit of Telegram bot API, files larger than 50MB cannot be stored in Telegram.
+
 ## Configuration
 
 ### STORAGE
