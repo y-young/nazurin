@@ -2,6 +2,7 @@ from cloudant.client import Cloudant as cloudant
 from requests.adapters import HTTPAdapter
 
 from nazurin.config import RETRIES, env
+from nazurin.database import DatabaseDriver
 from nazurin.utils.decorators import async_wrap
 
 with env.prefixed("CLOUDANT_"):
@@ -10,7 +11,7 @@ with env.prefixed("CLOUDANT_"):
     DATABASE = env.str("DB", default="nazurin")
 
 
-class Cloudant:
+class Cloudant(DatabaseDriver):
     """Cloudant driver of IBM Cloud."""
 
     def __init__(self):

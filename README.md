@@ -39,6 +39,7 @@
 |       Weibo       |      <https://weibo.com/>      |          |     ✔      |
 |    DeviantArt     | <https://www.deviantart.com/>  |          |     ✔      |
 |      Lofter       |   <https://www.lofter.com/>    |          |     ✔      |
+|   Kemono.party    |    <https://kemono.party/>     |          |     ✔      |
 
 ### Supported Databases
 
@@ -60,7 +61,7 @@ You can also implement your own database driver by creating a file under `databa
 |                                [MEGA](https://mega.io/)                                 |         [MEGA](https://nazurin.readthedocs.io/storage/mega)         |    `Mega`     |             |
 |                        [Google Drive](https://drive.google.com/)                        | [Google Drive](https://nazurin.readthedocs.io/storage/google-drive) | `GoogleDrive` |             |
 | [OneDrive](https://www.microsoft.com/en-us/microsoft-365/onedrive/online-cloud-storage) |     [OneDrive](https://nazurin.readthedocs.io/storage/onedrive)     |  `OneDrive`   |             |
-|                                [S3](https://aws.amazon.com/s3/)                         |         [S3](https://nazurin.readthedocs.io/storage/s3)             |     `S3`      |             |
+|                            [S3](https://aws.amazon.com/s3/)                             |           [S3](https://nazurin.readthedocs.io/storage/s3)           |     `S3`      |             |
 
 ## Configuration
 

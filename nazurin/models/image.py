@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from humanize import naturalsize
+
 from nazurin.utils import Request, logger
 from nazurin.utils.exceptions import NazurinError
 
@@ -65,7 +67,7 @@ class Image(File):
                 headers = response.headers
                 if "Content-Length" in headers:
                     self._size = int(headers["Content-Length"])
-                    logger.info("Got image size: {}", self._size)
+                    logger.info("Got image size: {}", naturalsize(self._size, True))
                 else:
                     logger.info("Failed to get image size")
                 return self._size
