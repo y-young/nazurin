@@ -5,7 +5,7 @@ import shlex
 import subprocess
 from typing import List, Tuple
 
-from nazurin.models import Caption, Illust, Image
+from nazurin.models import Caption, Illust, Image, Ugoira
 from nazurin.models.file import File
 from nazurin.utils import Request, logger
 from nazurin.utils.decorators import network_retry, async_wrap
@@ -48,7 +48,9 @@ class Misskey:
         )
 
     async def get_video(self, file: dict, destination: str, filename: str) -> File:
-        if file["type"] != "video/mp4":
+        if file["type"] == "video/mp4" or file["type"] == "image/gif":
+            video = File(filename, file["url"], destination)
+        else:
             @async_wrap
             def convert(config: File, output: File):
                 config_path = Path(config.path).as_posix()
@@ -85,18 +87,19 @@ class Misskey:
             filename, _ = os.path.splitext(filename)
             video = File(filename + ".mp4", "", destination)
             await convert(ori_video, video)
-        else:
-            video = File(filename, file["url"], destination)
         return video
 
     async def parse_note(self, note: dict, site_url: str) -> Illust:
-        """Get images and build caption."""
+        """Build caption and get images."""
+        # Build note caption
+        caption = self.build_caption(note, site_url)
+
         images: List[Image] = []
         files: List[File] = []
         file_dict = note["files"]
         for file in file_dict:
             destination, filename = self.get_storage_dest(note, file["name"])
-            if file["type"].startswith("image"):
+            if file["type"].startswith("image") and not file["type"].endswith("gif"):
                 images.append(
                     Image(
                         filename,
@@ -108,10 +111,9 @@ class Misskey:
                         file["properties"]["height"],
                     )
                 )
-            elif file["type"].startswith("video"):
-                files.append(await self.get_video(file, destination, filename))
-        # Build note caption
-        caption = self.build_caption(note, site_url)
+            elif file["type"].startswith("video") or file["type"].endswith("gif"):
+                return Ugoira(await self.get_video(file, destination, filename), caption, note)
+
         return Illust(images, caption, note, files)
 
     async def fetch(self, site_url: str, post_id: str) -> Illust:
