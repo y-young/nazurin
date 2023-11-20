@@ -14,7 +14,7 @@
 
 ### Misskey_FILE_NAME
 
-:material-lightbulb-on: 可选，默认为 `{filename} - {user[name]}({user[username]})`
+:material-lightbulb-on: 可选，默认为 `{id} - {filename} - {user[name]}({user[username]})`
 
 文件名称。
 

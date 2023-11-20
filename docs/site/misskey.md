@@ -14,7 +14,7 @@ Storage path for downloaded images.
 
 ### MISSKEY_FILE_NAME
 
-:material-lightbulb-on: Optional, defaults to `{filename} - {user[name]}({user[username]})`
+:material-lightbulb-on: Optional, defaults to `{id} - {filename} - {user[name]}({user[username]})`
 
 File name for downloaded images.
 

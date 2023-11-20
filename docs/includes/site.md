@@ -15,4 +15,4 @@
 |       Weibo       |      <https://weibo.com/>      |          |        ✔         |
 |    DeviantArt     | <https://www.deviantart.com/>  |          |        ✔         |
 |      Lofter       |   <https://www.lofter.com/>    |          |        ✔         |
-|      Misskey      |         Various Sites          |          |        ✔         |
+|      Misskey      |      Any Misskey instance      |          |        ✔         |
