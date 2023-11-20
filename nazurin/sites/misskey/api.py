@@ -36,14 +36,24 @@ class Misskey:
 
     def build_caption(self, note: dict, site_url: str) -> Caption:
         url = f"https://{site_url}/notes/{note['id']}"
-        return Caption(
-            {
-                "url": url,
-                "ori_url": note.get("uri", url),
-                "author": f"{note['user']['username']} #{note['user']['name']}",
-                "text": note["text"],
-            }
-        )
+        # URL from the original instance
+        if note["uri"] is None:
+            return Caption(
+                {
+                    "url": url,
+                    "author": f"{note['user']['username']} #{note['user']['name']}",
+                    "text": note["text"],
+                }
+            )
+        else:
+            return Caption(
+                {
+                    "url": url,
+                    "original_url": note["uri"],
+                    "author": f"{note['user']['username']} #{note['user']['name']}",
+                    "text": note["text"],
+                }
+            )
 
     async def get_video(self, file: dict, destination: str, filename: str) -> File:
         if file["type"] == "video/mp4" or file["type"] == "image/gif":
