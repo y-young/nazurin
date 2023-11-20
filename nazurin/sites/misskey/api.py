@@ -5,6 +5,7 @@ import shlex
 import subprocess
 from typing import List, Tuple
 
+from aiohttp.client_exceptions import ClientResponseError
 from nazurin.models import Caption, Illust, Image, Ugoira
 from nazurin.models.file import File
 from nazurin.utils import Request, logger
@@ -25,15 +26,12 @@ class Misskey:
 
         async with Request() as request:
             async with request.post(url=api, json=json) as response:
-                if response.status == 400:
-                    raise NazurinError("Note not found")
-                response.raise_for_status()
+                try:
+                    response.raise_for_status()
+                except ClientResponseError as err:
+                    raise NazurinError(err) from None
 
                 data = await response.json()
-                if "error" in data:
-                    logger.error(data)
-                    raise NazurinError(data["error"])
-
                 return data
 
     def build_caption(self, note: dict, site_url: str) -> Caption:
