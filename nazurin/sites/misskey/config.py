@@ -7,4 +7,5 @@ with env.prefixed("MISSKEY_"):
     with env.prefixed("FILE_"):
         DESTINATION: str = env.str("PATH", default="Misskey")
         FILENAME: str = env.str(
-            "NAME", default="{id} - {filename} - {user[name]}({user[username]})")
+            "NAME", default="{id} - {filename} - {user[name]}({user[username]})"
+        )

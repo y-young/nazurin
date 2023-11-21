@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import List, Tuple
 
 from aiohttp.client_exceptions import ClientResponseError
+
 from nazurin.models import Caption, Illust, Image, Ugoira
 from nazurin.models.file import File
 from nazurin.utils import Request, logger
@@ -27,13 +28,20 @@ class Misskey:
             if f not in user:
                 return False
         files = data["files"]
-        file_required_fields = ["name", "type", "url", "thumbnailUrl", "size", "properties"]
+        file_required_fields = [
+            "name",
+            "type",
+            "url",
+            "thumbnailUrl",
+            "size",
+            "properties",
+        ]
         for file in files:
             for f in file_required_fields:
                 if f not in file:
                     return False
         return True
-    
+
     @network_retry
     async def get_note(self, site_url: str, note_id: str) -> dict:
         """Fetch a note from a Misskey instance."""
@@ -47,11 +55,11 @@ class Misskey:
                 except ClientResponseError as err:
                     raise NazurinError(err) from None
                 data = await response.json()
-                
+
                 # check JSON format
                 if not self.check_res_json(data):
                     raise NazurinError("Invalid JSON format.")
-                
+
                 return data
 
     def build_caption(self, note: dict, site_url: str) -> Caption:
