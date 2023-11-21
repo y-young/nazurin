@@ -28,6 +28,12 @@ class Misskey:
 
         async with Request() as request:
             async with request.post(url=api, json=json) as response:
+                if response.status == 400:
+                    result = await response.json()
+                    error = result["error"]
+                    raise NazurinError(
+                        f"Error: {error['message']} ({error['code']})"
+                    ) from None
                 try:
                     response.raise_for_status()
                 except ClientResponseError as err:
