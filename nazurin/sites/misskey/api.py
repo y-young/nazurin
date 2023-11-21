@@ -16,9 +16,27 @@ from .config import DESTINATION, FILENAME
 
 
 class Misskey:
+    def check_res_json(self, data: dict) -> bool:
+        note_required_fields = ["id", "user", "text", "createdAt", "files"]
+        for f in note_required_fields:
+            if f not in data:
+                return False
+        user = data["user"]
+        user_required_fileds = ["username", "name"]
+        for f in user_required_fileds:
+            if f not in user:
+                return False
+        files = data["files"]
+        file_required_fields = ["name", "type", "url", "thumbnailUrl", "size", "properties"]
+        for file in files:
+            for f in file_required_fields:
+                if f not in file:
+                    return False
+        return True
+    
     @network_retry
     async def get_note(self, site_url: str, note_id: str) -> dict:
-        """Fetch a note from centain site's API."""
+        """Fetch a note from a Misskey instance."""
         api = f"https://{site_url}/api/notes/show"
         json = {
             "noteId": note_id
@@ -30,8 +48,12 @@ class Misskey:
                     response.raise_for_status()
                 except ClientResponseError as err:
                     raise NazurinError(err) from None
-
                 data = await response.json()
+                
+                # check JSON format
+                if not self.check_res_json(data):
+                    raise NazurinError("Invalid JSON format.")
+                
                 return data
 
     def build_caption(self, note: dict, site_url: str) -> Caption:
