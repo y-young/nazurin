@@ -6,7 +6,8 @@ import aiofiles
 import aiofiles.os
 import aiohttp
 
-from nazurin.config import STORAGE_DIR, TEMP_DIR
+from nazurin.config import DOWNLOAD_CHUNK_SIZE, STORAGE_DIR, TEMP_DIR
+from nazurin.utils import logger
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.helpers import (
     ensure_existence_async,
@@ -64,8 +65,13 @@ class File:
     @network_retry
     async def download(self, session: aiohttp.ClientSession):
         if await self.exists():
+            logger.info("File {} already exists", self.path)
             return True
         await ensure_existence_async(TEMP_DIR)
         async with session.get(self.url) as response:
+            logger.info("Downloading {} to {}...", self.url, self.path)
+            response.raise_for_status()
             async with aiofiles.open(self.path, "wb") as f:
-                await f.write(await response.read())
+                async for chunk in response.content.iter_chunked(DOWNLOAD_CHUNK_SIZE):
+                    await f.write(chunk)
+        logger.info("Downloaded to {}", self.path)

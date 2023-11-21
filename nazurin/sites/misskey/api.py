@@ -1,15 +1,15 @@
 import os
-from datetime import datetime
-from pathlib import Path
 import shlex
 import subprocess
+from datetime import datetime
+from pathlib import Path
 from typing import List, Tuple
 
 from aiohttp.client_exceptions import ClientResponseError
 from nazurin.models import Caption, Illust, Image, Ugoira
 from nazurin.models.file import File
 from nazurin.utils import Request, logger
-from nazurin.utils.decorators import network_retry, async_wrap
+from nazurin.utils.decorators import async_wrap, network_retry
 from nazurin.utils.exceptions import NazurinError
 
 from .config import DESTINATION, FILENAME
@@ -38,9 +38,7 @@ class Misskey:
     async def get_note(self, site_url: str, note_id: str) -> dict:
         """Fetch a note from a Misskey instance."""
         api = f"https://{site_url}/api/notes/show"
-        json = {
-            "noteId": note_id
-        }
+        json = {"noteId": note_id}
 
         async with Request() as request:
             async with request.post(url=api, json=json) as response:
@@ -81,6 +79,7 @@ class Misskey:
         if file["type"] == "video/mp4" or file["type"] == "image/gif":
             video = File(filename, file["url"], destination)
         else:
+
             @async_wrap
             def convert(config: File, output: File):
                 config_path = Path(config.path).as_posix()
@@ -108,8 +107,7 @@ class Misskey:
                         error.returncode,
                         error.output.decode(),
                     )
-                    raise NazurinError(
-                        "Failed to convert ugoira to mp4.") from None
+                    raise NazurinError("Failed to convert ugoira to mp4.") from None
 
             ori_video = File(filename, file["url"])
             async with Request() as session:
@@ -142,7 +140,9 @@ class Misskey:
                     )
                 )
             elif file["type"].startswith("video") or file["type"].endswith("gif"):
-                return Ugoira(await self.get_video(file, destination, filename), caption, note)
+                return Ugoira(
+                    await self.get_video(file, destination, filename), caption, note
+                )
 
         return Illust(images, caption, note, files)
 

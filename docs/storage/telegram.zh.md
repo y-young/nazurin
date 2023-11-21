@@ -6,6 +6,10 @@
 
 使用 Telegram 频道（相册频道）存储下载的文件。
 
+!!! warning "警告"
+
+    由于 Telegram 机器人 API 的文件大小限制，大于 50MB 的文件无法存储在 Telegram 中。
+
 ## 配置
 
 ### STORAGE
