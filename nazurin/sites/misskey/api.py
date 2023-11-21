@@ -1,49 +1,27 @@
 import os
 import shlex
 import subprocess
-from datetime import datetime
 from pathlib import Path
 from typing import List, Tuple
 
 from aiohttp.client_exceptions import ClientResponseError
+from pydantic import ValidationError
 
 from nazurin.models import Caption, Illust, Image, Ugoira
 from nazurin.models.file import File
+from nazurin.sites.misskey.models import File as NoteFile
+from nazurin.sites.misskey.models import Note
 from nazurin.utils import Request, logger
 from nazurin.utils.decorators import async_wrap, network_retry
 from nazurin.utils.exceptions import NazurinError
+from nazurin.utils.helpers import fromisoformat
 
 from .config import DESTINATION, FILENAME
 
 
 class Misskey:
-    def check_res_json(self, data: dict) -> bool:
-        note_required_fields = ["id", "user", "text", "createdAt", "files"]
-        for f in note_required_fields:
-            if f not in data:
-                return False
-        user = data["user"]
-        user_required_fileds = ["username", "name"]
-        for f in user_required_fileds:
-            if f not in user:
-                return False
-        files = data["files"]
-        file_required_fields = [
-            "name",
-            "type",
-            "url",
-            "thumbnailUrl",
-            "size",
-            "properties",
-        ]
-        for file in files:
-            for f in file_required_fields:
-                if f not in file:
-                    return False
-        return True
-
     @network_retry
-    async def get_note(self, site_url: str, note_id: str) -> dict:
+    async def get_note(self, site_url: str, note_id: str) -> Note:
         """Fetch a note from a Misskey instance."""
         api = f"https://{site_url}/api/notes/show"
         json = {"noteId": note_id}
@@ -54,38 +32,29 @@ class Misskey:
                     response.raise_for_status()
                 except ClientResponseError as err:
                     raise NazurinError(err) from None
+
                 data = await response.json()
+                try:
+                    return Note.model_validate(data)
+                except ValidationError as err:
+                    raise NazurinError(err) from None
 
-                # check JSON format
-                if not self.check_res_json(data):
-                    raise NazurinError("Invalid JSON format.")
-
-                return data
-
-    def build_caption(self, note: dict, site_url: str) -> Caption:
-        url = f"https://{site_url}/notes/{note['id']}"
+    def build_caption(self, note: Note, site_url: str) -> Caption:
+        url = f"https://{site_url}/notes/{note.id}"
+        caption = {
+            "url": url,
+            "author": f"{note.user.name} #{note.user.username}",
+            "text": note.text,
+        }
         # URL from the original instance
-        if note["uri"] is None:
-            return Caption(
-                {
-                    "url": url,
-                    "author": f"{note['user']['username']} #{note['user']['name']}",
-                    "text": note["text"],
-                }
-            )
-        else:
-            return Caption(
-                {
-                    "url": url,
-                    "original_url": note["uri"],
-                    "author": f"{note['user']['username']} #{note['user']['name']}",
-                    "text": note["text"],
-                }
-            )
+        if note.uri is not None:
+            caption["original_url"] = note.uri
+        return Caption(caption)
 
-    async def get_video(self, file: dict, destination: str, filename: str) -> File:
-        if file["type"] == "video/mp4" or file["type"] == "image/gif":
-            video = File(filename, file["url"], destination)
+    async def get_video(self, file: NoteFile, destination: str, filename: str) -> File:
+        file_type = file.type
+        if file_type in ["video/mp4", "image/gif"]:
+            video = File(filename, file.url, destination)
         else:
 
             @async_wrap
@@ -117,7 +86,7 @@ class Misskey:
                     )
                     raise NazurinError("Failed to convert ugoira to mp4.") from None
 
-            ori_video = File(filename, file["url"])
+            ori_video = File(filename, file.url)
             async with Request() as session:
                 await ori_video.download(session)
             filename, _ = os.path.splitext(filename)
@@ -125,51 +94,59 @@ class Misskey:
             await convert(ori_video, video)
         return video
 
-    async def parse_note(self, note: dict, site_url: str) -> Illust:
+    async def parse_note(self, note: Note, site_url: str) -> Illust:
         """Build caption and get images."""
         # Build note caption
         caption = self.build_caption(note, site_url)
 
         images: List[Image] = []
         files: List[File] = []
-        file_dict = note["files"]
-        for file in file_dict:
-            destination, filename = self.get_storage_dest(note, file["name"])
-            if file["type"].startswith("image") and not file["type"].endswith("gif"):
+        note_files = note.files
+        for index, file in enumerate(note_files):
+            if not file.url:
+                continue
+            destination, filename = self.get_storage_dest(note, file, index)
+            file_type = file.type
+            if file_type.startswith("image") and not file_type.endswith("gif"):
                 images.append(
                     Image(
                         filename,
-                        file["url"],
+                        file.url,
                         destination,
-                        file["thumbnailUrl"],
-                        file["size"],
-                        file["properties"]["width"],
-                        file["properties"]["height"],
+                        file.thumbnailUrl,
+                        file.size,
+                        file.properties.width,
+                        file.properties.height,
                     )
                 )
-            elif file["type"].startswith("video") or file["type"].endswith("gif"):
+            elif file_type.startswith("video") or file_type.endswith("gif"):
                 return Ugoira(
-                    await self.get_video(file, destination, filename), caption, note
+                    await self.get_video(file, destination, filename),
+                    caption,
+                    note.model_dump(),
                 )
 
-        return Illust(images, caption, note, files)
+        return Illust(images, caption, note.model_dump(), files)
 
-    async def fetch(self, site_url: str, post_id: str) -> Illust:
-        note = await self.get_note(site_url, post_id)
+    async def fetch(self, site_url: str, note_id: str) -> Illust:
+        note = await self.get_note(site_url, note_id)
         return await self.parse_note(note, site_url)
 
     @staticmethod
-    def get_storage_dest(note: dict, filename: str) -> Tuple[str, str]:
+    def get_storage_dest(note: Note, file: NoteFile, index: int) -> Tuple[str, str]:
         """
         Format destination and filename.
         """
-        # remove 'Z' to fit datetime.fromisoformat's needs
-        created_at = datetime.fromisoformat(note["createdAt"][:-1])
-        filename, extension = os.path.splitext(filename)
+        created_at = fromisoformat(note.createdAt)
+        filename, extension = os.path.splitext(file.name)
         context = {
-            **note,
+            "user": note.user.model_dump(),
+            **file.properties.model_dump(),
+            "md5": file.md5,
             # Human-friendly filename, without extension
             "filename": filename,
+            "index": index,
+            "id": note.id,
             "created_at": created_at,
             "extension": extension,
         }
