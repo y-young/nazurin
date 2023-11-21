@@ -8,7 +8,7 @@ from .config import COLLECTION
 
 patterns = [
     # https://site.example/notes/9khcu788zb
-    r"://(.*?)/notes/(.*)",
+    r"https?://(.*?)/notes/([0-9a-z]+)",
 ]
 
 
