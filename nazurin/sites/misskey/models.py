@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict
 
@@ -38,5 +38,5 @@ class Note(BaseModel):
     userId: str
     user: User
     text: Optional[str]
-    files: list[File]
+    files: List[File]
     uri: Optional[str] = None
