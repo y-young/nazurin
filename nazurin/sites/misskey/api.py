@@ -62,6 +62,7 @@ class Misskey:
     async def get_video(self, file: NoteFile, destination: str, filename: str) -> File:
         file_type = file.type
         if file_type not in ["video/mp4", "image/gif"]:
+
             @async_wrap
             def convert(config: File, output: File):
                 config_path = Path(config.path).as_posix()
@@ -89,8 +90,8 @@ class Misskey:
                         error.returncode,
                         error.output.decode(),
                     )
-                    raise NazurinError(
-                        "Failed to convert ugoira to mp4.") from None
+                    raise NazurinError("Failed to convert ugoira to mp4.") from None
+
             ori_video = File(filename, file.url)
             async with Request() as session:
                 await ori_video.download(session)
