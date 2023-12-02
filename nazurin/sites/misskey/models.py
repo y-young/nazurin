@@ -40,3 +40,4 @@ class Note(BaseModel):
     text: Optional[str]
     files: List[File]
     uri: Optional[str] = None
+    visibility: str

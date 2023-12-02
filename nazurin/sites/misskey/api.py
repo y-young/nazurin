@@ -41,7 +41,9 @@ class Misskey:
 
                 data = await response.json()
                 try:
-                    return Note.model_validate(data)
+                    note = Note.model_validate(data)
+                    if note.visibility not in ["public", "home"]:
+                        raise NazurinError("Note is not public.")
                 except ValidationError as err:
                     raise NazurinError(err) from None
 
@@ -59,10 +61,7 @@ class Misskey:
 
     async def get_video(self, file: NoteFile, destination: str, filename: str) -> File:
         file_type = file.type
-        if file_type in ["video/mp4", "image/gif"]:
-            video = File(filename, file.url, destination)
-        else:
-
+        if file_type not in ["video/mp4", "image/gif"]:
             @async_wrap
             def convert(config: File, output: File):
                 config_path = Path(config.path).as_posix()
@@ -90,14 +89,16 @@ class Misskey:
                         error.returncode,
                         error.output.decode(),
                     )
-                    raise NazurinError("Failed to convert ugoira to mp4.") from None
-
+                    raise NazurinError(
+                        "Failed to convert ugoira to mp4.") from None
             ori_video = File(filename, file.url)
             async with Request() as session:
                 await ori_video.download(session)
             filename, _ = os.path.splitext(filename)
             video = File(filename + ".mp4", "", destination)
             await convert(ori_video, video)
+        else:
+            video = File(filename, file.url, destination)
         return video
 
     async def parse_note(self, note: Note, site_url: str) -> Illust:
