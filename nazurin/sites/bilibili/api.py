@@ -1,4 +1,3 @@
-import json
 import os
 from datetime import datetime
 from typing import List, Tuple
@@ -13,60 +12,48 @@ from .config import DESTINATION, FILENAME
 
 class Bilibili:
     @network_retry
-    async def get_dynamic(self, dynamic_id: int):
+    async def get_dynamic(self, dynamic_id: str):
         """Get dynamic data from API."""
         api = (
-            "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr"
-            "/get_dynamic_detail?dynamic_id=" + str(dynamic_id)
+            f"https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?id={dynamic_id}"
         )
         async with Request() as request:
             async with request.get(api) as response:
                 response.raise_for_status()
                 data = await response.json()
                 # For some IDs, the API returns code 0 but empty content
-                if data["code"] == 500207 or (
-                    data["code"] == 0 and "card" not in data["data"]
-                ):
+                code = data.get("code")
+                if code == 4101147 or "data" not in data:
                     raise NazurinError("Dynamic not found")
-                if data["code"] != 0:
-                    raise NazurinError("Failed to get dynamic: " + data["message"])
-        card = data["data"]["card"]
-        desc = card["desc"]
-        card = json.loads(card["card"])
-        card.update(
-            {
-                "type": desc["type"],
-                "dynamic_id_str": desc["dynamic_id_str"],
-                "view": desc["view"],
-                "repost": desc["repost"],
-                "comment": desc["comment"],
-                "like": desc["like"],
-                "timestamp": desc["timestamp"],
-            }
-        )
-        if "vip" in card["user"]:
-            del card["user"]["vip"]
-        return card
+                if code != 0:
+                    raise NazurinError(
+                        f"Failed to get dynamic: code = {code}, message = {data['message']}"
+                    )
+        item = data["data"]["item"]
+        return self.cleanup_item(item)
 
-    async def fetch(self, dynamic_id: int) -> Illust:
+    async def fetch(self, dynamic_id: str) -> Illust:
         """Fetch images and detail."""
-        card = await self.get_dynamic(dynamic_id)
-        imgs = self.get_images(card)
-        caption = self.build_caption(card)
-        caption["url"] = f"https://t.bilibili.com/{dynamic_id}"
-        return Illust(imgs, caption, card)
+        item = await self.get_dynamic(dynamic_id)
+        imgs = self.get_images(item)
+        caption = self.build_caption(item)
+        caption["url"] = f"https://www.bilibili.com/opus/{dynamic_id}"
+        return Illust(imgs, caption, item)
 
     @staticmethod
-    def get_images(card) -> List[Image]:
+    def get_images(item: dict) -> List[Image]:
         """Get all images in a dynamic card."""
-        if "item" not in card or "pictures" not in card["item"]:
+        major_items = item["modules"]["module_dynamic"]["major"]
+        if not major_items:
             raise NazurinError("No image found")
-        pics = card["item"]["pictures"]
+        draw_items = major_items["draw"]["items"]
+        if not len(draw_items):
+            raise NazurinError("No image found")
         imgs = []
-        for index, pic in enumerate(pics):
-            url = pic["img_src"]
-            destination, filename = Bilibili.get_storage_dest(card, pic, index)
-            size = pic["img_size"] * 1024  # size returned by API is in KB
+        for index, pic in enumerate(draw_items):
+            url = pic["src"]
+            destination, filename = Bilibili.get_storage_dest(item, pic, index)
+            size = pic["size"] * 1024  # size returned by API is in KB
             # Sometimes it returns a wrong size that is not in whole bytes,
             # in this case we just ignore it.
             if size % 1 != 0:
@@ -78,30 +65,32 @@ class Bilibili:
                     destination,
                     url + "@518w.jpg",
                     size,
-                    pic["img_width"],
-                    pic["img_height"],
+                    pic["width"],
+                    pic["height"],
                 )
             )
         return imgs
 
     @staticmethod
-    def get_storage_dest(card: dict, pic: dict, index: int = 0) -> Tuple[str, str]:
+    def get_storage_dest(item: dict, pic: dict, index: int = 0) -> Tuple[str, str]:
         """
         Format destination and filename.
         """
 
-        url = pic["img_src"]
-        timestamp = datetime.fromtimestamp(card["timestamp"])
+        url = pic["src"]
+        timestamp = datetime.fromtimestamp(item["modules"]["module_author"]["pub_ts"])
         basename = os.path.basename(url)
         filename, extension = os.path.splitext(basename)
+        user = item["modules"]["module_author"]
         context = {
-            **card,
+            "user": user,
             # Original filename, without extension
             "filename": filename,
             # Image index
             "index": index,
             "timestamp": timestamp,
             "extension": extension,
+            "id_str": item["id_str"],
             "pic": pic,
         }
         return (
@@ -110,7 +99,21 @@ class Bilibili:
         )
 
     @staticmethod
-    def build_caption(card) -> Caption:
+    def build_caption(item: dict) -> Caption:
+        modules = item["modules"]
         return Caption(
-            {"author": card["user"]["name"], "content": card["item"]["description"]}
+            {
+                "author": "#" + modules["module_author"]["name"],
+                "content": modules["module_dynamic"]["desc"]["text"],
+            }
         )
+
+    @staticmethod
+    def cleanup_item(item: dict) -> dict:
+        try:
+            del item["basic"]
+            del item["modules"]["module_author"]["avatar"]
+            del item["modules"]["module_more"]
+        except KeyError:
+            pass
+        return item

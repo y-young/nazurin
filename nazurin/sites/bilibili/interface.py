@@ -11,6 +11,8 @@ patterns = [
     r"t\.bilibili\.com/(\d+)",
     # https://t.bilibili.com/h5/dynamic/detail/123456789012345678
     r"t\.bilibili\.com/h5/dynamic/detail/(\d+)",
+    # https://www.bilibili.com/opus/123456789012345678
+    r"bilibili\.com/opus/(\d+)",
 ]
 
 
