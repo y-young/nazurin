@@ -27,7 +27,8 @@ class Bilibili:
                     raise NazurinError("Dynamic not found")
                 if code != 0:
                     raise NazurinError(
-                        f"Failed to get dynamic: code = {code}, message = {data['message']}"
+                        f"Failed to get dynamic: code = {code}, "
+                        f"message = {data['message']}"
                     )
         item = data["data"]["item"]
         return self.cleanup_item(item)
@@ -47,7 +48,7 @@ class Bilibili:
         if not major_items:
             raise NazurinError("No image found")
         draw_items = major_items["draw"]["items"]
-        if not len(draw_items):
+        if len(draw_items) == 0:
             raise NazurinError("No image found")
         imgs = []
         for index, pic in enumerate(draw_items):
