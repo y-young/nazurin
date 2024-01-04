@@ -16,3 +16,4 @@
 |  DeviantArt  | <https://www.deviantart.com/>  |      |    ✔     |
 |    Lofter    |   <https://www.lofter.com/>    |      |    ✔     |
 | Kemono.party |    <https://kemono.party/>     |      |    ✔     |
+|   Misskey    |        各种 Misskey 实例          |      |    ✔     |
