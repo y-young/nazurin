@@ -8,7 +8,7 @@ from html import escape
 from mimetypes import guess_type
 from pathlib import Path
 from string import capwords
-from typing import Callable, List
+from typing import Callable, List, Union
 
 import aiofiles
 import aiofiles.os
@@ -18,8 +18,10 @@ from aiogram.utils.exceptions import (
     InvalidHTTPUrlContent,
     WrongFileIdentifier,
 )
+from PIL import Image
 
 from nazurin.models import Caption
+from nazurin.utils.decorators import async_wrap
 
 from . import logger
 
@@ -190,3 +192,22 @@ async def remove_files_older_than(path: str, days: int):
                 await aiofiles.os.remove(entry.path)
             elif entry.is_dir():
                 shutil.rmtree(entry.path)
+
+
+@async_wrap
+def check_image(path: Union[str, os.PathLike]) -> bool:
+    """
+    Check if file is a valid image and not truncated.
+    """
+
+    try:
+        with Image.open(path) as image:
+            image.verify()
+
+        with Image.open(path) as image:
+            image = Image.open(path)
+            image.load()
+        return True
+    except Exception as error:
+        logger.warning("Invalid image {}: {}", path, error)
+        return False

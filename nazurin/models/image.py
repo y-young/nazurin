@@ -1,9 +1,12 @@
+import os
 from dataclasses import dataclass
 
+import aiohttp
 from humanize import naturalsize
 
 from nazurin.utils import Request, logger
 from nazurin.utils.exceptions import NazurinError
+from nazurin.utils.helpers import check_image
 
 from .file import File
 
@@ -81,3 +84,22 @@ class Image(File):
         if value % 1 != 0:
             raise TypeError("Image size must be an integer")
         self._size = int(value)
+
+    async def download(self, session: aiohttp.ClientSession):
+        RETRIES = 3
+        for i in range(RETRIES):
+            await super().download(session)
+            is_valid = await check_image(self.path)
+            if is_valid:
+                break
+            logger.warning(
+                "Downloaded image {} is not valid, retry {} / {}",
+                self.path,
+                i + 1,
+                RETRIES,
+            )
+            os.remove(self.path)
+        if not is_valid:
+            raise NazurinError(
+                "Download failed with invalid image, please check logs for details"
+            )
