@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from typing import List
 
 from nazurin.utils import Request
+from nazurin.utils.network import NazurinRequestSession
 
 from .caption import Caption
 from .file import File
@@ -26,8 +27,10 @@ class Illust:
     def has_multiple_images(self) -> bool:
         return len(self.images) > 1
 
-    async def download(self, **kwargs):
-        async with Request(**kwargs) as session:
+    async def download(
+        self, *, request_class: NazurinRequestSession = Request, **kwargs
+    ):
+        async with request_class(**kwargs) as session:
             tasks = []
             for file in self.all_files:
                 if not file.url:

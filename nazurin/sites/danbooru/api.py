@@ -7,7 +7,8 @@ from typing import List, Optional, Tuple
 from pybooru import Danbooru as danbooru
 from pybooru import PybooruHTTPError
 
-from nazurin.models import Caption, File, Illust, Image
+from nazurin.models import Caption, File, Image
+from nazurin.sites.danbooru.models import DanbooruIllust
 from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
 from nazurin.utils.helpers import is_image
@@ -43,12 +44,12 @@ class Danbooru:
 
     async def view(
         self, post_id: Optional[int] = None, md5: Optional[str] = None
-    ) -> Illust:
+    ) -> DanbooruIllust:
         post = await self.get_post(post_id, md5)
         illust = self.parse_post(post)
         return illust
 
-    def parse_post(self, post) -> Illust:
+    def parse_post(self, post) -> DanbooruIllust:
         """Get images and build caption."""
         # Get images
         url = post["file_url"]
@@ -88,7 +89,7 @@ class Danbooru:
                 "has_children": post["has_children"],
             }
         )
-        return Illust(imgs, caption, post, files)
+        return DanbooruIllust(imgs, caption, post, files)
 
     @staticmethod
     def get_storage_dest(post: dict, filename: str) -> Tuple[str, str]:

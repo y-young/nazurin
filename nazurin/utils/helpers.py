@@ -208,6 +208,6 @@ def check_image(path: Union[str, os.PathLike]) -> bool:
             image = Image.open(path)
             image.load()
         return True
-    except Exception as error:
+    except OSError as error:
         logger.warning("Invalid image {}: {}", path, error)
         return False

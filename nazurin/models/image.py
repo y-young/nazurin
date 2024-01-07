@@ -98,7 +98,9 @@ class Image(File):
                 i + 1,
                 RETRIES,
             )
-            os.remove(self.path)
+            if i < RETRIES - 1:
+                # Keep the last one for debugging
+                os.remove(self.path)
         if not is_valid:
             raise NazurinError(
                 "Download failed with invalid image, please check logs for details"
