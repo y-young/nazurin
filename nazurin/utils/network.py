@@ -111,7 +111,7 @@ class CurlRequest(CurlSession, NazurinRequestSession):
                 logger.error(
                     "Download failed with status code {}", response.status_code
                 )
-                logger.info("Response: {}", response.content)
+                logger.info("Response: {}", await response.acontent())
                 response.raise_for_status()
             async with aiofiles.open(destination, "wb") as f:
                 async for chunk in response.aiter_content():
