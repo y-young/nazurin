@@ -1,8 +1,8 @@
-aiogram~=2.20.0
+aiogram~=2.25.1
 aiohttp~=3.8.0
 aiohttp_cors~=0.7.0
 aiofiles~=22.1.0
-aiojobs~=0.3.0
+aiojobs==1.2.0
 tenacity~=8.2.2
 environs~=9.3.4
 async_lru~=2.0.2
