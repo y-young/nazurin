@@ -1,12 +1,12 @@
-import asyncio
 from typing import List
 
 from humanize import naturalsize
 
 from nazurin import bot
-from nazurin.config import env
+from nazurin.config import MAX_PARALLEL_UPLOAD, env
 from nazurin.models import File
 from nazurin.utils import logger
+from nazurin.utils.helpers import run_in_pool
 
 ALBUM_ID = env.int("ALBUM_ID")
 
@@ -26,5 +26,5 @@ class Telegram:
                 )
                 continue
             tasks.append(bot.send_doc(file, chat_id=ALBUM_ID))
-        await asyncio.gather(*tasks)
+        await run_in_pool(tasks, MAX_PARALLEL_UPLOAD)
         return True

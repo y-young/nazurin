@@ -1,3 +1,4 @@
+import asyncio
 import os
 import pathlib
 import re
@@ -8,10 +9,11 @@ from html import escape
 from mimetypes import guess_type
 from pathlib import Path
 from string import capwords
-from typing import Callable, List, Union
+from typing import Callable, Coroutine, Iterable, List, Union
 
 import aiofiles
 import aiofiles.os
+import aiojobs
 from aiogram.types import Message
 from aiogram.utils.exceptions import (
     BadRequest,
@@ -211,3 +213,12 @@ def check_image(path: Union[str, os.PathLike]) -> bool:
     except OSError as error:
         logger.warning("Invalid image {}: {}", path, error)
         return False
+
+
+async def run_in_pool(tasks: Iterable[Coroutine], pool_size: int):
+    scheduler = await aiojobs.create_scheduler(limit=pool_size)
+    jobs: List[aiojobs.Job] = []
+    for task in tasks:
+        jobs.append(await scheduler.spawn(task))
+    await asyncio.gather(*[job.wait() for job in jobs])
+    await scheduler.close()

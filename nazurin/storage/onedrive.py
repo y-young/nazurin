@@ -7,13 +7,13 @@ from urllib.parse import quote
 
 from humanize import naturalsize
 
-from nazurin.config import NAZURIN_DATA, STORAGE_DIR, env
+from nazurin.config import MAX_PARALLEL_UPLOAD, NAZURIN_DATA, STORAGE_DIR, env
 from nazurin.database import Database
 from nazurin.models import File
 from nazurin.utils import Request, logger
 from nazurin.utils.decorators import Cache, network_retry
 from nazurin.utils.exceptions import NazurinError
-from nazurin.utils.helpers import read_by_chunks, sanitize_path
+from nazurin.utils.helpers import read_by_chunks, run_in_pool, sanitize_path
 
 OD_FOLDER = STORAGE_DIR
 OD_CLIENT = env.str("OD_CLIENT")
@@ -67,7 +67,7 @@ class OneDrive:
         await asyncio.gather(*tasks)
 
         tasks = [self.upload(file) for file in files]
-        await asyncio.gather(*tasks)
+        await run_in_pool(tasks, MAX_PARALLEL_UPLOAD)
 
     @network_retry
     async def find_folder(self, name: str) -> Optional[str]:

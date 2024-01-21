@@ -172,6 +172,22 @@ _在 v2 中新增。_
 
 _在 v2.6.0 中新增。_
 
+## MAX_PARALLEL_DOWNLOAD
+
+:material-lightbulb-on: 可选，默认为 `5`
+
+同时下载的最大文件数。
+
+_在 v2.7.0 中新增。_
+
+## MAX_PARALLEL_UPLOAD
+
+:material-lightbulb-on: 可选，默认为 `5`
+
+同时上传的最大文件数。
+
+_在 v2.7.0 中新增。_
+
 ## HTTP_PROXY
 
 :material-lightbulb-on: 可选，默认遵循环境变量

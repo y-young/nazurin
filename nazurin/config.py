@@ -37,6 +37,8 @@ ALLOW_GROUP: List[int] = env.list("ALLOW_GROUP", subcast=int, default=[])
 RETRIES: int = env.int("RETRIES", default=5)
 TIMEOUT: int = env.int("TIMEOUT", default=20)
 DOWNLOAD_CHUNK_SIZE: int = env.int("DOWNLOAD_CHUNK_SIZE", default=4096)
+MAX_PARALLEL_DOWNLOAD: int = env.int("MAX_PARALLEL_DOWNLOAD", default=5)
+MAX_PARALLEL_UPLOAD: int = env.int("MAX_PARALLEL_UPLOAD", default=5)
 PROXY: str = env.str("HTTP_PROXY", default=None)
 UA: str = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "

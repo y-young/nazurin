@@ -1,8 +1,9 @@
-import asyncio
 from dataclasses import dataclass, field
 from typing import List
 
+from nazurin.config import MAX_PARALLEL_DOWNLOAD
 from nazurin.utils import Request
+from nazurin.utils.helpers import run_in_pool
 from nazurin.utils.network import NazurinRequestSession
 
 from .caption import Caption
@@ -31,9 +32,6 @@ class Illust:
         self, *, request_class: NazurinRequestSession = Request, **kwargs
     ):
         async with request_class(**kwargs) as session:
-            tasks = []
-            for file in self.all_files:
-                if not file.url:
-                    continue
-                tasks.append(asyncio.create_task(file.download(session)))
-            await asyncio.gather(*tasks)
+            files = filter(lambda file: file.url, self.all_files)
+            tasks = [file.download(session) for file in files]
+            await run_in_pool(tasks, MAX_PARALLEL_DOWNLOAD)

@@ -5,12 +5,13 @@ from typing import List
 from mega import Mega as mega
 from mega.errors import RequestError
 
-from nazurin.config import NAZURIN_DATA, env
+from nazurin.config import MAX_PARALLEL_UPLOAD, NAZURIN_DATA, env
 from nazurin.database import Database
 from nazurin.models import File
 from nazurin.utils import logger
 from nazurin.utils.decorators import Cache, async_wrap, network_retry
 from nazurin.utils.exceptions import NazurinError
+from nazurin.utils.helpers import run_in_pool
 
 MEGA_USER = env.str("MEGA_USER")
 MEGA_PASS = env.str("MEGA_PASS")
@@ -91,7 +92,7 @@ class Mega:
             folders[destination] = folder_id
 
         tasks = [self.upload(file, folders) for file in files]
-        await asyncio.gather(*tasks)
+        await run_in_pool(tasks, MAX_PARALLEL_UPLOAD)
 
     @network_retry
     @Cache.lru()

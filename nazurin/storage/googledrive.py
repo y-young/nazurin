@@ -8,11 +8,12 @@ from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive as GDrive
 from pydrive2.drive import GoogleDriveFile
 
-from nazurin.config import STORAGE_DIR, env
+from nazurin.config import MAX_PARALLEL_UPLOAD, STORAGE_DIR, env
 from nazurin.models import File
 from nazurin.utils import logger
 from nazurin.utils.decorators import Cache, async_wrap
 from nazurin.utils.exceptions import NazurinError
+from nazurin.utils.helpers import run_in_pool
 
 GD_FOLDER = env.str("GD_FOLDER")
 GD_CREDENTIALS = env.str(
@@ -77,7 +78,7 @@ class GoogleDrive:
             folders[destination] = folder_id
 
         tasks = [self.upload(item, folders) for item in files]
-        await asyncio.gather(*tasks)
+        await run_in_pool(tasks, MAX_PARALLEL_UPLOAD)
 
     @staticmethod
     @Cache.lru()

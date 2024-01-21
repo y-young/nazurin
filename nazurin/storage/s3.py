@@ -1,14 +1,14 @@
-import asyncio
 import mimetypes
 import pathlib
 from typing import List
 
 from minio import Minio
 
-from nazurin.config import env
+from nazurin.config import MAX_PARALLEL_UPLOAD, env
 from nazurin.models import File
 from nazurin.utils import logger
 from nazurin.utils.decorators import async_wrap
+from nazurin.utils.helpers import run_in_pool
 
 with env.prefixed("S3_"):
     ENDPOINT = env.str("ENDPOINT", default="s3.amazonaws.com")
@@ -50,6 +50,6 @@ class S3:
         await self.check_bucket()
 
         tasks = [self.upload(file) for file in files]
-        await asyncio.gather(*tasks)
+        await run_in_pool(tasks, MAX_PARALLEL_UPLOAD)
 
         return True

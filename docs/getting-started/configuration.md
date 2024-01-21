@@ -172,6 +172,22 @@ Chunk size when writing downloaded files, in bytes.
 
 _Added in v2.6.0._
 
+## MAX_PARALLEL_DOWNLOAD
+
+:material-lightbulb-on: Optional, defaults to `5`
+
+Maximum number of parallel downloads.
+
+_Added in v2.7.0._
+
+## MAX_PARALLEL_UPLOAD
+
+:material-lightbulb-on: Optional, defaults to `5`
+
+Maximum number of parallel uploads.
+
+_Added in v2.7.0._
+
 ## HTTP_PROXY
 
 :material-lightbulb-on: Optional, defaults to your environment
