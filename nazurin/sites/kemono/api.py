@@ -57,7 +57,7 @@ class Kemono:
         image_index = 0
         for file in files:
             path: str = file["path"]
-            url = "https://c1.kemono.party/data" + path
+            url = "https://c1.kemono.su/data" + path
 
             # Handle non-image files
             if not self.is_image(path):
@@ -72,7 +72,7 @@ class Kemono:
             destination, filename = self.get_storage_dest(
                 post, f"{image_index} - {file['name']}", path
             )
-            thumbnail = "https://img.kemono.party/thumbnail/data" + path
+            thumbnail = "https://img.kemono.su/thumbnail/data" + path
             images.append(
                 Image(
                     filename,
@@ -120,7 +120,7 @@ class Kemono:
                 "title": post["title"],
                 "author": "#" + post["username"],
                 "url": (
-                    f"https://kemono.party/{post['service']}"
+                    f"https://kemono.su/{post['service']}"
                     f"/user/{post['user']}/post/{post['id']}"
                 ),
             }
