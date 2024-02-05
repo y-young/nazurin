@@ -52,11 +52,11 @@
       "required": false
     },
     "PIXIV_TOKEN": {
-      "description": "Pixiv refresh token. See more information at https://github.com/y-young/nazurin/wiki/Pixiv .",
+      "description": "Pixiv refresh token. See more information at https://nazurin.readthedocs.io/site/pixiv/ .",
       "required": false
     },
     "WALLHAVEN_API_KEY": {
-      "description": "Wallhaven API key. See more information at https://github.com/y-young/nazurin/wiki/Wallhaven .",
+      "description": "Wallhaven API key. See more information at https://nazurin.readthedocs.io/site/wallhaven/ .",
       "required": false
     },
     "MEGA_USER": {

@@ -38,6 +38,12 @@
 
 例如：`zh-CN`, `en-US`
 
+### PIXIV_BOOKMARK_PRIVACY
+
+:material-lightbulb-on: 可选，默认为 `public`
+
+收藏可见性，`public` 或 `private`。
+
 ## 自定义存储路径和文件名
 
 更多信息请查阅 [自定义存储路径和文件名](./index.zh.md/#customizing-storage-path--file-name)。
