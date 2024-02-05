@@ -6,13 +6,13 @@
 
 更多信息请查阅 [自定义存储路径和文件名](./index.zh.md/#customizing-storage-path--file-name)。
 
-### LOFTER_FILE_PATH
+### KEMONO_FILE_PATH
 
 :material-lightbulb-on: 可选，默认为 `Kemono/{service}/{username} ({user})/{title} ({id})`
 
 存储路径。
 
-### LOFTER_FILE_NAME
+### KEMONO_FILE_NAME
 
 :material-lightbulb-on: 可选，默认为 `{pretty_name}`
 
