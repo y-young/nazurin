@@ -6,4 +6,6 @@ COLLECTION = "bluesky"
 with env.prefixed("BLUESKY_"):
     with env.prefixed("FILE_"):
         DESTINATION: str = env.str("PATH", default="Bluesky")
-        FILENAME: str = env.str("NAME", default="{rkey}_{index} - {user[display_name]}({user[handle]})")
+        FILENAME: str = env.str(
+            "NAME", default="{rkey}_{index} - {user[display_name]}({user[handle]})"
+        )
