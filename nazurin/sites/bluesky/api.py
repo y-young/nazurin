@@ -18,7 +18,7 @@ class Bluesky:
         https://www.docs.bsky.app/docs/api/com-atproto-identity-resolve-handle
         """
         api = "https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle"
-        async with Request(headers={"Accept": "application/json"}) as request:
+        async with Request() as request:
             async with request.get(api, params={"handle": handle}) as response:
                 data = await response.json()
                 if "error" in data:
@@ -34,7 +34,7 @@ class Bluesky:
         """
         api = "https://public.api.bsky.app/xrpc/app.bsky.feed.getPostThread"
         params = {"uri": uri, "depth": depth, "parentHeight": parent_height}
-        async with Request(headers={"Accept": "application/json"}) as request:
+        async with Request() as request:
             async with request.get(api, params=params) as response:
                 data = await response.json()
                 if "error" in data:
