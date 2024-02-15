@@ -23,5 +23,31 @@ File name for downloaded images.
 _Only common used ones are listed._
 
 ```json
-TODO after code review
+{
+  "rkey": "rkey of the post",
+  "uri": "AT:// uri of the post",
+  "cid": "cid of the post",
+  "user": {
+    "did": "User DID",
+    "handle": "User handle",
+    "display_name": "User display name"
+  },
+  "filename": "Original file name, without extension",
+  "index": "Image index",
+  "timestamp": "Timestamp",
+  "extension": "Extension",
+  "reply_count": "Reply count",
+  "repost_count": "Repost count",
+  "like_count": "Like count",
+  "pic": {
+    "aspectRatio": {
+      "height": 1440,
+      "width": 1080
+    },
+    "image": {
+      "mimeType": "image/jpeg",
+      "size": 123456,
+    }
+  }
+}
 ```
