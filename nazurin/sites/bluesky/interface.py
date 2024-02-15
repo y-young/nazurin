@@ -7,8 +7,9 @@ from .api import Bluesky
 from .config import COLLECTION
 
 patterns = [
+    # https://atproto.com/specs/record-key#record-key-syntax
     # https://bsky.app/profile/shiratamacaron.bsky.social/post/3kkt7oj5rmw2j
-    r"bsky\.app/profile/([\w\.-]+)/post/([\w\.-~]+)"
+    r"bsky\.app/profile/([\w\.-]+)/post/([\w\.\-~]+)"
 ]
 
 
