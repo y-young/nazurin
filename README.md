@@ -40,6 +40,7 @@
 |    DeviantArt     | <https://www.deviantart.com/>  |          |     ✔      |
 |      Lofter       |   <https://www.lofter.com/>    |          |     ✔      |
 |   Kemono.party    |    <https://kemono.party/>     |          |     ✔      |
+|      Bluesky      |      <https://bsky.app/>       |          |     ✔      |
 
 ### Supported Databases
 
