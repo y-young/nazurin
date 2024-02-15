@@ -24,8 +24,8 @@ _Only common used ones are listed._
 
 ```json
 {
-  "rkey": "rkey of the post",
-  "uri": "AT:// uri of the post",
+  "rkey": "Record Key of the post",
+  "uri": "at:// uri of the post",
   "cid": "cid of the post",
   "user": {
     "did": "User DID",

@@ -24,8 +24,8 @@ _此处只列出常用项。_
 
 ```json
 {
-  "rkey": "帖子的 rkey",
-  "uri": "帖子的 AT:// uri",
+  "rkey": "帖子的 Record Key",
+  "uri": "帖子的 at:// uri",
   "cid": "帖子的 cid",
   "user": {
     "did": "用户 DID",
