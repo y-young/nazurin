@@ -71,16 +71,12 @@ class Bluesky:
             url = pic["fullsize"]
             thumbnail = pic["thumb"]
             destination, filename = Bluesky.get_storage_dest(item, pic, index)
-            size = item["record"]["embed"]["images"][index]["image"]["size"]
             imgs.append(
                 Image(
                     filename,
                     url,
                     destination,
                     thumbnail,
-                    size,
-                    pic["aspectRatio"]["width"],
-                    pic["aspectRatio"]["height"],
                 )
             )
         return imgs
