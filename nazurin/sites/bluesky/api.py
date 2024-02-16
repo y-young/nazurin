@@ -1,11 +1,11 @@
 import os
-from datetime import datetime
 from typing import List, Tuple
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
+from nazurin.utils.helpers import fromisoformat
 
 from .config import DESTINATION, FILENAME
 
@@ -88,7 +88,7 @@ class Bluesky:
         """
 
         url = pic["fullsize"]
-        created_at = datetime.fromisoformat(item["record"]["createdAt"])
+        created_at = fromisoformat(item["record"]["createdAt"])
         basename = os.path.basename(url)
         filename, extension = basename.split("@")
         context = {
