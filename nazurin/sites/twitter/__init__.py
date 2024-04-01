@@ -1,4 +1,5 @@
 """Twitter site plugin."""
+
 from .api import Twitter
 from .commands import *
 from .config import PRIORITY

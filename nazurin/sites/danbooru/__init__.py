@@ -1,4 +1,5 @@
 """Danbooru site plugin."""
+
 from .api import Danbooru
 from .commands import *
 from .config import PRIORITY

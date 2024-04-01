@@ -1,4 +1,5 @@
 """Nazurin site plugins & plugin manager."""
+
 from glob import glob
 from importlib import import_module
 from os import path
