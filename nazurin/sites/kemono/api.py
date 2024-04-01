@@ -1,7 +1,7 @@
 import os
 from datetime import datetime, timezone
 from mimetypes import guess_type
-from typing import Tuple, Union
+from typing import ClassVar, Tuple, Union
 
 from bs4 import BeautifulSoup
 
@@ -15,10 +15,12 @@ from .config import DESTINATION, FILENAME
 
 
 class Kemono:
+    API_BASE: ClassVar[str] = "https://kemono.su/api/v1"
+
     @network_retry
     async def get_post(self, service: str, user_id: str, post_id: str) -> dict:
         """Fetch an post."""
-        api = f"https://kemono.su/api/v1/{service}/user/{user_id}/post/{post_id}"
+        api = f"{self.API_BASE}/{service}/user/{user_id}/post/{post_id}"
         async with Request() as request:
             async with request.get(api) as response:
                 response.raise_for_status()
@@ -34,7 +36,7 @@ class Kemono:
         self, service: str, user_id: str, post_id: str, revision_id: str
     ) -> dict:
         """Fetch a post revision."""
-        api = f"https://kemono.su/api/v1/{service}/user/{user_id}/post/{post_id}/revisions"
+        api = f"{self.API_BASE}/{service}/user/{user_id}/post/{post_id}/revisions"
         async with Request() as request:
             async with request.get(api) as response:
                 response.raise_for_status()
@@ -140,20 +142,23 @@ class Kemono:
         return (DESTINATION.format_map(context), filename + extension)
 
     @staticmethod
+    def get_url(post: dict) -> str:
+        url = (
+            f"https://kemono.su/{post['service']}"
+            f"/user/{post['user']}/post/{post['id']}"
+        )
+        revision = post.get("revision_id")
+        if revision:
+            url += f"/revision/{post['revision_id']}"
+        return url
+
+    @staticmethod
     def build_caption(post) -> Caption:
         return Caption(
             {
                 "title": post["title"],
                 "author": "#" + post["username"],
-                "url": (
-                    f"https://kemono.su/{post['service']}"
-                    f"/user/{post['user']}/post/{post['id']}"
-                    + (
-                        f"/revision/{post['revision_id']}"
-                        if post.get("revision_id")
-                        else ""
-                    )
-                ),
+                "url": Kemono.get_url(post),
             }
         )
 
