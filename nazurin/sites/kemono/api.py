@@ -30,8 +30,9 @@ class Kemono:
                 return post
 
     @network_retry
-    async def get_post_revision(self, service: str, user_id: str, post_id: str,
-                                revision_id: str) -> dict:
+    async def get_post_revision(
+        self, service: str, user_id: str, post_id: str, revision_id: str
+    ) -> dict:
         """Fetch a post revision."""
         api = f"https://kemono.su/api/v1/{service}/user/{user_id}/post/{post_id}/revisions"
         async with Request() as request:
@@ -63,8 +64,9 @@ class Kemono:
                 username = tag.get("content", "")
                 return username
 
-    async def fetch(self, service: str, user_id: str, post_id: str,
-                    revision_id: Union[str, None]) -> Illust:
+    async def fetch(
+        self, service: str, user_id: str, post_id: str, revision_id: Union[str, None]
+    ) -> Illust:
         if revision_id:
             post = await self.get_post_revision(service, user_id, post_id, revision_id)
         else:
@@ -146,7 +148,11 @@ class Kemono:
                 "url": (
                     f"https://kemono.su/{post['service']}"
                     f"/user/{post['user']}/post/{post['id']}"
-                    + (f"/revision/{post['revision_id']}" if post.get('revision_id') else '')
+                    + (
+                        f"/revision/{post['revision_id']}"
+                        if post.get("revision_id")
+                        else ""
+                    )
                 ),
             }
         )
