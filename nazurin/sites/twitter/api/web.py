@@ -145,9 +145,11 @@ class WebAPI(BaseAPI):
         )
         self.headers.update(
             {
-                Headers.AUTHORIZATION: AuthorizationToken.LOGGED_IN
-                if AUTH_TOKEN
-                else AuthorizationToken.GUEST
+                Headers.AUTHORIZATION: (
+                    AuthorizationToken.LOGGED_IN
+                    if AUTH_TOKEN
+                    else AuthorizationToken.GUEST
+                )
             }
         )
         variables = WebAPI.variables

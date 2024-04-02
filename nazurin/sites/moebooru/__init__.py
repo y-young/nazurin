@@ -1,4 +1,5 @@
 """Moebooru site plugin."""
+
 from .api import Moebooru
 from .commands import *
 from .config import PRIORITY

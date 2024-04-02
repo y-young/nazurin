@@ -1,4 +1,5 @@
 """Zerochan site plugin."""
+
 from .api import Zerochan
 from .commands import *
 from .config import PRIORITY

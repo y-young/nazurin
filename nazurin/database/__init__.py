@@ -1,4 +1,5 @@
 """Nazurin database drivers and database manager."""
+
 from __future__ import annotations
 
 import importlib
