@@ -40,7 +40,7 @@ class NazurinDispatcher(Dispatcher):
             content_types=[ContentType.TEXT, ContentType.PHOTO],
         )
 
-    def message_handler(
+    def message_handler(  # noqa: PLR0913
         self,
         *custom_filters,
         commands=None,
