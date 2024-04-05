@@ -1,6 +1,7 @@
 import os
 import pathlib
 from dataclasses import dataclass
+from typing import Optional
 
 import aiofiles
 import aiofiles.os
@@ -45,7 +46,7 @@ class File:
     def destination(self, value: str):
         self._destination = sanitize_path(value)
 
-    async def size(self):
+    async def size(self) -> Optional[int]:
         """
         Get file size in bytes
         """
@@ -53,6 +54,7 @@ class File:
         if os.path.exists(self.path):
             stat = await aiofiles.os.stat(self.path)
             return stat.st_size
+        return None
 
     async def exists(self) -> bool:
         if (
@@ -63,11 +65,13 @@ class File:
         return False
 
     @network_retry
-    async def download(self, session: NazurinRequestSession):
+    async def download(self, session: NazurinRequestSession) -> Optional[int]:
         if await self.exists():
             logger.info("File {} already exists", self.path)
             return True
         await ensure_existence_async(TEMP_DIR)
         logger.info("Downloading {} to {}...", self.url, self.path)
         await session.download(self.url, self.path)
-        logger.info("Downloaded to {}", self.path)
+        size = await self.size()
+        logger.info("Downloaded to {}, size = {}", self.path, size)
+        return size

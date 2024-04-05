@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass
+from typing import Optional
 
 import aiohttp
 from humanize import naturalsize
@@ -14,7 +15,7 @@ from .file import File
 @dataclass
 class Image(File):
     thumbnail: str = None
-    _size: int = None
+    _size: Optional[int] = None
     """
     File size in bytes
     """
@@ -88,20 +89,27 @@ class Image(File):
     async def download(self, session: aiohttp.ClientSession):
         RETRIES = 3
         for i in range(RETRIES):
-            await super().download(session)
+            downloaded_size = await super().download(session)
             is_valid = await check_image(self.path)
+            attempt_count = f"{i + 1} / {RETRIES}"
             if is_valid:
-                break
-            logger.warning(
-                "Downloaded image {} is not valid, retry {} / {}",
-                self.path,
-                i + 1,
-                RETRIES,
-            )
+                if self._size is None or self._size == downloaded_size:
+                    return
+                logger.warning(
+                    "Downloaded file size {} does not match image size {}, attempt {}",
+                    downloaded_size,
+                    self._size,
+                    attempt_count,
+                )
+            else:
+                logger.warning(
+                    "Downloaded image {} is not valid, attempt {}",
+                    self.path,
+                    attempt_count,
+                )
             if i < RETRIES - 1:
                 # Keep the last one for debugging
                 os.remove(self.path)
-        if not is_valid:
-            raise NazurinError(
-                "Download failed with invalid image, please check logs for details"
-            )
+        raise NazurinError(
+            "Download failed with invalid image, please check logs for details"
+        )

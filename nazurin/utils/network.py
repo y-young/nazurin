@@ -1,7 +1,7 @@
 import abc
 import os
 from contextlib import AbstractAsyncContextManager, asynccontextmanager
-from typing import AsyncContextManager, Generator, Optional, Union
+from typing import AsyncContextManager, AsyncGenerator, Optional, Union
 
 import aiofiles
 import cloudscraper
@@ -21,7 +21,7 @@ class NazurinRequestSession(AbstractAsyncContextManager):
         cookies: Optional[dict] = None,
         headers: Optional[dict] = None,
         timeout: int = TIMEOUT,
-        **kwargs
+        **kwargs,
     ):
         raise NotImplementedError
 
@@ -45,7 +45,7 @@ class Request(ClientSession, NazurinRequestSession):
         cookies: Optional[dict] = None,
         headers: Optional[dict] = None,
         timeout: int = TIMEOUT,
-        **kwargs
+        **kwargs,
     ):
         headers = headers or {}
         headers.update({"User-Agent": UA})
@@ -60,7 +60,7 @@ class Request(ClientSession, NazurinRequestSession):
             headers=headers,
             trust_env=True,
             timeout=timeout,
-            **kwargs
+            **kwargs,
         )
 
     async def download(self, url: str, destination: Union[str, os.PathLike]):
@@ -85,7 +85,7 @@ class CurlRequest(CurlSession, NazurinRequestSession):
         cookies: Optional[dict] = None,
         headers: Optional[dict] = None,
         timeout: int = TIMEOUT,
-        **kwargs
+        **kwargs,
     ):
         self.cookies = cookies
         self.headers = headers
@@ -96,7 +96,7 @@ class CurlRequest(CurlSession, NazurinRequestSession):
     @asynccontextmanager
     async def get(
         self, *args, impersonate: str = "chrome110", **kwargs
-    ) -> Generator[CurlResponse, None, None]:
+    ) -> AsyncGenerator[CurlResponse, None]:
         yield await super().request(
             "GET",
             *args,
@@ -105,7 +105,7 @@ class CurlRequest(CurlSession, NazurinRequestSession):
             timeout=self.timeout,
             impersonate=impersonate,
             proxies=self.proxies,
-            **kwargs
+            **kwargs,
         )
 
     async def download(self, url: str, destination: Union[str, os.PathLike]):
@@ -132,7 +132,7 @@ class CloudScraperRequest(NazurinRequestSession):
         cookies: Optional[dict] = None,
         headers: Optional[dict] = None,
         timeout: int = TIMEOUT,
-        **kwargs
+        **kwargs,
     ):
         proxies = {"https": PROXY, "http": PROXY} if PROXY else {}
         session = Session()
@@ -145,7 +145,7 @@ class CloudScraperRequest(NazurinRequestSession):
     @asynccontextmanager
     async def get(
         self, *args, **kwargs
-    ) -> Generator[cloudscraper.requests.Response, None, None]:
+    ) -> AsyncGenerator[cloudscraper.requests.Response, None]:
         yield await async_wrap(self.scraper.get)(*args, timeout=self.timeout, **kwargs)
 
     async def download(self, url: str, destination: Union[str, os.PathLike]):
