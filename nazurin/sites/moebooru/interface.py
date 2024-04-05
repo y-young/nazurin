@@ -1,7 +1,7 @@
-from time import time
+import re
 
-from nazurin.database import Database
-from nazurin.models import Illust
+from nazurin.models import Document
+from nazurin.sites import HandlerResult
 
 from .api import Moebooru
 from .config import COLLECTIONS
@@ -23,14 +23,13 @@ patterns = [
 ]
 
 
-async def handle(match) -> Illust:
+async def handle(match: re.Match) -> HandlerResult:
     site_url = match.group(1)
     post_id = match.group(2)
-    db = Database().driver()
-    collection = db.collection(COLLECTIONS[site_url])
     api = Moebooru().site(site_url)
 
-    illust = await api.view(post_id)
-    illust.metadata["collected_at"] = time()
-    await collection.insert(int(post_id), illust.metadata)
-    return illust
+    illust = await api.view(int(post_id))
+    document = Document(
+        id=illust.id, collection=COLLECTIONS[site_url], data=illust.metadata
+    )
+    return illust, document

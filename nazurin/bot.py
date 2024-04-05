@@ -1,4 +1,5 @@
 import asyncio
+from time import time
 from typing import List, Optional
 
 from aiogram import Bot
@@ -7,6 +8,7 @@ from aiogram.types.message import ParseMode
 from aiogram.utils.exceptions import BadRequest
 
 from nazurin import config
+from nazurin.database import Database
 from nazurin.models import File, Illust, Image, Ugoira
 from nazurin.sites import SiteManager
 from nazurin.storage import Storage
@@ -114,6 +116,26 @@ class NazurinBot(Bot):
         for file in illust.all_files:
             await self.send_doc(file, chat_id, message_id)
 
+    async def send_to_gallery(
+        self, urls: List[str], illust: Illust, message: Optional[Message] = None
+    ):
+        if isinstance(illust, Ugoira):
+            await self.send_illust(illust, message, config.GALLERY_ID)
+        elif (
+            message
+            and message.is_forward()
+            and message.photo
+            # If there're multiple images,
+            # then send a new message instead of forwarding an existing one,
+            # since we currently can't forward albums correctly.
+            and not illust.has_multiple_images()
+        ):
+            await message.forward(config.GALLERY_ID)
+        elif not illust.has_image():
+            await self.send_message(config.GALLERY_ID, "\n".join(urls))
+        else:
+            await self.send_illust(illust, message, config.GALLERY_ID)
+
     async def update_collection(
         self, urls: List[str], message: Optional[Message] = None
     ):
@@ -121,40 +143,31 @@ class NazurinBot(Bot):
         if not result:
             raise NazurinError("No source matched")
         logger.info(
-            "Collection update: site={}, match={}",
-            result["site"],
-            result["match"].groups(),
+            "Collection update: source={}, match={}",
+            result.source.name,
+            result.match.groups(),
         )
 
-        illust = await self.sites.handle_update(result)
+        illust, document = await self.sites.handle_update(result)
+
+        db = Database().driver()
+        collection = db.collection(document.collection)
+        if await collection.document(document.id).exists():
+            await message.reply("Already exists in database, skipped update.")
+            return True
 
         # Send / Forward to gallery & Save to album
         download = asyncio.create_task(illust.download())
-
         if config.GALLERY_ID:
-            task = None
-            if isinstance(illust, Ugoira):
-                task = self.send_illust(illust, message, config.GALLERY_ID)
-            elif (
-                message
-                and message.is_forward()
-                and message.photo
-                # If there're multiple images,
-                # then send a new message instead of forwarding an existing one,
-                # since we currently can't forward albums correctly.
-                and not illust.has_multiple_images()
-            ):
-                task = message.forward(config.GALLERY_ID)
-            elif not illust.has_image():
-                task = self.send_message(config.GALLERY_ID, "\n".join(urls))
-            else:
-                task = self.send_illust(illust, message, config.GALLERY_ID)
-            save = asyncio.create_task(task)
+            save = asyncio.create_task(self.send_to_gallery(urls, illust, message))
             await asyncio.gather(save, download)
         else:
             await download
 
         await self.storage.store(illust)
+        document.data["collected_at"] = time()
+        await collection.insert(document.id, document.data)
+        await message.reply("Done!")
         return True
 
     async def cleanup_temp_dir(self):

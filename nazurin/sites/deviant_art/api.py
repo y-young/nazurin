@@ -61,7 +61,7 @@ class DeviantArt:
         imgs = self.get_images(deviation)
         caption = self.build_caption(deviation)
         file = await self.get_download(deviation)
-        return Illust(imgs, caption, deviation, [file] if file else [])
+        return Illust(deviation_id, imgs, caption, deviation, [file] if file else [])
 
     def get_images(self, deviation: dict) -> List[Image]:
         """Get images from deviation."""

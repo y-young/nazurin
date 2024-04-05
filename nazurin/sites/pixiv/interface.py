@@ -1,7 +1,7 @@
-from time import time
+import re
 
-from nazurin.database import Database
-from nazurin.models import Illust
+from nazurin.models import Document
+from nazurin.sites import HandlerResult
 
 from .api import Pixiv
 from .config import BOOKMARK_PRIVACY, COLLECTION
@@ -29,14 +29,10 @@ patterns = [
 ]
 
 
-async def handle(match) -> Illust:
+async def handle(match: re.Match) -> HandlerResult:
     artwork_id = match.group(1)
     api = Pixiv()
-    db = Database().driver()
-    collection = db.collection(COLLECTION)
-
     await api.bookmark(artwork_id, BOOKMARK_PRIVACY)
     illust = await api.view(artwork_id)
-    illust.metadata["collected_at"] = time()
-    await collection.insert(int(artwork_id), illust.metadata)
-    return illust
+    document = Document(id=illust.id, collection=COLLECTION, data=illust.metadata)
+    return illust, document

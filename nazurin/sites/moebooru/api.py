@@ -59,7 +59,7 @@ class Moebooru:
         post, tags = await self.get_post(post_id)
         imgs = self.get_images(post)
         caption = self.build_caption(post, tags)
-        return Illust(imgs, caption, post)
+        return Illust(post_id, imgs, caption, post)
 
     def pool(self, pool_id: int, jpeg=False):
         client = moebooru(self.site)

@@ -50,7 +50,8 @@ class Bluesky:
         imgs = self.get_images(item)
         caption = self.build_caption(item)
         caption["url"] = f"https://bsky.app/profile/{user_handle}/post/{post_rkey}"
-        return Illust(imgs, caption, item)
+        illust_id = "_".join([user_handle, post_rkey])
+        return Illust(illust_id, imgs, caption, item)
 
     @staticmethod
     def construct_at_uri(authority: str, collection: str, rkey: str):

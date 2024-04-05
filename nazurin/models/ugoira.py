@@ -1,4 +1,6 @@
+import os
 from dataclasses import dataclass
+from typing import Optional, Union
 
 from .caption import Caption
 from .file import File
@@ -9,8 +11,10 @@ from .illust import Illust
 class Ugoira(Illust):
     video: File = None
 
-    def __init__(self, video, caption=None, metadata=None, files=None):
-        super().__init__()
+    def __init__(
+        self, id: Union[int, str], video, caption=None, metadata=None, files=None
+    ):
+        super().__init__(id)
         self.video = video
         self.caption = caption or Caption()
         self.metadata = metadata

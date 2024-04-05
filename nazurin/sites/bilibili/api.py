@@ -39,7 +39,7 @@ class Bilibili:
         imgs = self.get_images(item)
         caption = self.build_caption(item)
         caption["url"] = f"https://www.bilibili.com/opus/{dynamic_id}"
-        return Illust(imgs, caption, item)
+        return Illust(int(dynamic_id), imgs, caption, item)
 
     @staticmethod
     def get_images(item: dict) -> List[Image]:

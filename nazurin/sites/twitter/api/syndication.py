@@ -38,7 +38,7 @@ class SyndicationAPI(BaseAPI):
             return await self.get_video(tweet)
         imgs = self.get_images(tweet)
         caption = self.build_caption(tweet)
-        return Illust(imgs, caption, tweet)
+        return Illust(status_id, imgs, caption, tweet)
 
     def get_images(self, tweet) -> List[Image]:
         """Get all images in a tweet."""

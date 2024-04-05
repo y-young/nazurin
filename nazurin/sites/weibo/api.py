@@ -30,7 +30,11 @@ class Weibo:
         imgs = self.get_images(post)
         caption = self.build_caption(post)
         return WeiboIllust(
-            imgs, caption, post, referer=f"https://m.weibo.cn/detail/{post_id}"
+            int(post["mid"]),
+            imgs,
+            caption,
+            post,
+            referer=f"https://m.weibo.cn/detail/{post_id}",
         )
 
     def get_images(self, post) -> List[WeiboImage]:

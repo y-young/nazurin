@@ -111,7 +111,7 @@ class Pixiv:
     async def view_illust(self, illust) -> PixivIllust:
         caption = self.build_caption(illust)
         imgs = self.get_images(illust)
-        return PixivIllust(imgs, caption, illust)
+        return PixivIllust(illust.id, imgs, caption, illust)
 
     async def view_ugoira(self, illust) -> Ugoira:
         """Download ugoira zip file, store animation data and convert ugoira to mp4."""
@@ -130,7 +130,7 @@ class Pixiv:
             await f.write(json.dumps(frames))
         video = await self.ugoira_to_mp4(gif_zip, frames)
         caption = self.build_caption(illust)
-        return Ugoira(video, caption, illust, files)
+        return Ugoira(illust.id, video, caption, illust, files)
 
     async def bookmark(
         self, artwork_id: int, privacy: PixivPrivacy = PixivPrivacy.PUBLIC

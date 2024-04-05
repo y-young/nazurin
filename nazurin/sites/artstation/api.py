@@ -27,7 +27,7 @@ class Artstation:
         post = await self.get_post(post_id)
         imgs = self.get_images(post)
         caption = self.build_caption(post)
-        return Illust(imgs, caption, post)
+        return Illust(post_id, imgs, caption, post)
 
     def get_images(self, post) -> List[Image]:
         """Get images from post."""

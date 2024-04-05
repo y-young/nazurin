@@ -111,7 +111,8 @@ class Kemono:
             )
             image_index += 1
 
-        return Illust(images, caption, post, download_files)
+        identifier = filter(lambda x: x, [service, user_id, post_id, revision_id])
+        return Illust("_".join(identifier), images, caption, post, download_files)
 
     @staticmethod
     def get_storage_dest(post: dict, pretty_name: str, path: str) -> Tuple[str, str]:

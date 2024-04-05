@@ -24,7 +24,9 @@ class Danbooru:
         self.post_show = async_wrap(self.api.post_show)
         self.post_list = async_wrap(self.api.post_list)
 
-    async def get_post(self, post_id: Optional[int] = None, md5: Optional[str] = None):
+    async def get_post(
+        self, post_id: Optional[int] = None, md5: Optional[str] = None
+    ) -> dict:
         """Fetch a post."""
         try:
             if post_id:
@@ -49,7 +51,7 @@ class Danbooru:
         illust = self.parse_post(post)
         return illust
 
-    def parse_post(self, post) -> DanbooruIllust:
+    def parse_post(self, post: dict) -> DanbooruIllust:
         """Get images and build caption."""
         # Get images
         url = post["file_url"]
@@ -89,7 +91,7 @@ class Danbooru:
                 "has_children": post["has_children"],
             }
         )
-        return DanbooruIllust(imgs, caption, post, files)
+        return DanbooruIllust(int(post["id"]), imgs, caption, post, files)
 
     @staticmethod
     def get_storage_dest(post: dict, filename: str) -> Tuple[str, str]:

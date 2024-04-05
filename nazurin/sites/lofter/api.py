@@ -50,7 +50,7 @@ class Lofter:
                 "tags": " ".join(["#" + tag for tag in post["tagList"]]),
             }
         )
-        return Illust(imgs, caption, post)
+        return Illust(int(post["id"]), imgs, caption, post)
 
     @staticmethod
     def get_images(post: dict) -> List[Image]:

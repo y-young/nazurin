@@ -1,7 +1,7 @@
-from time import time
+import re
 
-from nazurin.database import Database
-from nazurin.models import Illust
+from nazurin.models import Document
+from nazurin.sites import HandlerResult
 
 from .api import Kemono
 from .config import COLLECTION
@@ -19,16 +19,11 @@ patterns = [
 ]
 
 
-async def handle(match) -> Illust:
+async def handle(match: re.Match) -> HandlerResult:
     service = match.group(1)
     user_id = match.group(2)
     post_id = match.group(3)
     revision_id = match.group(4)
-    db = Database().driver()
-    collection = db.collection(COLLECTION)
-
     illust = await Kemono().fetch(service, user_id, post_id, revision_id)
-    illust.metadata["collected_at"] = time()
-    identifier = filter(lambda x: x, [service, user_id, post_id, revision_id])
-    await collection.insert("_".join(identifier), illust.metadata)
-    return illust
+    document = Document(id=illust.id, collection=COLLECTION, data=illust.metadata)
+    return illust, document

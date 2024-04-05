@@ -1,7 +1,7 @@
-from time import time
+import re
 
-from nazurin.database import Database
-from nazurin.models import Illust
+from nazurin.models import Document
+from nazurin.sites import HandlerResult
 
 from .api import Twitter
 from .config import COLLECTION
@@ -15,11 +15,8 @@ patterns = [
 ]
 
 
-async def handle(match) -> Illust:
+async def handle(match: re.Match) -> HandlerResult:
     status_id = match.group(1)
-    db = Database().driver()
-    collection = db.collection(COLLECTION)
-    illust = await Twitter().fetch(status_id)
-    illust.metadata["collected_at"] = time()
-    await collection.insert(int(illust.metadata["id_str"]), illust.metadata)
-    return illust
+    illust = await Twitter().fetch(int(status_id))
+    document = Document(id=illust.id, collection=COLLECTION, data=illust.metadata)
+    return illust, document

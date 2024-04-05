@@ -136,7 +136,7 @@ class WebAPI(BaseAPI):
         if len(imgs) == 0:
             raise NazurinError("No photo found.")
         caption = self.build_caption(tweet)
-        return Illust(imgs, caption, tweet)
+        return Illust(status_id, imgs, caption, tweet)
 
     async def tweet_detail(self, tweet_id: str):
         logger.info("Fetching tweet {} from web API", tweet_id)

@@ -37,7 +37,7 @@ class Wallhaven:
         wallpaper = await self.get_wallpaper(wallpaper_id)
         imgs = self.get_images(wallpaper)
         caption = self.build_caption(wallpaper)
-        return Illust(imgs, caption, wallpaper)
+        return Illust(wallpaper_id, imgs, caption, wallpaper)
 
     @staticmethod
     def get_images(wallpaper) -> List[Image]:

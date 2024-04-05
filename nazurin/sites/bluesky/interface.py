@@ -1,7 +1,7 @@
-from time import time
+import re
 
-from nazurin.database import Database
-from nazurin.models import Illust
+from nazurin.models import Document
+from nazurin.sites import HandlerResult
 
 from .api import Bluesky
 from .config import COLLECTION
@@ -13,13 +13,13 @@ patterns = [
 ]
 
 
-async def handle(match) -> Illust:
+async def handle(match: re.Match) -> HandlerResult:
     user_handle = match.group(1)
     post_rkey = match.group(2)
-    db = Database().driver()
-    collection = db.collection(COLLECTION)
-
     illust = await Bluesky().fetch(user_handle, post_rkey)
-    illust.metadata["collected_at"] = time()
-    await collection.insert("_".join([user_handle, post_rkey]), illust.metadata)
-    return illust
+    document = Document(
+        id=illust.id,
+        collection=COLLECTION,
+        data=illust.metadata,
+    )
+    return illust, document
