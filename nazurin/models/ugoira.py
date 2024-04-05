@@ -1,6 +1,5 @@
-import os
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Union
 
 from .caption import Caption
 from .file import File
