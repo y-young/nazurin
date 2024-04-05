@@ -3,6 +3,7 @@ import json
 import os
 import re
 from datetime import datetime
+from http import HTTPStatus
 from http.cookies import SimpleCookie
 from typing import List, Optional, Tuple
 from urllib.parse import urlparse
@@ -36,7 +37,7 @@ class DeviantArt:
             cookies=DeviantArt.cookies, headers={"Referer": BASE_URL}
         ) as request:
             async with request.get(api, params=params) as response:
-                if response.status == 404:
+                if response.status == HTTPStatus.NOT_FOUND:
                     raise NazurinError("Deviation not found")
                 response.raise_for_status()
 

@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from http import HTTPStatus
 from typing import List, Tuple
 
 from nazurin.models import Caption, Illust, Image
@@ -19,9 +20,9 @@ class Wallhaven:
             api += "?apikey=" + API_KEY
         async with Request() as request:
             async with request.get(api) as response:
-                if response.status == 404:
+                if response.status == HTTPStatus.NOT_FOUND:
                     raise NazurinError("Wallpaper doesn't exist.")
-                if response.status == 401:
+                if response.status == HTTPStatus.UNAUTHORIZED:
                     raise NazurinError(
                         "You need to log in to view this wallpaper. "
                         + "Please ensure that you have set a valid API key."

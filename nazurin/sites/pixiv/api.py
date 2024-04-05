@@ -33,6 +33,7 @@ from .config import (
 from .models import PixivIllust, PixivImage
 
 SANITY_LEVEL_LIMITED = "https://s.pximg.net/common/images/limit_sanity_level_360.png"
+TOKEN_EXPIRATION_SECONDS = 3600
 
 
 class Pixiv:
@@ -53,7 +54,10 @@ class Pixiv:
             Pixiv.api.set_accept_language(TRANSLATION)
 
     async def require_auth(self):
-        if Pixiv.api.access_token and time.time() - Pixiv.updated_time < 3600:
+        if (
+            Pixiv.api.access_token
+            and time.time() - Pixiv.updated_time < TOKEN_EXPIRATION_SECONDS
+        ):
             # Logged in, access_token not expired
             return
         if Pixiv.api.refresh_token:
@@ -67,7 +71,9 @@ class Pixiv:
             Pixiv.api.access_token = tokens["access_token"]
             Pixiv.api.refresh_token = tokens["refresh_token"]
             Pixiv.updated_time = tokens["updated_time"]
-            if time.time() - Pixiv.updated_time >= 3600:  # Token expired
+            if (
+                time.time() - Pixiv.updated_time >= TOKEN_EXPIRATION_SECONDS
+            ):  # Token expired
                 await self.refresh_token()
             else:
                 logger.info("Pixiv logged in through cached tokens")

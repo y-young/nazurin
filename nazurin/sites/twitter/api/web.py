@@ -1,6 +1,7 @@
 import json
 import secrets
 from datetime import datetime
+from http import HTTPStatus
 from http.cookies import SimpleCookie
 from typing import List
 
@@ -211,12 +212,12 @@ class WebAPI(BaseAPI):
                 if not response.ok:
                     result = await response.text()
                     logger.error("Web API Error: {}, {}", response.status, result)
-                    if response.status == 401:
+                    if response.status == HTTPStatus.UNAUTHORIZED:
                         raise NazurinError(
                             f"Failed to authenticate Twitter web API: {result}, "
                             "try updating auth token."
                         )
-                    if response.status == 429:
+                    if response.status == HTTPStatus.TOO_MANY_REQUESTS:
                         headers = response.headers
                         detail = ""
                         if (

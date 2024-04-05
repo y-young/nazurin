@@ -146,10 +146,11 @@ class Danbooru:
         characters = characters.split(" ")
         characters = list(map(Danbooru._normalize, characters))
         size = len(characters)
-        if size <= 5:
+        MAX_CHARACTER_COUNT = 5
+        if size <= MAX_CHARACTER_COUNT:
             result = Danbooru._sentence(characters)
         else:
-            characters = characters[:5]
+            characters = characters[:MAX_CHARACTER_COUNT]
             result = Danbooru._sentence(characters) + " and " + str(size - 1) + " more"
         return result
 

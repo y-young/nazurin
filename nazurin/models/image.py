@@ -11,6 +11,9 @@ from nazurin.utils.helpers import check_image
 
 from .file import File
 
+TG_IMG_WIDTH_HEIGHT_RATIO_LIMIT = 20
+TG_IMG_DIMENSION_LIMIT = 10000
+
 
 @dataclass
 class Image(File):
@@ -31,7 +34,11 @@ class Image(File):
         # https://core.telegram.org/bots/api#sendphoto
         if self._chosen_url:
             return self._chosen_url
-        if self.height != 0 and self.width / self.height > 20:
+
+        if (
+            self.height != 0
+            and self.width / self.height > TG_IMG_WIDTH_HEIGHT_RATIO_LIMIT
+        ):
             raise NazurinError(
                 "Width and height ratio of image exceeds 20, try download option."
             )
@@ -41,7 +48,7 @@ class Image(File):
             if (
                 (not self.width)
                 or (not self.height)
-                or self.width + self.height > 10000
+                or self.width + self.height > TG_IMG_DIMENSION_LIMIT
             ):
                 self._chosen_url = self.thumbnail
                 logger.info(

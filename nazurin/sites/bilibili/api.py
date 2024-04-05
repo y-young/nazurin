@@ -9,6 +9,8 @@ from nazurin.utils.exceptions import NazurinError
 
 from .config import DESTINATION, FILENAME
 
+ERROR_NOT_FOUND = 4101147
+
 
 class Bilibili:
     @network_retry
@@ -23,7 +25,7 @@ class Bilibili:
                 data = await response.json()
                 # For some IDs, the API returns code 0 but empty content
                 code = data.get("code")
-                if code == 4101147 or "data" not in data:
+                if code == ERROR_NOT_FOUND or "data" not in data:
                     raise NazurinError("Dynamic not found")
                 if code != 0:
                     raise NazurinError(

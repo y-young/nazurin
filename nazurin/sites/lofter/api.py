@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+from http import HTTPStatus
 from typing import List, Tuple
 from urllib.parse import parse_qs, urlparse
 
@@ -32,7 +33,7 @@ class Lofter:
                 response.raise_for_status()
 
                 data = await response.json()
-                if data["meta"]["status"] != 200:
+                if data["meta"]["status"] != HTTPStatus.OK:
                     raise NazurinError(data["meta"]["msg"])
 
                 post = data["response"]["posts"][0]["post"]
@@ -103,7 +104,7 @@ class Lofter:
         api = f"https://{username}.lofter.com/post/{post_id}"
         async with Request() as request:
             async with request.get(api) as response:
-                if response.status == 404:
+                if response.status == HTTPStatus.NOT_FOUND:
                     raise NazurinError("Post not found")
                 response.raise_for_status()
 

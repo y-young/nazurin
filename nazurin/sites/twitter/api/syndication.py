@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import List
 
 from nazurin.models import Illust, Image, Ugoira
@@ -24,7 +25,7 @@ class SyndicationAPI(BaseAPI):
         }
         async with Request() as request:
             async with request.get(API_URL, params=params) as response:
-                if response.status == 404:
+                if response.status == HTTPStatus.NOT_FOUND:
                     raise NazurinError("Tweet not found or unavailable.")
                 response.raise_for_status()
                 tweet = await response.json()
