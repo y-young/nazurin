@@ -152,15 +152,15 @@ class OneDrive:
         }
         async with Request() as request:
             async with request.post(url, data=data) as response:
-                response = await response.json()
-                if "error" in response:
-                    logger.error(response)
+                response_json = await response.json()
+                if "error" in response_json:
+                    logger.error(response_json)
                     raise NazurinError(
-                        f"OneDrive authorization error: {response['error_description']}"
+                        f"OneDrive authorization error: {response_json['error_description']}"
                     )
-                self.access_token = response["access_token"]
-                self.refresh_token = response["refresh_token"]
-                self.expires_at = time.time() + response["expires_in"]
+                self.access_token = response_json["access_token"]
+                self.refresh_token = response_json["refresh_token"]
+                self.expires_at = time.time() + response_json["expires_in"]
         credentials = {
             "access_token": self.access_token,
             "refresh_token": self.refresh_token,

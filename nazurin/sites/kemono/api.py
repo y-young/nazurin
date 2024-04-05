@@ -58,8 +58,8 @@ class Kemono:
         async with Request() as request:
             async with request.get(url) as response:
                 response.raise_for_status()
-                response = await response.text()
-                soup = BeautifulSoup(response, "html.parser")
+                response_text = await response.text()
+                soup = BeautifulSoup(response_text, "html.parser")
                 tag = soup.find("meta", attrs={"name": "artist_name"})
                 if not tag:
                     return ""

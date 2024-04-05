@@ -109,8 +109,8 @@ class Lofter:
                     raise NazurinError("Post not found")
                 response.raise_for_status()
 
-                response = await response.text()
-                soup = BeautifulSoup(response, "html.parser")
+                response_text = await response.text()
+                soup = BeautifulSoup(response_text, "html.parser")
                 iframe = soup.find("iframe", id="control_frame")
                 if not iframe:
                     raise NazurinError("Failed to get real post ID")

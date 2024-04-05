@@ -35,8 +35,8 @@ class Moebooru:
                     response.raise_for_status()
                 except ClientResponseError as err:
                     raise NazurinError(err) from None
-                response = await response.text()
-        soup = BeautifulSoup(response, "html.parser")
+                response_text = await response.text()
+        soup = BeautifulSoup(response_text, "html.parser")
         tag = soup.find(id="post-view").find(recursive=False)
         if tag.name == "script":
             content = str.strip(tag.string)

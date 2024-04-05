@@ -209,8 +209,9 @@ def check_image(path: Union[str, os.PathLike]) -> bool:
         with Image.open(path) as image:
             image.verify()
 
+        # verify() does not detect all the possible image defects
+        # e.g. truncated images, try to open the image to detect
         with Image.open(path) as image:
-            image = Image.open(path)
             image.load()
         return True
     except OSError as error:

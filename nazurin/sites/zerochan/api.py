@@ -25,9 +25,9 @@ class Zerochan:
                 # Override post_id if there's a redirection TODO: Check
                 if response.history:
                     post_id = response.url.path[1:]
-                response = await response.text()
+                response_text = await response.text()
 
-        soup = BeautifulSoup(response, "html.parser")
+        soup = BeautifulSoup(response_text, "html.parser")
         info = soup.find("script", {"type": "application/ld+json"}).contents
         info = json.loads("".join(info).replace("\\'", "'"))
 
