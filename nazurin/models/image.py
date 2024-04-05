@@ -14,6 +14,8 @@ from .file import File
 TG_IMG_WIDTH_HEIGHT_RATIO_LIMIT = 20
 TG_IMG_DIMENSION_LIMIT = 10000
 
+INVALID_IMAGE_RETRIES = 3
+
 
 @dataclass
 class Image(File):
@@ -94,11 +96,10 @@ class Image(File):
         self._size = int(value)
 
     async def download(self, session: aiohttp.ClientSession):
-        RETRIES = 3
-        for i in range(RETRIES):
+        for i in range(INVALID_IMAGE_RETRIES):
             downloaded_size = await super().download(session)
             is_valid = await check_image(self.path)
-            attempt_count = f"{i + 1} / {RETRIES}"
+            attempt_count = f"{i + 1} / {INVALID_IMAGE_RETRIES}"
             if is_valid:
                 if self._size is None or self._size == downloaded_size:
                     return
@@ -114,7 +115,7 @@ class Image(File):
                     self.path,
                     attempt_count,
                 )
-            if i < RETRIES - 1:
+            if i < INVALID_IMAGE_RETRIES - 1:
                 # Keep the last one for debugging
                 os.remove(self.path)
         raise NazurinError(

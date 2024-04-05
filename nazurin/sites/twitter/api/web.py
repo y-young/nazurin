@@ -44,6 +44,13 @@ class TweetDetailAPI:
     LOGGED_IN = "q94uRCEn65LZThakYcPT6g/TweetDetail"
 
 
+ERROR_MESSAGES = {
+    "NsfwLoggedOut": "NSFW tweet, please log in",
+    "Protected": "Protected tweet, you may try logging in if you have access",
+    "Suspended": "This account has been suspended",
+}
+
+
 class WebAPI(BaseAPI):
     auth_token = AUTH_TOKEN
     headers = {
@@ -362,11 +369,6 @@ class WebAPI(BaseAPI):
 
     @staticmethod
     def error_message_by_reason(reason: str):
-        MESSAGES = {
-            "NsfwLoggedOut": "NSFW tweet, please log in",
-            "Protected": "Protected tweet, you may try logging in if you have access",
-            "Suspended": "This account has been suspended",
-        }
-        if reason in MESSAGES:
-            return MESSAGES[reason]
+        if reason in ERROR_MESSAGES:
+            return ERROR_MESSAGES[reason]
         return reason

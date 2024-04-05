@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters import Command, Regexp
 from aiogram.types import Message
 
 from nazurin import bot, dp
-from nazurin.utils.exceptions import InvalidCommandUsage
+from nazurin.utils.exceptions import InvalidCommandUsageError
 
 from .api import Pixiv
 from .config import PixivPrivacy
@@ -19,7 +19,7 @@ async def pixiv_view(message: Message, command: Command.CommandObj):
     try:
         artwork_id = int(command.args)
     except (IndexError, ValueError, TypeError) as e:
-        raise InvalidCommandUsage("pixiv") from e
+        raise InvalidCommandUsageError("pixiv") from e
     if artwork_id < 0:
         await message.reply("Invalid artwork id!")
         return
@@ -34,7 +34,7 @@ async def pixiv_download(message: Message, command: Command.CommandObj):
     try:
         artwork_id = int(command.args)
     except (IndexError, ValueError, TypeError) as e:
-        raise InvalidCommandUsage("pixiv_download") from e
+        raise InvalidCommandUsageError("pixiv_download") from e
     if artwork_id < 0:
         await message.reply("Invalid artwork id!")
         return
@@ -52,7 +52,7 @@ async def pixiv_bookmark(message: Message, command: Command.CommandObj):
     try:
         artwork_id = int(command.args)
     except (IndexError, ValueError, TypeError) as e:
-        raise InvalidCommandUsage("pixiv_bookmark") from e
+        raise InvalidCommandUsageError("pixiv_bookmark") from e
     if artwork_id < 0:
         await message.reply("Invalid artwork id!")
         return

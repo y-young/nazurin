@@ -9,7 +9,7 @@ class NazurinError(Exception):
         return self.msg
 
 
-class InvalidCommandUsage(NazurinError):
+class InvalidCommandUsageError(NazurinError):
     """Raised when a command is used incorrectly."""
 
     command: str

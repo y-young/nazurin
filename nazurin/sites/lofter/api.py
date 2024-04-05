@@ -16,15 +16,16 @@ from .config import DESTINATION, FILENAME
 
 
 class Lofter:
+    API = "https://api.lofter.com/oldapi/post/detail.api"
+    UA = "LOFTER/6.24.0 (iPhone; iOS 15.4.1; Scale/3.00)"
+
     @network_retry
     async def get_post(self, username: str, permalink: str) -> dict:
         """Fetch a post."""
         (blog_id, post_id) = await self.get_real_id(username, permalink)
-        API = "https://api.lofter.com/oldapi/post/detail.api"
-        UA = "LOFTER/6.24.0 (iPhone; iOS 15.4.1; Scale/3.00)"
-        async with Request(headers={"User-Agent": UA}) as request:
+        async with Request(headers={"User-Agent": self.UA}) as request:
             async with request.post(
-                API,
+                self.API,
                 data={
                     "targetblogid": blog_id,
                     "postid": post_id,

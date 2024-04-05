@@ -13,8 +13,8 @@ class Mongo(DatabaseDriver):
 
     def __init__(self):
         """Load credentials and initialize client."""
-        URI = env.str("MONGO_URI", default="mongodb://localhost:27017/nazurin")
-        self.client = AsyncIOMotorClient(URI)
+        uri = env.str("MONGO_URI", default="mongodb://localhost:27017/nazurin")
+        self.client = AsyncIOMotorClient(uri)
         self.db = self.client.get_default_database()
         self._collection = None
         self._document = None

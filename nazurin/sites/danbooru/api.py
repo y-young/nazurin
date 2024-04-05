@@ -4,7 +4,7 @@ from datetime import datetime
 from os import path
 from typing import List, Optional, Tuple
 
-from pybooru import Danbooru as danbooru
+from pybooru import Danbooru as DanbooruBase
 from pybooru import PybooruHTTPError
 
 from nazurin.models import Caption, File, Image
@@ -15,12 +15,14 @@ from nazurin.utils.helpers import is_image
 
 from .config import DESTINATION, FILENAME
 
+MAX_CHARACTER_COUNT = 5
+
 
 class Danbooru:
     def __init__(self, site="danbooru"):
         """Set Danbooru site."""
         self.site = site
-        self.api = danbooru(site)
+        self.api = DanbooruBase(site)
         self.post_show = async_wrap(self.api.post_show)
         self.post_list = async_wrap(self.api.post_list)
 
@@ -146,7 +148,6 @@ class Danbooru:
         characters = characters.split(" ")
         characters = list(map(Danbooru._normalize, characters))
         size = len(characters)
-        MAX_CHARACTER_COUNT = 5
         if size <= MAX_CHARACTER_COUNT:
             result = Danbooru._sentence(characters)
         else:

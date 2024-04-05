@@ -27,6 +27,9 @@ from nazurin.utils.decorators import async_wrap
 
 from . import logger
 
+FILENAME_MAX_LENGTH = 255
+CAPTION_MAX_LENGTH = 1024
+
 
 async def handle_bad_request(message: Message, error: BadRequest):
     logger.error("BadRequest exception: {}", error)
@@ -69,7 +72,6 @@ def sanitize_filename(name: str) -> str:
     if Path(filename).is_reserved():
         filename = "_" + filename
     name = filename + ext
-    FILENAME_MAX_LENGTH = 255
     if len(name) > FILENAME_MAX_LENGTH:
         name = filename[: FILENAME_MAX_LENGTH - len(ext)] + ext
     return name
@@ -92,8 +94,7 @@ def sanitize_path(
 
 def sanitize_caption(caption: Caption) -> str:
     content = caption.text
-    MAX_CAPTION_LENGTH = 1024
-    if len(content) > MAX_CAPTION_LENGTH:
+    if len(content) > CAPTION_MAX_LENGTH:
         content = content[:1024]
     content = escape(content, quote=False)
     return content

@@ -6,7 +6,7 @@ from urllib.parse import unquote
 
 from aiohttp.client_exceptions import ClientResponseError
 from bs4 import BeautifulSoup
-from pybooru import Moebooru as moebooru
+from pybooru import Moebooru as MoebooruBase
 
 from nazurin.config import TEMP_DIR
 from nazurin.models import Caption, Illust, Image
@@ -62,7 +62,7 @@ class Moebooru:
         return Illust(post_id, imgs, caption, post)
 
     def pool(self, pool_id: int, jpeg=False):
-        client = moebooru(self.site)
+        client = MoebooruBase(self.site)
         info = client.pool_posts(id=pool_id)
         posts = info["posts"]
         imgs = []

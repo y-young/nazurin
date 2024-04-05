@@ -13,18 +13,19 @@ from .base import BaseAPI
 class SyndicationAPI(BaseAPI):
     """Public API from publish.twitter.com"""
 
+    API_URL = "https://cdn.syndication.twimg.com/tweet-result"
+
     @network_retry
     async def get_tweet(self, status_id: int):
         """Get a tweet from API."""
         logger.info("Fetching tweet {} from syndication API", status_id)
-        API_URL = "https://cdn.syndication.twimg.com/tweet-result"
         params = {
             "features": "tfw_tweet_edit_backend:on",
             "id": str(status_id),
             "lang": "en",
         }
         async with Request() as request:
-            async with request.get(API_URL, params=params) as response:
+            async with request.get(self.API_URL, params=params) as response:
                 if response.status == HTTPStatus.NOT_FOUND:
                     raise NazurinError("Tweet not found or unavailable.")
                 response.raise_for_status()

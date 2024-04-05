@@ -2,7 +2,7 @@
 import asyncio
 from typing import List
 
-from mega import Mega as mega
+from mega import Mega as MegaBase
 from mega.errors import RequestError
 
 from nazurin.config import MAX_PARALLEL_UPLOAD, NAZURIN_DATA, env
@@ -19,7 +19,7 @@ MEGA_DOCUMENT = "mega"
 
 
 class Mega:
-    api = mega()
+    api = MegaBase()
     db = Database().driver()
     collection = db.collection(NAZURIN_DATA)
     document = collection.document(MEGA_DOCUMENT)

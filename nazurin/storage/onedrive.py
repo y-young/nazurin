@@ -20,7 +20,10 @@ OD_CLIENT = env.str("OD_CLIENT")
 OD_SECRET = env.str("OD_SECRET")
 OD_RF_TOKEN = env.str("OD_RF_TOKEN")  # Refresh token for first-time auth
 OD_DOCUMENT = "onedrive"
+
 BASE_URL = "https://graph.microsoft.com/v1.0"
+# Must be a multiple of 320 KB
+UPLOAD_CHUNK_SIZE = 16 * 320 * 1024  # 5MB
 
 
 class OneDrive:
@@ -203,8 +206,6 @@ class OneDrive:
                     logger.error(await response.text())
                 response.raise_for_status()
 
-        # Must be a multiple of 320 KB
-        CHUNK_SIZE = 16 * 320 * 1024  # 5MB
         headers = self.with_credentials()
         range_start = 0
         total_size = await file.size()
@@ -214,7 +215,7 @@ class OneDrive:
         )
 
         async with Request(headers=headers) as session:
-            async for chunk in read_by_chunks(file.path, CHUNK_SIZE):
+            async for chunk in read_by_chunks(file.path, UPLOAD_CHUNK_SIZE):
                 content_length = len(chunk)
                 range_end = range_start + content_length - 1
                 session.headers.update({"Content-Length": str(content_length)})
