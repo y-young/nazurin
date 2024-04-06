@@ -106,7 +106,7 @@ class Pixiv:
             raise NazurinError("Artwork is private")
         return illust
 
-    async def view(self, artwork_id: int = None) -> Illust:
+    async def view(self, artwork_id: int) -> Illust:
         illust = await self.get_artwork(artwork_id)
         if illust.type == "ugoira":
             illust = await self.view_ugoira(illust)

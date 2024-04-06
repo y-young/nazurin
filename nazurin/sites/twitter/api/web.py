@@ -3,7 +3,7 @@ import secrets
 from datetime import datetime, timezone
 from http import HTTPStatus
 from http.cookies import SimpleCookie
-from typing import List
+from typing import ClassVar, List
 
 from nazurin.models import Illust, Image
 from nazurin.utils.decorators import Cache, network_retry
@@ -53,7 +53,7 @@ ERROR_MESSAGES = {
 
 class WebAPI(BaseAPI):
     auth_token = AUTH_TOKEN
-    headers = {
+    headers: ClassVar[dict[str, str]] = {
         "Authorization": AuthorizationToken.GUEST,
         "Origin": "https://twitter.com",
         "Referer": "https://twitter.com",
@@ -61,7 +61,7 @@ class WebAPI(BaseAPI):
         "x-twitter-client-language": "en",
         "x-twitter-active-user": "yes",
     }
-    variables = {
+    variables: ClassVar[dict[str, bool]] = {
         "with_rux_injections": False,
         "includePromotedContent": False,
         "withCommunity": True,
@@ -73,7 +73,7 @@ class WebAPI(BaseAPI):
         "withVoice": True,
         "withV2Timeline": True,
     }
-    features = {
+    features: ClassVar[dict[str, bool]] = {
         "blue_business_profile_image_shape_enabled": False,
         "rweb_lists_timeline_redesign_enabled": True,
         "responsive_web_graphql_exclude_directive_enabled": True,

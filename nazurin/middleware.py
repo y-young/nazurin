@@ -13,7 +13,7 @@ class AuthMiddleware(BaseMiddleware):
         allowed_chats = config.ALLOW_ID + config.ALLOW_GROUP + [config.ADMIN_ID]
         if (
             message.chat.id in allowed_chats
-            or message.from_user.id in config.ALLOW_ID + [config.ADMIN_ID]
+            or message.from_user.id in [*config.ALLOW_ID, config.ADMIN_ID]
             or message.from_user.username in config.ALLOW_USERNAME
         ):
             return

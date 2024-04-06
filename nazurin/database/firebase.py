@@ -1,4 +1,5 @@
 import json
+from typing import Optional
 
 import firebase_admin
 from firebase_admin import credentials, firestore_async
@@ -33,7 +34,7 @@ class Firebase(DatabaseDriver):
         self._document = self._collection.document(str(key))
         return self
 
-    async def list(self, page_size: int = None):
+    async def list(self, page_size: Optional[int] = None):
         return self._collection.list_documents(page_size)
 
     async def get(self):

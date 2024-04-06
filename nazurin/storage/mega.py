@@ -1,5 +1,5 @@
 import asyncio
-from typing import List
+from typing import List, Optional
 
 from mega import Mega as MegaBase
 from mega.errors import RequestError
@@ -62,7 +62,13 @@ class Mega:
                 await self.login(initialize=True)
 
     @network_retry
-    async def upload(self, file: File, folders: dict = None, *, retry: bool = False):
+    async def upload(
+        self,
+        file: File,
+        folders: Optional[dict] = None,
+        *,
+        retry: bool = False,
+    ):
         path = file.destination.as_posix()
         try:
             destination = (

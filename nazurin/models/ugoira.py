@@ -26,7 +26,7 @@ class Ugoira(Illust):
 
     @property
     def all_files(self):
-        return [self.video] + self.files
+        return [self.video, *self.files]
 
     def has_image(self) -> bool:
         return self.video is not None

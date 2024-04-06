@@ -1,7 +1,7 @@
 import asyncio
 import json
 from pathlib import PurePath
-from typing import Awaitable, Callable, List
+from typing import Awaitable, Callable, List, Optional
 
 from oauth2client.service_account import ServiceAccountCredentials
 from pydrive2.auth import GoogleAuth
@@ -57,7 +57,7 @@ class GoogleDrive:
         GoogleDrive.drive.auth = gauth
 
     @staticmethod
-    async def upload(file: File, folders: dict = None):
+    async def upload(file: File, folders: Optional[dict] = None):
         # Compute relative path to STORAGE_DIR, which is GD_FOLDER
         path = file.destination.relative_to(STORAGE_DIR).as_posix()
         parent = folders[path] if folders else await GoogleDrive.create_folders(path)
@@ -86,7 +86,7 @@ class GoogleDrive:
     @staticmethod
     @Cache.lru()
     @async_wrap
-    def find_folder(name: str, parent: str = None) -> str:
+    def find_folder(name: str, parent: Optional[str] = None) -> str:
         query = {
             "q": f"mimeType='{FOLDER_MIME}' and "
             f"title='{name}' and "
@@ -99,7 +99,7 @@ class GoogleDrive:
         return result[0].get("id")
 
     @staticmethod
-    async def create_folder(name: str, parent: str = None) -> str:
+    async def create_folder(name: str, parent: Optional[str] = None) -> str:
         metadata = {
             "title": name,
             "mimeType": FOLDER_MIME,
@@ -110,7 +110,7 @@ class GoogleDrive:
         return folder.get("id")
 
     @staticmethod
-    async def create_folders(path: str, parent: str = None) -> str:
+    async def create_folders(path: str, parent: Optional[str] = None) -> str:
         """
         Create folders recursively.
 

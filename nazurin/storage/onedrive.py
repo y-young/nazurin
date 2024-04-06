@@ -236,7 +236,7 @@ class OneDrive:
                 )
         logger.info("[File {}] Upload completed", file.name)
 
-    def with_credentials(self, headers: dict = None) -> dict:
+    def with_credentials(self, headers: Optional[dict] = None) -> dict:
         """
         Add credentials to the request header.
         """
