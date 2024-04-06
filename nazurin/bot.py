@@ -14,7 +14,7 @@ from nazurin.sites import SiteManager
 from nazurin.storage import Storage
 from nazurin.utils import logger
 from nazurin.utils.decorators import retry_after
-from nazurin.utils.exceptions import NazurinError
+from nazurin.utils.exceptions import AlreadyExistsError, NazurinError
 from nazurin.utils.helpers import (
     handle_bad_request,
     remove_files_older_than,
@@ -166,8 +166,7 @@ class NazurinBot(Bot):
         db = Database().driver()
         collection = db.collection(document.collection)
         if await collection.document(document.id).exists():
-            await message.reply("Already exists in database, skipped update.")
-            return True
+            raise AlreadyExistsError
 
         # Send / Forward to gallery & Save to album
         download = asyncio.create_task(illust.download())
@@ -180,7 +179,6 @@ class NazurinBot(Bot):
         await self.storage.store(illust)
         document.data["collected_at"] = time()
         await collection.insert(document.id, document.data)
-        await message.reply("Done!")
         return True
 
     async def cleanup_temp_dir(self):

@@ -7,6 +7,7 @@ from aiogram.utils.executor import Executor
 
 from nazurin import config
 from nazurin.utils import logger
+from nazurin.utils.exceptions import AlreadyExistsError
 from nazurin.utils.filters import URLFilter
 
 from .bot import NazurinBot
@@ -117,4 +118,8 @@ class NazurinDispatcher(Dispatcher):
             self.executor.start_polling()
 
     async def update_collection(self, message: Message, urls: List[str]):
-        await self.bot.update_collection(urls, message)
+        try:
+            await self.bot.update_collection(urls, message)
+            await message.reply("Done!")
+        except AlreadyExistsError as error:
+            await message.reply(error.msg)

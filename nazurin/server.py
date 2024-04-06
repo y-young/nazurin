@@ -45,7 +45,7 @@ class NazurinServer(web.Application):
         except NazurinError as error:
             await self.bot.send_message(
                 config.ADMIN_ID,
-                f"Error processing {url}: {format_error(error)}",
+                f"Error processing {url}: {error}",
             )
         # pylint: disable-next=broad-exception-caught
         except Exception as error:
