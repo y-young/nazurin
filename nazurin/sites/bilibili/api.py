@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Tuple
 
 from nazurin.models import Caption, Illust, Image
@@ -81,7 +81,10 @@ class Bilibili:
         """
 
         url = pic["src"]
-        timestamp = datetime.fromtimestamp(item["modules"]["module_author"]["pub_ts"])
+        timestamp = datetime.fromtimestamp(
+            item["modules"]["module_author"]["pub_ts"],
+            tz=timezone.utc,
+        )
         basename = os.path.basename(url)
         filename, extension = os.path.splitext(basename)
         user = item["modules"]["module_author"]

@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional, Tuple
 from urllib.parse import unquote
 
@@ -112,7 +112,10 @@ class Moebooru:
         """
 
         # `updated_at` is only available on yande.re, so we won't cover it here
-        created_at = datetime.fromtimestamp(post["created_at"])
+        created_at = datetime.fromtimestamp(
+            post["created_at"],
+            tz=timezone.utc,
+        )
         filename, extension = os.path.splitext(filename)
         # Site name in pascal case, i.e. Yandere, Konachan, Lolibooru
         site_name = snake_to_pascal(COLLECTIONS[self.url])

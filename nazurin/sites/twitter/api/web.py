@@ -1,6 +1,6 @@
 import json
 import secrets
-from datetime import datetime
+from datetime import datetime, timezone
 from http import HTTPStatus
 from http.cookies import SimpleCookie
 from typing import List
@@ -238,7 +238,10 @@ class WebAPI(BaseAPI):
                                 rate_limit,
                                 reset_time,
                             )
-                            reset_time = datetime.fromtimestamp(reset_time)
+                            reset_time = datetime.fromtimestamp(
+                                reset_time,
+                                tz=timezone.utc,
+                            )
                             detail = (
                                 f"Rate limit: {rate_limit}, Reset time: {reset_time}"
                             )

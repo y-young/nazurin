@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from http import HTTPStatus
 from typing import List, Tuple
 from urllib.parse import parse_qs, urlparse
@@ -84,7 +84,10 @@ class Lofter:
         Format destination and filename.
         """
 
-        publish_time = datetime.fromtimestamp(post["publishTime"] / 1000)
+        publish_time = datetime.fromtimestamp(
+            post["publishTime"] / 1000,
+            tz=timezone.utc,
+        )
         filename, extension = os.path.splitext(filename)
         context = {
             **post,
