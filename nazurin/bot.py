@@ -26,7 +26,7 @@ class NazurinBot(Bot):
     send_message = retry_after(Bot.send_message)
 
     def __init__(self, *args, **kwargs):
-        super().__init__(parse_mode=ParseMode.HTML, *args, **kwargs)
+        super().__init__(*args, parse_mode=ParseMode.HTML, **kwargs)
         self.sites = SiteManager()
         self.storage = Storage()
         self.cleanup_task = None
@@ -51,14 +51,16 @@ class NazurinBot(Bot):
         reply_to: Optional[int] = None,
     ):
         await self.send_chat_action(chat_id, ChatActions.UPLOAD_PHOTO)
-        media = []
-        for img in imgs:
-            media.append(InputMediaPhoto(await img.display_url()))  # TODO
+        # TODO: Fetch display URL in batch
+        media = [InputMediaPhoto(await img.display_url()) for img in imgs]
         media[0].caption = caption
         await self.send_media_group(chat_id, media, reply_to_message_id=reply_to)
 
     async def send_photos(
-        self, illust: Illust, chat_id: int, reply_to: Optional[int] = None
+        self,
+        illust: Illust,
+        chat_id: int,
+        reply_to: Optional[int] = None,
     ):
         caption = sanitize_caption(illust.caption)
         groups = []
@@ -101,11 +103,16 @@ class NazurinBot(Bot):
     async def send_doc(self, file: File, chat_id, message_id=None):
         await self.send_chat_action(chat_id, ChatActions.UPLOAD_DOCUMENT)
         await self.send_document(
-            chat_id, InputFile(file.path), reply_to_message_id=message_id
+            chat_id,
+            InputFile(file.path),
+            reply_to_message_id=message_id,
         )
 
     async def send_docs(
-        self, illust: Illust, message: Optional[Message] = None, chat_id=None
+        self,
+        illust: Illust,
+        message: Optional[Message] = None,
+        chat_id=None,
     ):
         if message:
             message_id = message.message_id
@@ -117,7 +124,10 @@ class NazurinBot(Bot):
             await self.send_doc(file, chat_id, message_id)
 
     async def send_to_gallery(
-        self, urls: List[str], illust: Illust, message: Optional[Message] = None
+        self,
+        urls: List[str],
+        illust: Illust,
+        message: Optional[Message] = None,
     ):
         if isinstance(illust, Ugoira):
             await self.send_illust(illust, message, config.GALLERY_ID)
@@ -137,7 +147,9 @@ class NazurinBot(Bot):
             await self.send_illust(illust, message, config.GALLERY_ID)
 
     async def update_collection(
-        self, urls: List[str], message: Optional[Message] = None
+        self,
+        urls: List[str],
+        message: Optional[Message] = None,
     ):
         result = self.sites.match(urls)
         if not result:

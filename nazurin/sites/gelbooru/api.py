@@ -17,14 +17,13 @@ class Gelbooru:
             "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&id="
             + str(post_id)
         )
-        async with Request() as request:
-            async with request.get(api) as response:
-                response.raise_for_status()
-                response = await response.json()
-                if "post" not in response:
-                    raise NazurinError("Post not found")
-                post = response["post"][0]
-                return post
+        async with Request() as request, request.get(api) as response:
+            response.raise_for_status()
+            response_json = await response.json()
+            if "post" not in response_json:
+                raise NazurinError("Post not found")
+            post = response_json["post"][0]
+            return post
 
     async def fetch(self, post_id: int) -> Illust:
         post = await self.get_post(post_id)
@@ -45,7 +44,7 @@ class Gelbooru:
                 self.get_thumbnail(post),
                 width=post["width"],
                 height=post["height"],
-            )
+            ),
         )
         return imgs
 
@@ -70,7 +69,7 @@ class Gelbooru:
     @staticmethod
     def build_caption(post) -> Caption:
         tags = post["tags"].split(" ")
-        tag_string = str()
+        tag_string = ""
         for tag in tags:
             tag_string += "#" + tag + " "
         return Caption(
@@ -80,7 +79,7 @@ class Gelbooru:
                 "url": "https://gelbooru.com/index.php"
                 f"?page=post&s=view&id={post['id']}",
                 "tags": tag_string,
-            }
+            },
         )
 
     @staticmethod

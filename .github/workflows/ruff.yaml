@@ -1,0 +1,20 @@
+name: Ruff
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "nazurin/**"
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+    branches: [master]
+    paths:
+      - "nazurin/**"
+      - ".github/workflows/ruff.yaml"
+
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: y-young/ruff-action@v2

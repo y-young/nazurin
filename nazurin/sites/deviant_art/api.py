@@ -3,6 +3,7 @@ import json
 import os
 import re
 from datetime import datetime
+from http import HTTPStatus
 from http.cookies import SimpleCookie
 from typing import List, Optional, Tuple
 from urllib.parse import urlparse
@@ -23,9 +24,9 @@ class DeviantArt:
     cookies: SimpleCookie = None
 
     @network_retry
-    async def get_deviation(self, deviation_id: int, retry: bool = False) -> dict:
+    async def get_deviation(self, deviation_id: int, *, retry: bool = False) -> dict:
         """Fetch a deviation."""
-        await self.require_csrf_token(retry)
+        await self.require_csrf_token(refresh=retry)
         api = f"{BASE_URL}/_napi/da-user-profile/shared_api/deviation/extended_fetch"
         params = {
             "type": "art",
@@ -33,28 +34,25 @@ class DeviantArt:
             "csrf_token": self.csrf_token,
         }
         async with Request(
-            cookies=DeviantArt.cookies, headers={"Referer": BASE_URL}
-        ) as request:
-            async with request.get(api, params=params) as response:
-                if response.status == 404:
-                    raise NazurinError("Deviation not found")
-                response.raise_for_status()
+            cookies=DeviantArt.cookies,
+            headers={"Referer": BASE_URL},
+        ) as request, request.get(api, params=params) as response:
+            if response.status == HTTPStatus.NOT_FOUND:
+                raise NazurinError("Deviation not found")
+            response.raise_for_status()
 
-                data = await response.json()
-                if "error" in data:
-                    logger.error(data)
-                    # If CSRF token is invalid, try to get a new one
-                    if (
-                        data.get("errorDetails", {}).get("csrf") == "invalid"
-                        and not retry
-                    ):
-                        logger.info("CSRF token seems expired, refreshing...")
-                        return await self.get_deviation(deviation_id, True)
-                    raise NazurinError(data["errorDescription"])
+            data = await response.json()
+            if "error" in data:
+                logger.error(data)
+                # If CSRF token is invalid, try to get a new one
+                if data.get("errorDetails", {}).get("csrf") == "invalid" and not retry:
+                    logger.info("CSRF token seems expired, refreshing...")
+                    return await self.get_deviation(deviation_id, retry=True)
+                raise NazurinError(data["errorDescription"])
 
-                deviation = data["deviation"]
-                del deviation["extended"]["relatedContent"]
-                return deviation
+            deviation = data["deviation"]
+            del deviation["extended"]["relatedContent"]
+            return deviation
 
     async def fetch(self, deviation_id: str) -> Illust:
         deviation = await self.get_deviation(deviation_id)
@@ -77,13 +75,16 @@ class DeviantArt:
                 original_file["filesize"],
                 original_file["width"],
                 original_file["height"],
-            )
+            ),
         ]
         return imgs
 
     @staticmethod
     def get_storage_dest(
-        deviation: dict, filename: str, is_download: bool = False
+        deviation: dict,
+        filename: str,
+        *,
+        is_download: bool = False,
     ) -> Tuple[str, str]:
         """
         Format destination and filename.
@@ -136,7 +137,11 @@ class DeviantArt:
 
         # Duplicate attribute on top level for convenience
         deviation["prettyName"] = deviation["media"]["prettyName"]
-        destination, filename = self.get_storage_dest(deviation, filename, True)
+        destination, filename = self.get_storage_dest(
+            deviation,
+            filename,
+            is_download=True,
+        )
         return File(filename, f"{url.geturl()}?token={token}", destination)
 
     @staticmethod
@@ -146,11 +151,11 @@ class DeviantArt:
                 "title": deviation["title"],
                 "author": f"#{deviation['author']['username']}",
                 "url": deviation["url"],
-            }
+            },
         )
         if "tags" in deviation["extended"]:
             caption["tags"] = " ".join(
-                ["#" + tag["name"] for tag in deviation["extended"]["tags"]]
+                ["#" + tag["name"] for tag in deviation["extended"]["tags"]],
             )
         return caption
 
@@ -161,7 +166,7 @@ class DeviantArt:
 
         media = deviation["media"]
         base_uri = media["baseUri"]
-        tokens = media["token"] if "token" in media else []
+        tokens = media.get("token", [])
         types = {}
         for type_ in media["types"]:
             types[type_["t"]] = type_
@@ -183,7 +188,8 @@ class DeviantArt:
             else:
                 thumbnail = types["preview"]
             thumbnail = base_uri + thumbnail["c"].replace(
-                "<prettyName>", media["prettyName"]
+                "<prettyName>",
+                media["prettyName"],
             )
             thumbnail = f"{thumbnail}?token={token}"
         elif base_uri.endswith(".gif"):  # TODO: Send GIFs properly
@@ -207,24 +213,23 @@ class DeviantArt:
         return f"{header}.{payload}."
 
     @network_retry
-    async def require_csrf_token(self, refresh: bool = False) -> None:
+    async def require_csrf_token(self, *, refresh: bool = False) -> None:
         if self.csrf_token and not refresh:
             return
         logger.info("Fetching CSRF token...")
-        async with Request() as request:
-            async with request.get(BASE_URL) as response:
-                response.raise_for_status()
-                pattern = re.compile(r"window\.__CSRF_TOKEN__ = '(\S+)';")
-                content = await response.text()
-                match = pattern.search(content)
-                if not match:
-                    raise NazurinError("Unable to get CSRF token")
-                DeviantArt.csrf_token = match.group(1)
-                # CSRF token must be used along with the cookies returned,
-                # otherwise will be considered invalid
-                DeviantArt.cookies = response.cookies
-                logger.info(
-                    "Fetched CSRF token: {}, cookies: {}",
-                    DeviantArt.csrf_token,
-                    DeviantArt.cookies,
-                )
+        async with Request() as request, request.get(BASE_URL) as response:
+            response.raise_for_status()
+            pattern = re.compile(r"window\.__CSRF_TOKEN__ = '(\S+)';")
+            content = await response.text()
+            match = pattern.search(content)
+            if not match:
+                raise NazurinError("Unable to get CSRF token")
+            DeviantArt.csrf_token = match.group(1)
+            # CSRF token must be used along with the cookies returned,
+            # otherwise will be considered invalid
+            DeviantArt.cookies = response.cookies
+            logger.info(
+                "Fetched CSRF token: {}, cookies: {}",
+                DeviantArt.csrf_token,
+                DeviantArt.cookies,
+            )

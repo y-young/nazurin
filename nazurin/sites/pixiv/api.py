@@ -33,6 +33,7 @@ from .config import (
 from .models import PixivIllust, PixivImage
 
 SANITY_LEVEL_LIMITED = "https://s.pximg.net/common/images/limit_sanity_level_360.png"
+TOKEN_EXPIRATION_SECONDS = 3600
 
 
 class Pixiv:
@@ -53,7 +54,10 @@ class Pixiv:
             Pixiv.api.set_accept_language(TRANSLATION)
 
     async def require_auth(self):
-        if Pixiv.api.access_token and time.time() - Pixiv.updated_time < 3600:
+        if (
+            Pixiv.api.access_token
+            and time.time() - Pixiv.updated_time < TOKEN_EXPIRATION_SECONDS
+        ):
             # Logged in, access_token not expired
             return
         if Pixiv.api.refresh_token:
@@ -67,7 +71,9 @@ class Pixiv:
             Pixiv.api.access_token = tokens["access_token"]
             Pixiv.api.refresh_token = tokens["refresh_token"]
             Pixiv.updated_time = tokens["updated_time"]
-            if time.time() - Pixiv.updated_time >= 3600:  # Token expired
+            if (
+                time.time() - Pixiv.updated_time >= TOKEN_EXPIRATION_SECONDS
+            ):  # Token expired
                 await self.refresh_token()
             else:
                 logger.info("Pixiv logged in through cached tokens")
@@ -100,7 +106,7 @@ class Pixiv:
             raise NazurinError("Artwork is private")
         return illust
 
-    async def view(self, artwork_id: int = None) -> Illust:
+    async def view(self, artwork_id: int) -> Illust:
         illust = await self.get_artwork(artwork_id)
         if illust.type == "ugoira":
             illust = await self.view_ugoira(illust)
@@ -133,7 +139,9 @@ class Pixiv:
         return Ugoira(illust.id, video, caption, illust, files)
 
     async def bookmark(
-        self, artwork_id: int, privacy: PixivPrivacy = PixivPrivacy.PUBLIC
+        self,
+        artwork_id: int,
+        privacy: PixivPrivacy = PixivPrivacy.PUBLIC,
     ):
         response = await self.call(Pixiv.illust_bookmark_add, artwork_id, privacy.value)
         if "error" in response:
@@ -154,7 +162,7 @@ class Pixiv:
                 "access_token": Pixiv.api.access_token,
                 "refresh_token": Pixiv.api.refresh_token,
                 "updated_time": Pixiv.updated_time,
-            }
+            },
         )
         logger.info("Pixiv tokens updated")
 
@@ -163,7 +171,7 @@ class Pixiv:
         await self.require_auth()
         response = await func(*args)
         if (
-            "error" in response.keys() and "invalid_grant" in response.error.message
+            "error" in response and "invalid_grant" in response.error.message
         ):  # Access token expired
             await self.refresh_token()
             response = await func(*args)
@@ -200,7 +208,9 @@ class Pixiv:
             logger.info("Calling FFmpeg with command: {}", cmd)
             try:
                 output = subprocess.check_output(
-                    args, stderr=subprocess.STDOUT, shell=False
+                    args,
+                    stderr=subprocess.STDOUT,
+                    shell=False,
                 )
             except subprocess.CalledProcessError as error:
                 logger.error(
@@ -255,7 +265,7 @@ class Pixiv:
                         thumbnail=self.get_thumbnail(url),
                         width=width,
                         height=height,
-                    )
+                    ),
                 )
                 # For multi-page illusts,
                 # width & height will be the size of the first page,
@@ -279,14 +289,14 @@ class Pixiv:
                     thumbnail=self.get_thumbnail(url),
                     width=width,
                     height=height,
-                )
+                ),
             )
         return imgs
 
     @staticmethod
     def build_caption(illust) -> Caption:
         """Build media caption from an artwork."""
-        tags = str()
+        tags = ""
         for tag in illust.tags:
             if TRANSLATION and tag.translated_name:
                 tag_name = tag.translated_name
@@ -301,7 +311,7 @@ class Pixiv:
                 "total_bookmarks": illust.total_bookmarks,
                 "url": "pixiv.net/i/" + str(illust.id),
                 "bookmarked": illust.is_bookmarked,
-            }
+            },
         )
         return caption
 
@@ -336,7 +346,7 @@ class Pixiv:
         thumbnail = pre + "_master1200.jpg"
         return thumbnail
 
-    async def auth(self, retry=True):
+    async def auth(self, *, retry=True):
         try:
             await Pixiv.api_auth()
             if not retry:
@@ -351,12 +361,13 @@ class Pixiv:
                 if retry:
                     random_ua = f"PixivAndroidApp/6.{random.randrange(0, 60)}.0"
                     logger.info(
-                        "Blocked by CloudFlare, retry with random UA: {}", random_ua
+                        "Blocked by CloudFlare, retry with random UA: {}",
+                        random_ua,
                     )
                     Pixiv.api.additional_headers = {"User-Agent": random_ua}
                     return await self.auth(retry=False)
                 logger.error(error)
                 raise NazurinError(
-                    "Blocked by CloudFlare security check, please try again later."
+                    "Blocked by CloudFlare security check, please try again later.",
                 ) from None
             raise error

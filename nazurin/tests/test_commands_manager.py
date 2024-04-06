@@ -29,7 +29,8 @@ class TestCommandsManager(unittest.TestCase):
         self.assertEqual(self.manager.resolve_names(Command(names)), names)
         self.assertEqual(self.manager.resolve_names(commands=names), names)
         self.assertEqual(
-            self.manager.resolve_names(Command(["second"]), commands=["first"]), names
+            self.manager.resolve_names(Command(["second"]), commands=["first"]),
+            names,
         )
 
     def test_command_list(self):
@@ -63,7 +64,7 @@ class TestCommandsManager(unittest.TestCase):
             <b>Usage:</b> /alternative, /first
 
             First Command Help Text
-            """
+            """,
             ),
         )
         self.assertEqual(
@@ -72,7 +73,7 @@ class TestCommandsManager(unittest.TestCase):
                 """
             Second Command
             <b>Usage:</b> /second ARG
-            """
+            """,
             ),
         )
         self.assertIsNone(self.manager.help("third"))

@@ -1,7 +1,7 @@
 import asyncio
 import json
 from pathlib import PurePath
-from typing import Awaitable, Callable, List
+from typing import Awaitable, Callable, List, Optional
 
 from oauth2client.service_account import ServiceAccountCredentials
 from pydrive2.auth import GoogleAuth
@@ -17,7 +17,8 @@ from nazurin.utils.helpers import run_in_pool
 
 GD_FOLDER = env.str("GD_FOLDER")
 GD_CREDENTIALS = env.str(
-    "GD_CREDENTIALS", default=env.str("GOOGLE_APPLICATION_CREDENTIALS")
+    "GD_CREDENTIALS",
+    default=env.str("GOOGLE_APPLICATION_CREDENTIALS"),
 )
 FOLDER_MIME = "application/vnd.google-apps.folder"
 
@@ -27,7 +28,7 @@ class GoogleDrive:
 
     drive = GDrive()
     create_file: Callable[[dict], Awaitable[GoogleDriveFile]] = async_wrap(
-        drive.CreateFile
+        drive.CreateFile,
     )
 
     def __init__(self):
@@ -43,18 +44,20 @@ class GoogleDrive:
             if GD_CREDENTIALS.startswith("{"):
                 credentials = json.loads(GD_CREDENTIALS)
                 gauth.credentials = ServiceAccountCredentials.from_json_keyfile_dict(
-                    credentials, scope
+                    credentials,
+                    scope,
                 )
             else:
                 gauth.credentials = ServiceAccountCredentials.from_json_keyfile_name(
-                    GD_CREDENTIALS, scope
+                    GD_CREDENTIALS,
+                    scope,
                 )
         else:
             raise NazurinError("Credentials not found for Google Drive storage.")
         GoogleDrive.drive.auth = gauth
 
     @staticmethod
-    async def upload(file: File, folders: dict = None):
+    async def upload(file: File, folders: Optional[dict] = None):
         # Compute relative path to STORAGE_DIR, which is GD_FOLDER
         path = file.destination.relative_to(STORAGE_DIR).as_posix()
         parent = folders[path] if folders else await GoogleDrive.create_folders(path)
@@ -83,7 +86,7 @@ class GoogleDrive:
     @staticmethod
     @Cache.lru()
     @async_wrap
-    def find_folder(name: str, parent: str = None) -> str:
+    def find_folder(name: str, parent: Optional[str] = None) -> str:
         query = {
             "q": f"mimeType='{FOLDER_MIME}' and "
             f"title='{name}' and "
@@ -96,7 +99,7 @@ class GoogleDrive:
         return result[0].get("id")
 
     @staticmethod
-    async def create_folder(name: str, parent: str = None) -> str:
+    async def create_folder(name: str, parent: Optional[str] = None) -> str:
         metadata = {
             "title": name,
             "mimeType": FOLDER_MIME,
@@ -107,7 +110,7 @@ class GoogleDrive:
         return folder.get("id")
 
     @staticmethod
-    async def create_folders(path: str, parent: str = None) -> str:
+    async def create_folders(path: str, parent: Optional[str] = None) -> str:
         """
         Create folders recursively.
 

@@ -1,4 +1,4 @@
-from cloudant.client import Cloudant as cloudant
+from cloudant.client import Cloudant as CloudantBase
 from requests.adapters import HTTPAdapter
 
 from nazurin.config import RETRIES, env
@@ -16,8 +16,11 @@ class Cloudant(DatabaseDriver):
 
     def __init__(self):
         """Connect to database."""
-        self.client = cloudant.iam(
-            USERNAME, APIKEY, timeout=5, adapter=HTTPAdapter(max_retries=RETRIES)
+        self.client = CloudantBase.iam(
+            USERNAME,
+            APIKEY,
+            timeout=5,
+            adapter=HTTPAdapter(max_retries=RETRIES),
         )
         self.client.connect()
         self.db = self.client[DATABASE]

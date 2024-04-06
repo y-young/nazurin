@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import json
 import secrets
-from datetime import datetime
+from datetime import datetime, timezone
+from http import HTTPStatus
 from http.cookies import SimpleCookie
-from typing import List
+from typing import ClassVar
 
 from nazurin.models import Illust, Image
 from nazurin.utils.decorators import Cache, network_retry
@@ -43,9 +46,16 @@ class TweetDetailAPI:
     LOGGED_IN = "q94uRCEn65LZThakYcPT6g/TweetDetail"
 
 
+ERROR_MESSAGES = {
+    "NsfwLoggedOut": "NSFW tweet, please log in",
+    "Protected": "Protected tweet, you may try logging in if you have access",
+    "Suspended": "This account has been suspended",
+}
+
+
 class WebAPI(BaseAPI):
     auth_token = AUTH_TOKEN
-    headers = {
+    headers: ClassVar[dict[str, str]] = {
         "Authorization": AuthorizationToken.GUEST,
         "Origin": "https://twitter.com",
         "Referer": "https://twitter.com",
@@ -53,7 +63,7 @@ class WebAPI(BaseAPI):
         "x-twitter-client-language": "en",
         "x-twitter-active-user": "yes",
     }
-    variables = {
+    variables: ClassVar[dict[str, bool]] = {
         "with_rux_injections": False,
         "includePromotedContent": False,
         "withCommunity": True,
@@ -65,7 +75,7 @@ class WebAPI(BaseAPI):
         "withVoice": True,
         "withV2Timeline": True,
     }
-    features = {
+    features: ClassVar[dict[str, bool]] = {
         "blue_business_profile_image_shape_enabled": False,
         "rweb_lists_timeline_redesign_enabled": True,
         "responsive_web_graphql_exclude_directive_enabled": True,
@@ -113,7 +123,7 @@ class WebAPI(BaseAPI):
         if "extended_entities" not in tweet:
             raise NazurinError("No photo found.")
         media = tweet["extended_entities"]["media"]
-        imgs: List[Image] = []
+        imgs: list[Image] = []
         for medium in media:
             if medium["type"] == "photo":
                 index = len(imgs)
@@ -127,7 +137,7 @@ class WebAPI(BaseAPI):
                             "height": original_info["height"],
                         },
                         index,
-                    )
+                    ),
                 )
             else:
                 # video or animated_gif
@@ -149,8 +159,8 @@ class WebAPI(BaseAPI):
                     AuthorizationToken.LOGGED_IN
                     if AUTH_TOKEN
                     else AuthorizationToken.GUEST
-                )
-            }
+                ),
+            },
         )
         variables = WebAPI.variables
         variables.update({"focalTweetId": tweet_id})
@@ -206,41 +216,44 @@ class WebAPI(BaseAPI):
             headers = {}
         headers.update(WebAPI.headers)
 
-        async with Request(headers=headers, cookies=WebAPI.cookies) as request:
-            async with request.request(method, url, **kwargs) as response:
-                if not response.ok:
-                    result = await response.text()
-                    logger.error("Web API Error: {}, {}", response.status, result)
-                    if response.status == 401:
-                        raise NazurinError(
-                            f"Failed to authenticate Twitter web API: {result}, "
-                            "try updating auth token."
+        async with Request(
+            headers=headers,
+            cookies=WebAPI.cookies,
+        ) as request, request.request(method, url, **kwargs) as response:
+            if not response.ok:
+                result = await response.text()
+                logger.error("Web API Error: {}, {}", response.status, result)
+                if response.status == HTTPStatus.UNAUTHORIZED:
+                    raise NazurinError(
+                        f"Failed to authenticate Twitter web API: {result}, "
+                        "try updating auth token.",
+                    )
+                if response.status == HTTPStatus.TOO_MANY_REQUESTS:
+                    headers = response.headers
+                    detail = ""
+                    if (
+                        Headers.RATE_LIMIT_LIMIT in headers
+                        and Headers.RATE_LIMIT_RESET in headers
+                    ):
+                        rate_limit = int(headers[Headers.RATE_LIMIT_LIMIT])
+                        reset_time = int(headers[Headers.RATE_LIMIT_RESET])
+                        logger.error(
+                            "Rate limited, limit: {}, reset: {}",
+                            rate_limit,
+                            reset_time,
                         )
-                    if response.status == 429:
-                        headers = response.headers
-                        detail = ""
-                        if (
-                            Headers.RATE_LIMIT_LIMIT in headers
-                            and Headers.RATE_LIMIT_RESET in headers
-                        ):
-                            rate_limit = int(headers[Headers.RATE_LIMIT_LIMIT])
-                            reset_time = int(headers[Headers.RATE_LIMIT_RESET])
-                            logger.error(
-                                "Rate limited, limit: {}, reset: {}",
-                                rate_limit,
-                                reset_time,
-                            )
-                            reset_time = datetime.fromtimestamp(reset_time)
-                            detail = (
-                                f"Rate limit: {rate_limit}, Reset time: {reset_time}"
-                            )
-                        raise NazurinError(
-                            "Hit API rate limit, please try again later. " + detail
+                        reset_time = datetime.fromtimestamp(
+                            reset_time,
+                            tz=timezone.utc,
                         )
-                    raise NazurinError(f"Twitter web API error: {result}")
-                result = await response.json()
-                self._update_cookies(response.cookies)
-                return result
+                        detail = f"Rate limit: {rate_limit}, Reset time: {reset_time}"
+                    raise NazurinError(
+                        "Hit API rate limit, please try again later. " + detail,
+                    )
+                raise NazurinError(f"Twitter web API error: {result}")
+            result = await response.json()
+            self._update_cookies(response.cookies)
+            return result
 
     def _update_cookies(self, cookies: SimpleCookie):
         WebAPI.cookies.update(cookies)
@@ -267,7 +280,7 @@ class WebAPI(BaseAPI):
         if "errors" in response:
             logger.error(response)
             raise NazurinError(
-                "\n".join([error["message"] for error in response["errors"]])
+                "\n".join([error["message"] for error in response["errors"]]),
             )
 
         instructions = response["data"]["threaded_conversation_with_injections_v2"][
@@ -288,7 +301,7 @@ class WebAPI(BaseAPI):
                     raise NazurinError(
                         "Tweet result is empty, maybe it's a sensitive tweet "
                         "or the author limited visibility, "
-                        "you may try setting an AUTH_TOKEN."
+                        "you may try setting an AUTH_TOKEN.",
                     )
                 tweet = tweet["result"]
                 break
@@ -307,7 +320,7 @@ class WebAPI(BaseAPI):
             text = tombstone["text"]
             if text.startswith("Age-restricted"):
                 raise NazurinError(
-                    "Age-restricted adult content. Please set Twitter auth token."
+                    "Age-restricted adult content. Please set Twitter auth token.",
                 )
             raise NazurinError(text)
 
@@ -338,7 +351,7 @@ class WebAPI(BaseAPI):
                 "created_at": fromasctimeformat(tweet["created_at"]).isoformat(),
                 "user": WebAPI.normalize_user(data["core"]["user_results"]["result"]),
                 "text": tweet["full_text"],
-            }
+            },
         )
         del tweet["full_text"]
         return tweet
@@ -355,17 +368,12 @@ class WebAPI(BaseAPI):
                 "id_str": data["rest_id"],
                 "created_at": fromasctimeformat(user["created_at"]).isoformat(),
                 "is_blue_verified": data["is_blue_verified"],
-            }
+            },
         )
         return user
 
     @staticmethod
     def error_message_by_reason(reason: str):
-        MESSAGES = {
-            "NsfwLoggedOut": "NSFW tweet, please log in",
-            "Protected": "Protected tweet, you may try logging in if you have access",
-            "Suspended": "This account has been suspended",
-        }
-        if reason in MESSAGES:
-            return MESSAGES[reason]
+        if reason in ERROR_MESSAGES:
+            return ERROR_MESSAGES[reason]
         return reason

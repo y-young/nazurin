@@ -49,19 +49,20 @@ class SiteManager:
             module = import_module("nazurin.sites." + module_name)
             # Store site API class
             self.sites[module_name.lower()] = getattr(
-                module, snake_to_pascal(module_name)
+                module,
+                snake_to_pascal(module_name),
             )()
             if hasattr(module, "patterns") and hasattr(module, "handle"):
-                PRIORITY = getattr(module, "PRIORITY")
-                patterns = getattr(module, "patterns")
-                handle = getattr(module, "handle")
+                priority = module.PRIORITY
+                patterns = module.patterns
+                handle = module.handle
                 self.sources.append(
                     Source(
-                        priority=PRIORITY,
+                        priority=priority,
                         patterns=patterns,
                         handler=handle,
                         name=module_name,
-                    )
+                    ),
                 )
             self.sources.sort(key=lambda s: s.priority, reverse=True)
         logger.info("Loaded {} sites", len(self.sites))

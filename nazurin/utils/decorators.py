@@ -1,6 +1,7 @@
 import asyncio
 import functools
 from functools import partial, wraps
+from typing import Callable, ClassVar, List
 
 import tenacity
 from aiogram.types import ChatActions, Message
@@ -81,7 +82,8 @@ def retry_after(func):
                 return result
             except RetryAfter as error:
                 logger.opt(depth=1).warning(
-                    "Hit flood limit, retry after {} seconds", error.timeout + 1
+                    "Hit flood limit, retry after {} seconds",
+                    error.timeout + 1,
                 )
                 await asyncio.sleep(error.timeout + 1)
 
@@ -89,7 +91,7 @@ def retry_after(func):
 
 
 class Cache:
-    cached_functions = []
+    cached_functions: ClassVar[List[Callable]] = []
 
     @staticmethod
     def lru(*args, **kwargs):

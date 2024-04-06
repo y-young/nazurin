@@ -11,6 +11,11 @@ from nazurin.utils.helpers import check_image
 
 from .file import File
 
+TG_IMG_WIDTH_HEIGHT_RATIO_LIMIT = 20
+TG_IMG_DIMENSION_LIMIT = 10000
+
+INVALID_IMAGE_RETRIES = 3
+
 
 @dataclass
 class Image(File):
@@ -31,9 +36,13 @@ class Image(File):
         # https://core.telegram.org/bots/api#sendphoto
         if self._chosen_url:
             return self._chosen_url
-        if self.height != 0 and self.width / self.height > 20:
+
+        if (
+            self.height != 0
+            and self.width / self.height > TG_IMG_WIDTH_HEIGHT_RATIO_LIMIT
+        ):
             raise NazurinError(
-                "Width and height ratio of image exceeds 20, try download option."
+                "Width and height ratio of image exceeds 20, try download option.",
             )
         self._chosen_url = self.url
         if self.thumbnail:
@@ -41,7 +50,7 @@ class Image(File):
             if (
                 (not self.width)
                 or (not self.height)
-                or self.width + self.height > 10000
+                or self.width + self.height > TG_IMG_DIMENSION_LIMIT
             ):
                 self._chosen_url = self.thumbnail
                 logger.info(
@@ -66,15 +75,17 @@ class Image(File):
         self._size = self._size or await super().size()
         if self._size:
             return self._size
-        async with Request(**kwargs) as request:
-            async with request.head(self.url) as response:
-                headers = response.headers
-                if "Content-Length" in headers:
-                    self._size = int(headers["Content-Length"])
-                    logger.info("Got image size: {}", naturalsize(self._size, True))
-                else:
-                    logger.info("Failed to get image size")
-                return self._size
+        async with Request(**kwargs) as request, request.head(self.url) as response:
+            headers = response.headers
+            if "Content-Length" in headers:
+                self._size = int(headers["Content-Length"])
+                logger.info(
+                    "Got image size: {}",
+                    naturalsize(self._size, binary=True),
+                )
+            else:
+                logger.info("Failed to get image size")
+            return self._size
 
     def __post_init__(self):
         if self._size:
@@ -87,11 +98,10 @@ class Image(File):
         self._size = int(value)
 
     async def download(self, session: aiohttp.ClientSession):
-        RETRIES = 3
-        for i in range(RETRIES):
+        for i in range(INVALID_IMAGE_RETRIES):
             downloaded_size = await super().download(session)
             is_valid = await check_image(self.path)
-            attempt_count = f"{i + 1} / {RETRIES}"
+            attempt_count = f"{i + 1} / {INVALID_IMAGE_RETRIES}"
             if is_valid:
                 if self._size is None or self._size == downloaded_size:
                     return
@@ -107,9 +117,9 @@ class Image(File):
                     self.path,
                     attempt_count,
                 )
-            if i < RETRIES - 1:
+            if i < INVALID_IMAGE_RETRIES - 1:
                 # Keep the last one for debugging
                 os.remove(self.path)
         raise NazurinError(
-            "Download failed with invalid image, please check logs for details"
+            "Download failed with invalid image, please check logs for details",
         )

@@ -20,7 +20,10 @@ OD_CLIENT = env.str("OD_CLIENT")
 OD_SECRET = env.str("OD_SECRET")
 OD_RF_TOKEN = env.str("OD_RF_TOKEN")  # Refresh token for first-time auth
 OD_DOCUMENT = "onedrive"
+
 BASE_URL = "https://graph.microsoft.com/v1.0"
+# Must be a multiple of 320 KB
+UPLOAD_CHUNK_SIZE = 16 * 320 * 1024  # 5MB
 
 
 class OneDrive:
@@ -47,7 +50,7 @@ class OneDrive:
         body = {
             "item": {
                 "@microsoft.graph.conflictBehavior": "replace",
-            }
+            },
         }
         path = self.encode_path(pathlib.Path(file.destination, file.name))
         create_session_url = (
@@ -138,7 +141,7 @@ class OneDrive:
             await self.auth(initialize=True)
 
     @network_retry
-    async def auth(self, initialize=False):
+    async def auth(self, *, initialize=False):
         # https://docs.microsoft.com/zh-cn/azure/active-directory/develop/v2-oauth2-auth-code-flow
         url = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
         data = {
@@ -147,17 +150,16 @@ class OneDrive:
             "refresh_token": self.refresh_token or OD_RF_TOKEN,
             "grant_type": "refresh_token",
         }
-        async with Request() as request:
-            async with request.post(url, data=data) as response:
-                response = await response.json()
-                if "error" in response:
-                    logger.error(response)
-                    raise NazurinError(
-                        f"OneDrive authorization error: {response['error_description']}"
-                    )
-                self.access_token = response["access_token"]
-                self.refresh_token = response["refresh_token"]
-                self.expires_at = time.time() + response["expires_in"]
+        async with Request() as request, request.post(url, data=data) as response:
+            response_json = await response.json()
+            if "error" in response_json:
+                logger.error(response_json)
+                raise NazurinError(
+                    f"OneDrive authorization error: {response_json['error_description']}",
+                )
+            self.access_token = response_json["access_token"]
+            self.refresh_token = response_json["refresh_token"]
+            self.expires_at = time.time() + response_json["expires_in"]
         credentials = {
             "access_token": self.access_token,
             "refresh_token": self.refresh_token,
@@ -186,14 +188,17 @@ class OneDrive:
         # make a request with access token
         _headers = self.with_credentials(headers)
         _headers["Content-Type"] = "application/json"
-        async with Request(headers=_headers) as session:
-            async with session.request(method, url, **kwargs) as response:
-                if not response.ok:
-                    logger.error(await response.text())
-                response.raise_for_status()
-                if "application/json" in response.headers["Content-Type"]:
-                    return await response.json()
-                return await response.text()
+        async with Request(headers=_headers) as session, session.request(
+            method,
+            url,
+            **kwargs,
+        ) as response:
+            if not response.ok:
+                logger.error(await response.text())
+            response.raise_for_status()
+            if "application/json" in response.headers["Content-Type"]:
+                return await response.json()
+            return await response.text()
 
     async def stream_upload(self, file: File, url: str):
         @network_retry
@@ -203,35 +208,35 @@ class OneDrive:
                     logger.error(await response.text())
                 response.raise_for_status()
 
-        # Must be a multiple of 320 KB
-        CHUNK_SIZE = 16 * 320 * 1024  # 5MB
         headers = self.with_credentials()
         range_start = 0
         total_size = await file.size()
-        total_size_str = naturalsize(total_size, True)
+        total_size_str = naturalsize(total_size, binary=True)
         logger.info(
-            "[File {}] Start upload, total size: {}...", file.name, total_size_str
+            "[File {}] Start upload, total size: {}...",
+            file.name,
+            total_size_str,
         )
 
         async with Request(headers=headers) as session:
-            async for chunk in read_by_chunks(file.path, CHUNK_SIZE):
+            async for chunk in read_by_chunks(file.path, UPLOAD_CHUNK_SIZE):
                 content_length = len(chunk)
                 range_end = range_start + content_length - 1
                 session.headers.update({"Content-Length": str(content_length)})
                 session.headers.update(
-                    {"Content-Range": f"bytes {range_start}-{range_end}/{total_size}"}
+                    {"Content-Range": f"bytes {range_start}-{range_end}/{total_size}"},
                 )
                 await upload_chunk(url, chunk)
                 range_start += content_length
                 logger.info(
                     "[File {}] Uploaded {} / {}",
                     file.name,
-                    naturalsize(range_start, True),
+                    naturalsize(range_start, binary=True),
                     total_size_str,
                 )
         logger.info("[File {}] Upload completed", file.name)
 
-    def with_credentials(self, headers: dict = None) -> dict:
+    def with_credentials(self, headers: Optional[dict] = None) -> dict:
         """
         Add credentials to the request header.
         """

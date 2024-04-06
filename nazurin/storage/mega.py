@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 import asyncio
-from typing import List
+from typing import List, Optional
 
-from mega import Mega as mega
+from mega import Mega as MegaBase
 from mega.errors import RequestError
 
 from nazurin.config import MAX_PARALLEL_UPLOAD, NAZURIN_DATA, env
@@ -19,7 +18,7 @@ MEGA_DOCUMENT = "mega"
 
 
 class Mega:
-    api = mega()
+    api = MegaBase()
     db = Database().driver()
     collection = db.collection(NAZURIN_DATA)
     document = collection.document(MEGA_DOCUMENT)
@@ -30,7 +29,7 @@ class Mega:
     create_folder = async_wrap(api.create_folder)
 
     @network_retry
-    async def login(self, initialize=False):
+    async def login(self, *, initialize=False):
         await Mega.api_login(MEGA_USER, MEGA_PASS)
         if initialize:
             await Mega.collection.insert(
@@ -47,7 +46,7 @@ class Mega:
                     "sid": Mega.api.sid,
                     "master_key": list(Mega.api.master_key),
                     "root_id": Mega.api.root_id,
-                }
+                },
             )
         logger.info("MEGA tokens cached")
 
@@ -63,7 +62,13 @@ class Mega:
                 await self.login(initialize=True)
 
     @network_retry
-    async def upload(self, file: File, folders: dict = None, retry: bool = False):
+    async def upload(
+        self,
+        file: File,
+        folders: Optional[dict] = None,
+        *,
+        retry: bool = False,
+    ):
         path = file.destination.as_posix()
         try:
             destination = (

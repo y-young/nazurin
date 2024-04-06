@@ -12,7 +12,7 @@ from aiohttp import ClientResponseError
 from nazurin import config, dp
 from nazurin.utils import logger
 from nazurin.utils.decorators import Cache, chat_action
-from nazurin.utils.exceptions import InvalidCommandUsage, NazurinError
+from nazurin.utils.exceptions import InvalidCommandUsageError, NazurinError
 from nazurin.utils.helpers import format_error
 
 
@@ -39,14 +39,14 @@ async def show_help(message: Message, command: Command.CommandObj):
             小さな小さな賢将, can help you collect images from various sites.
 
             <b>Commands:</b>
-            """
+            """,
         )
         + dp.commands.help_text()
         + dedent(
             """
 
             PS: Send a URL of supported sites to collect image(s)
-            """
+            """,
         ),
     )
 
@@ -89,7 +89,7 @@ async def on_error(update: Update, exception: Exception):
     message = update.message
     try:
         raise exception
-    except InvalidCommandUsage as error:
+    except InvalidCommandUsageError as error:
         await message.reply(dp.commands.help(error.command))
     except ClientResponseError as error:
         traceback.print_exc()

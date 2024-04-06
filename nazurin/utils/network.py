@@ -95,7 +95,10 @@ class CurlRequest(CurlSession, NazurinRequestSession):
 
     @asynccontextmanager
     async def get(
-        self, *args, impersonate: str = "chrome110", **kwargs
+        self,
+        *args,
+        impersonate: str = "chrome110",
+        **kwargs,
     ) -> AsyncGenerator[CurlResponse, None]:
         yield await super().request(
             "GET",
@@ -112,7 +115,8 @@ class CurlRequest(CurlSession, NazurinRequestSession):
         async with self.get(url, stream=True) as response:
             if not response.ok:
                 logger.error(
-                    "Download failed with status code {}", response.status_code
+                    "Download failed with status code {}",
+                    response.status_code,
                 )
                 logger.info("Response: {}", await response.acontent())
                 response.raise_for_status()
@@ -144,7 +148,9 @@ class CloudScraperRequest(NazurinRequestSession):
 
     @asynccontextmanager
     async def get(
-        self, *args, **kwargs
+        self,
+        *args,
+        **kwargs,
     ) -> AsyncGenerator[cloudscraper.requests.Response, None]:
         yield await async_wrap(self.scraper.get)(*args, timeout=self.timeout, **kwargs)
 
@@ -152,7 +158,8 @@ class CloudScraperRequest(NazurinRequestSession):
         async with self.get(url, stream=True) as response:
             if not response.ok:
                 logger.error(
-                    "Download failed with status code {}", response.status_code
+                    "Download failed with status code {}",
+                    response.status_code,
                 )
                 logger.info("Response: {}", await response.text)
                 response.raise_for_status()

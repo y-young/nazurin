@@ -4,7 +4,7 @@ from datetime import datetime
 from os import path
 from typing import List, Optional, Tuple
 
-from pybooru import Danbooru as danbooru
+from pybooru import Danbooru as DanbooruBase
 from pybooru import PybooruHTTPError
 
 from nazurin.models import Caption, File, Image
@@ -15,17 +15,21 @@ from nazurin.utils.helpers import is_image
 
 from .config import DESTINATION, FILENAME
 
+MAX_CHARACTER_COUNT = 5
+
 
 class Danbooru:
     def __init__(self, site="danbooru"):
         """Set Danbooru site."""
         self.site = site
-        self.api = danbooru(site)
+        self.api = DanbooruBase(site)
         self.post_show = async_wrap(self.api.post_show)
         self.post_list = async_wrap(self.api.post_list)
 
     async def get_post(
-        self, post_id: Optional[int] = None, md5: Optional[str] = None
+        self,
+        post_id: Optional[int] = None,
+        md5: Optional[str] = None,
     ) -> dict:
         """Fetch a post."""
         try:
@@ -40,12 +44,14 @@ class Danbooru:
         if "file_url" not in post:
             raise NazurinError(
                 "You may need a gold account to view this post\nSource: "
-                + post["source"]
+                + post["source"],
             )
         return post
 
     async def view(
-        self, post_id: Optional[int] = None, md5: Optional[str] = None
+        self,
+        post_id: Optional[int] = None,
+        md5: Optional[str] = None,
     ) -> DanbooruIllust:
         post = await self.get_post(post_id, md5)
         illust = self.parse_post(post)
@@ -70,14 +76,14 @@ class Danbooru:
                     post["file_size"],
                     post["image_width"],
                     post["image_height"],
-                )
+                ),
             )
         else:  # danbooru has non-image posts, such as #animated
             files.append(File(filename, url, destination))
 
         # Build media caption
         tags = post["tag_string"].split(" ")
-        tag_string = str()
+        tag_string = ""
         for character in tags:
             tag_string += "#" + character + " "
         caption = Caption(
@@ -89,7 +95,7 @@ class Danbooru:
                 "parent_id": post["parent_id"],
                 "pixiv_id": post["pixiv_id"],
                 "has_children": post["has_children"],
-            }
+            },
         )
         return DanbooruIllust(int(post["id"]), imgs, caption, post, files)
 
@@ -126,7 +132,7 @@ class Danbooru:
         copyrights = Danbooru._format_copyrights(post["tag_string_copyright"])
         artists = Danbooru._format_artists(post["tag_string_artist"])
         extension = path.splitext(post["file_url"])[1]
-        filename = str()
+        filename = ""
 
         if characters:
             filename += characters + " "
@@ -146,10 +152,10 @@ class Danbooru:
         characters = characters.split(" ")
         characters = list(map(Danbooru._normalize, characters))
         size = len(characters)
-        if size <= 5:
+        if size <= MAX_CHARACTER_COUNT:
             result = Danbooru._sentence(characters)
         else:
-            characters = characters[:5]
+            characters = characters[:MAX_CHARACTER_COUNT]
             result = Danbooru._sentence(characters) + " and " + str(size - 1) + " more"
         return result
 

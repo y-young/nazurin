@@ -8,7 +8,7 @@ from .config import COLLECTION
 
 patterns = [
     # https://username.lofter.com/post/1a2b3c4d_1a2b3c4d5
-    r"(\w+)\.lofter\.com/post/(\w+)"
+    r"(\w+)\.lofter\.com/post/(\w+)",
 ]
 
 

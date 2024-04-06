@@ -26,13 +26,13 @@ class NazurinCommand:
             f"""
             {self.description}
             <b>Usage:</b> {self.usage}
-            """
+            """,
         )
         if self.help_text:
             text += dedent(
                 f"""
                 {self.help_text}
-                """
+                """,
             )
         return text
 
@@ -77,7 +77,7 @@ class CommandsManager:
             [
                 f"{command.usage} — {command.description}"
                 for command in sorted(self.commands, key=lambda x: x.names[0])
-            ]
+            ],
         )
 
     def help(self, command: str) -> Optional[str]:

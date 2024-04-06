@@ -30,6 +30,8 @@ async def handle(match: re.Match) -> HandlerResult:
 
     illust = await api.view(int(post_id))
     document = Document(
-        id=illust.id, collection=COLLECTIONS[site_url], data=illust.metadata
+        id=illust.id,
+        collection=COLLECTIONS[site_url],
+        data=illust.metadata,
     )
     return illust, document

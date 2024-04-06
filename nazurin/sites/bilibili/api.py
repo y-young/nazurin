@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Tuple
 
 from nazurin.models import Caption, Illust, Image
@@ -9,6 +9,8 @@ from nazurin.utils.exceptions import NazurinError
 
 from .config import DESTINATION, FILENAME
 
+ERROR_NOT_FOUND = 4101147
+
 
 class Bilibili:
     @network_retry
@@ -17,19 +19,18 @@ class Bilibili:
         api = (
             f"https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?id={dynamic_id}"
         )
-        async with Request() as request:
-            async with request.get(api) as response:
-                response.raise_for_status()
-                data = await response.json()
-                # For some IDs, the API returns code 0 but empty content
-                code = data.get("code")
-                if code == 4101147 or "data" not in data:
-                    raise NazurinError("Dynamic not found")
-                if code != 0:
-                    raise NazurinError(
-                        f"Failed to get dynamic: code = {code}, "
-                        f"message = {data['message']}"
-                    )
+        async with Request() as request, request.get(api) as response:
+            response.raise_for_status()
+            data = await response.json()
+            # For some IDs, the API returns code 0 but empty content
+            code = data.get("code")
+            if code == ERROR_NOT_FOUND or "data" not in data:
+                raise NazurinError("Dynamic not found")
+            if code != 0:
+                raise NazurinError(
+                    f"Failed to get dynamic: code = {code}, "
+                    f"message = {data['message']}",
+                )
         item = data["data"]["item"]
         return self.cleanup_item(item)
 
@@ -68,7 +69,7 @@ class Bilibili:
                     size,
                     pic["width"],
                     pic["height"],
-                )
+                ),
             )
         return imgs
 
@@ -79,7 +80,10 @@ class Bilibili:
         """
 
         url = pic["src"]
-        timestamp = datetime.fromtimestamp(item["modules"]["module_author"]["pub_ts"])
+        timestamp = datetime.fromtimestamp(
+            item["modules"]["module_author"]["pub_ts"],
+            tz=timezone.utc,
+        )
         basename = os.path.basename(url)
         filename, extension = os.path.splitext(basename)
         user = item["modules"]["module_author"]
@@ -106,7 +110,7 @@ class Bilibili:
             {
                 "author": "#" + modules["module_author"]["name"],
                 "content": modules["module_dynamic"]["desc"]["text"],
-            }
+            },
         )
 
     @staticmethod

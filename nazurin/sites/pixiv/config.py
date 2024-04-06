@@ -28,7 +28,8 @@ with env.prefixed("PIXIV_"):
     with env.prefixed("FILE_"):
         DESTINATION: str = env.str("PATH", default="Pixiv")
         FILENAME: str = env.str(
-            "NAME", default="{filename} - {title} - {user[name]}({user[id]})"
+            "NAME",
+            default="{filename} - {title} - {user[name]}({user[id]})",
         )
 
 HEADERS = {"Referer": "https://app-api.pixiv.net/"}

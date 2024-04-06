@@ -1,12 +1,12 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional, Tuple
 from urllib.parse import unquote
 
 from aiohttp.client_exceptions import ClientResponseError
 from bs4 import BeautifulSoup
-from pybooru import Moebooru as moebooru
+from pybooru import Moebooru as MoebooruBase
 
 from nazurin.config import TEMP_DIR
 from nazurin.models import Caption, Illust, Image
@@ -29,14 +29,13 @@ class Moebooru:
     @network_retry
     async def get_post(self, post_id: int):
         url = "https://" + self.url + "/post/show/" + str(post_id)
-        async with Request() as request:
-            async with request.get(url) as response:
-                try:
-                    response.raise_for_status()
-                except ClientResponseError as err:
-                    raise NazurinError(err) from None
-                response = await response.text()
-        soup = BeautifulSoup(response, "html.parser")
+        async with Request() as request, request.get(url) as response:
+            try:
+                response.raise_for_status()
+            except ClientResponseError as err:
+                raise NazurinError(err) from None
+            response_text = await response.text()
+        soup = BeautifulSoup(response_text, "html.parser")
         tag = soup.find(id="post-view").find(recursive=False)
         if tag.name == "script":
             content = str.strip(tag.string)
@@ -61,24 +60,21 @@ class Moebooru:
         caption = self.build_caption(post, tags)
         return Illust(post_id, imgs, caption, post)
 
-    def pool(self, pool_id: int, jpeg=False):
-        client = moebooru(self.site)
+    def pool(self, pool_id: int, *, jpeg=False):
+        client = MoebooruBase(self.site)
         info = client.pool_posts(id=pool_id)
         posts = info["posts"]
         imgs = []
         for post in posts:
-            if not jpeg:
-                url = post["file_url"]
-            else:
-                url = post["jpeg_url"]
+            url = post["file_url"] if not jpeg else post["jpeg_url"]
             name, _ = self.parse_url(url)
             destination, filename = self.get_storage_dest(post, name)
             imgs.append(Image(filename, url, destination))
         caption = Caption({"name": info["name"], "description": info["description"]})
         return imgs, caption
 
-    async def download_pool(self, pool_id, jpeg=False):
-        imgs, caption = self.pool(pool_id, jpeg)
+    async def download_pool(self, pool_id, *, jpeg=False):
+        imgs, caption = self.pool(pool_id, jpeg=jpeg)
         pool_name = caption["name"]
         await ensure_existence_async(os.path.join(TEMP_DIR, pool_name))
         for key, img in enumerate(imgs):
@@ -102,7 +98,7 @@ class Moebooru:
                 post["file_size"],
                 post["width"],
                 post["height"],
-            )
+            ),
         ]
         return imgs
 
@@ -112,7 +108,10 @@ class Moebooru:
         """
 
         # `updated_at` is only available on yande.re, so we won't cover it here
-        created_at = datetime.fromtimestamp(post["created_at"])
+        created_at = datetime.fromtimestamp(
+            post["created_at"],
+            tz=timezone.utc,
+        )
         filename, extension = os.path.splitext(filename)
         # Site name in pascal case, i.e. Yandere, Konachan, Lolibooru
         site_name = snake_to_pascal(COLLECTIONS[self.url])
@@ -133,7 +132,7 @@ class Moebooru:
         """Build media caption from an post."""
         title = post["tags"]
         source = post["source"]
-        tag_string = artists = str()
+        tag_string = artists = ""
         for tag, tag_type in tags.items():
             if tag_type == "artist":
                 artists += tag + " "
@@ -148,7 +147,7 @@ class Moebooru:
                 "source": source,
                 "parent_id": post["parent_id"],
                 "has_children": post["has_children"],
-            }
+            },
         )
         return caption
 

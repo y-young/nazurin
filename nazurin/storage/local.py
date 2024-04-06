@@ -17,7 +17,8 @@ class Local:
     @async_wrap
     def move_file(file: File):
         shutil.copyfile(
-            file.path, os.path.join(os.path.join(DATA_DIR, file.destination), file.name)
+            file.path,
+            os.path.join(os.path.join(DATA_DIR, file.destination), file.name),
         )
 
     async def store(self, files: List[File]):

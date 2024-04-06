@@ -13,15 +13,17 @@ class AuthMiddleware(BaseMiddleware):
         allowed_chats = config.ALLOW_ID + config.ALLOW_GROUP + [config.ADMIN_ID]
         if (
             message.chat.id in allowed_chats
-            or message.from_user.id in config.ALLOW_ID + [config.ADMIN_ID]
+            or message.from_user.id in [*config.ALLOW_ID, config.ADMIN_ID]
             or message.from_user.username in config.ALLOW_USERNAME
         ):
             return
-        raise CancelHandler()
+        raise CancelHandler
 
 
 class LoggingMiddleware(BaseMiddleware):
     async def on_process_message(self, message: Message, _data: dict):
         logger.info(
-            "Message {}: {}", message.message_id, message.text or message.caption
+            "Message {}: {}",
+            message.message_id,
+            message.text or message.caption,
         )
