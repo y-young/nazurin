@@ -14,8 +14,10 @@ class BaseAPI:
     def build_caption(tweet) -> Caption:
         return Caption(
             {
-                "url": f"https://twitter.com/{tweet['user']['screen_name']}"
-                + f"/status/{tweet['id_str']}",
+                "url": (
+                    f"https://twitter.com/{tweet['user']['screen_name']}"
+                    f"/status/{tweet['id_str']}"
+                ),
                 "author": f"{tweet['user']['name']} #{tweet['user']['screen_name']}",
                 "text": tweet["text"],
             },

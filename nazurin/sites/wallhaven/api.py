@@ -24,8 +24,10 @@ class Wallhaven:
                     raise NazurinError("Wallpaper doesn't exist.")
                 if response.status == HTTPStatus.UNAUTHORIZED:
                     raise NazurinError(
-                        "You need to log in to view this wallpaper. "
-                        + "Please ensure that you have set a valid API key.",
+                        (
+                            "You need to log in to view this wallpaper. "
+                            "Please ensure that you have set a valid API key."
+                        ),
                     )
                 response.raise_for_status()
                 wallpaper = await response.json()
