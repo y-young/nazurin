@@ -17,4 +17,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: y-young/ruff-action@v1
+      - uses: y-young/ruff-action@v2
