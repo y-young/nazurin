@@ -55,7 +55,7 @@ class Weibo:
                     width=width,
                     height=height,
                     referer=f"https://m.weibo.cn/detail/{post['mid']}",
-                )
+                ),
             )
         return imgs
 
@@ -90,7 +90,7 @@ class Weibo:
                 "desktop_url": f"https://weibo.com/{user['id']}/{post['bid']}",
                 "mobile_url": f"https://m.weibo.cn/detail/{post['mid']}",
                 "tags": tag_string,
-            }
+            },
         )
 
     @staticmethod

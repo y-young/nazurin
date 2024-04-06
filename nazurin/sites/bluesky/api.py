@@ -78,7 +78,7 @@ class Bluesky:
                     url,
                     destination,
                     thumbnail,
-                )
+                ),
             )
         return imgs
 
@@ -123,5 +123,5 @@ class Bluesky:
             {
                 "author": "#" + item["author"]["displayName"],
                 "text": item["record"]["text"],
-            }
+            },
         )

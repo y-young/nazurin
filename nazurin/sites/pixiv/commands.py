@@ -13,7 +13,9 @@ pixiv = Pixiv()
 
 
 @dp.message_handler(
-    Command(["pixiv"]), args="ARTWORK_ID", description="View Pixiv artwork"
+    Command(["pixiv"]),
+    args="ARTWORK_ID",
+    description="View Pixiv artwork",
 )
 async def pixiv_view(message: Message, command: Command.CommandObj):
     try:
@@ -28,7 +30,9 @@ async def pixiv_view(message: Message, command: Command.CommandObj):
 
 
 @dp.message_handler(
-    Command(["pixiv_download"]), args="ARTWORK_ID", description="Download Pixiv artwork"
+    Command(["pixiv_download"]),
+    args="ARTWORK_ID",
+    description="Download Pixiv artwork",
 )
 async def pixiv_download(message: Message, command: Command.CommandObj):
     try:

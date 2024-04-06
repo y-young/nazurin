@@ -18,7 +18,7 @@ class Zerochan:
     async def get_post(self, post_id: int):
         async with Request() as request:
             async with request.get(
-                "https://www.zerochan.net/" + str(post_id)
+                "https://www.zerochan.net/" + str(post_id),
             ) as response:
                 response.raise_for_status()
 
@@ -73,7 +73,7 @@ class Zerochan:
                 post["file_size"],
                 int(post["image_width"]),
                 int(post["image_height"]),
-            )
+            ),
         ]
 
     @staticmethod
@@ -112,6 +112,6 @@ class Zerochan:
                 "url": "https://www.zerochan.net/" + str(post["id"]),
                 "source": source,
                 "tags": tag_string,
-            }
+            },
         )
         return caption

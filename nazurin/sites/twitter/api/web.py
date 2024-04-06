@@ -135,7 +135,7 @@ class WebAPI(BaseAPI):
                             "height": original_info["height"],
                         },
                         index,
-                    )
+                    ),
                 )
             else:
                 # video or animated_gif
@@ -157,8 +157,8 @@ class WebAPI(BaseAPI):
                     AuthorizationToken.LOGGED_IN
                     if AUTH_TOKEN
                     else AuthorizationToken.GUEST
-                )
-            }
+                ),
+            },
         )
         variables = WebAPI.variables
         variables.update({"focalTweetId": tweet_id})
@@ -222,7 +222,7 @@ class WebAPI(BaseAPI):
                     if response.status == HTTPStatus.UNAUTHORIZED:
                         raise NazurinError(
                             f"Failed to authenticate Twitter web API: {result}, "
-                            "try updating auth token."
+                            "try updating auth token.",
                         )
                     if response.status == HTTPStatus.TOO_MANY_REQUESTS:
                         headers = response.headers
@@ -243,7 +243,7 @@ class WebAPI(BaseAPI):
                                 f"Rate limit: {rate_limit}, Reset time: {reset_time}"
                             )
                         raise NazurinError(
-                            "Hit API rate limit, please try again later. " + detail
+                            "Hit API rate limit, please try again later. " + detail,
                         )
                     raise NazurinError(f"Twitter web API error: {result}")
                 result = await response.json()
@@ -275,7 +275,7 @@ class WebAPI(BaseAPI):
         if "errors" in response:
             logger.error(response)
             raise NazurinError(
-                "\n".join([error["message"] for error in response["errors"]])
+                "\n".join([error["message"] for error in response["errors"]]),
             )
 
         instructions = response["data"]["threaded_conversation_with_injections_v2"][
@@ -296,7 +296,7 @@ class WebAPI(BaseAPI):
                     raise NazurinError(
                         "Tweet result is empty, maybe it's a sensitive tweet "
                         "or the author limited visibility, "
-                        "you may try setting an AUTH_TOKEN."
+                        "you may try setting an AUTH_TOKEN.",
                     )
                 tweet = tweet["result"]
                 break
@@ -315,7 +315,7 @@ class WebAPI(BaseAPI):
             text = tombstone["text"]
             if text.startswith("Age-restricted"):
                 raise NazurinError(
-                    "Age-restricted adult content. Please set Twitter auth token."
+                    "Age-restricted adult content. Please set Twitter auth token.",
                 )
             raise NazurinError(text)
 
@@ -346,7 +346,7 @@ class WebAPI(BaseAPI):
                 "created_at": fromasctimeformat(tweet["created_at"]).isoformat(),
                 "user": WebAPI.normalize_user(data["core"]["user_results"]["result"]),
                 "text": tweet["full_text"],
-            }
+            },
         )
         del tweet["full_text"]
         return tweet
@@ -363,7 +363,7 @@ class WebAPI(BaseAPI):
                 "id_str": data["rest_id"],
                 "created_at": fromasctimeformat(user["created_at"]).isoformat(),
                 "is_blue_verified": data["is_blue_verified"],
-            }
+            },
         )
         return user
 

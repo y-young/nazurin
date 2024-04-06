@@ -50,7 +50,7 @@ class Lofter:
                 + post["blogInfo"]["blogName"],
                 "url": post["blogPageUrl"],
                 "tags": " ".join(["#" + tag for tag in post["tagList"]]),
-            }
+            },
         )
         return Illust(int(post["id"]), imgs, caption, post)
 
@@ -74,7 +74,7 @@ class Lofter:
                     thumbnail=photo["orign"],
                     width=photo["rw"],
                     height=photo["rh"],
-                )
+                ),
             )
         return imgs
 

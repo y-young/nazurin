@@ -50,7 +50,7 @@ class OneDrive:
         body = {
             "item": {
                 "@microsoft.graph.conflictBehavior": "replace",
-            }
+            },
         }
         path = self.encode_path(pathlib.Path(file.destination, file.name))
         create_session_url = (
@@ -156,7 +156,7 @@ class OneDrive:
                 if "error" in response_json:
                     logger.error(response_json)
                     raise NazurinError(
-                        f"OneDrive authorization error: {response_json['error_description']}"
+                        f"OneDrive authorization error: {response_json['error_description']}",
                     )
                 self.access_token = response_json["access_token"]
                 self.refresh_token = response_json["refresh_token"]
@@ -211,7 +211,9 @@ class OneDrive:
         total_size = await file.size()
         total_size_str = naturalsize(total_size, binary=True)
         logger.info(
-            "[File {}] Start upload, total size: {}...", file.name, total_size_str
+            "[File {}] Start upload, total size: {}...",
+            file.name,
+            total_size_str,
         )
 
         async with Request(headers=headers) as session:
@@ -220,7 +222,7 @@ class OneDrive:
                 range_end = range_start + content_length - 1
                 session.headers.update({"Content-Length": str(content_length)})
                 session.headers.update(
-                    {"Content-Range": f"bytes {range_start}-{range_end}/{total_size}"}
+                    {"Content-Range": f"bytes {range_start}-{range_end}/{total_size}"},
                 )
                 await upload_chunk(url, chunk)
                 range_start += content_length

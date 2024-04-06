@@ -10,7 +10,9 @@ moebooru = Moebooru()
 
 
 @dp.message_handler(
-    Command(["yandere"]), args="POST_ID", description="View yandere post"
+    Command(["yandere"]),
+    args="POST_ID",
+    description="View yandere post",
 )
 async def yandere_view(message: Message, command: Command.CommandObj):
     try:
@@ -25,7 +27,9 @@ async def yandere_view(message: Message, command: Command.CommandObj):
 
 
 @dp.message_handler(
-    Command(["yandere_download"]), args="POST_ID", description="Download yandere post"
+    Command(["yandere_download"]),
+    args="POST_ID",
+    description="Download yandere post",
 )
 async def yandere_download(message: Message, command: Command.CommandObj):
     try:
@@ -41,7 +45,9 @@ async def yandere_download(message: Message, command: Command.CommandObj):
 
 
 @dp.message_handler(
-    Command(["konachan"]), args="POST_ID", description="Download Konachan post"
+    Command(["konachan"]),
+    args="POST_ID",
+    description="Download Konachan post",
 )
 async def konachan_view(message: Message, command: Command.CommandObj):
     try:
@@ -56,7 +62,9 @@ async def konachan_view(message: Message, command: Command.CommandObj):
 
 
 @dp.message_handler(
-    Command(["konachan_download"]), args="POST_ID", description="Download Konachan post"
+    Command(["konachan_download"]),
+    args="POST_ID",
+    description="Download Konachan post",
 )
 async def konachan_download(message: Message, command: Command.CommandObj):
     try:

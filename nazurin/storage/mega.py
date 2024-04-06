@@ -46,7 +46,7 @@ class Mega:
                     "sid": Mega.api.sid,
                     "master_key": list(Mega.api.master_key),
                     "root_id": Mega.api.root_id,
-                }
+                },
             )
         logger.info("MEGA tokens cached")
 

@@ -42,7 +42,7 @@ class Image(File):
             and self.width / self.height > TG_IMG_WIDTH_HEIGHT_RATIO_LIMIT
         ):
             raise NazurinError(
-                "Width and height ratio of image exceeds 20, try download option."
+                "Width and height ratio of image exceeds 20, try download option.",
             )
         self._chosen_url = self.url
         if self.thumbnail:
@@ -81,7 +81,8 @@ class Image(File):
                 if "Content-Length" in headers:
                     self._size = int(headers["Content-Length"])
                     logger.info(
-                        "Got image size: {}", naturalsize(self._size, binary=True)
+                        "Got image size: {}",
+                        naturalsize(self._size, binary=True),
                     )
                 else:
                     logger.info("Failed to get image size")
@@ -121,5 +122,5 @@ class Image(File):
                 # Keep the last one for debugging
                 os.remove(self.path)
         raise NazurinError(
-            "Download failed with invalid image, please check logs for details"
+            "Download failed with invalid image, please check logs for details",
         )

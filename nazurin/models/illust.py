@@ -30,7 +30,10 @@ class Illust:
         return len(self.images) > 1
 
     async def download(
-        self, *, request_class: NazurinRequestSession = Request, **kwargs
+        self,
+        *,
+        request_class: NazurinRequestSession = Request,
+        **kwargs,
     ):
         async with request_class(**kwargs) as session:
             files = filter(lambda file: file.url, self.all_files)

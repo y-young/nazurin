@@ -51,7 +51,7 @@ class Artstation:
                     thumbnail,
                     width=asset["width"],
                     height=asset["height"],
-                )
+                ),
             )
             index += 1
         return imgs
@@ -89,7 +89,7 @@ class Artstation:
                 "author": f"{user['full_name']} #{user['username']}",
                 "url": f"https://www.artstation.com/artwork/{post['hash_id']}",
                 "tags": tag_string,
-            }
+            },
         )
 
     @staticmethod

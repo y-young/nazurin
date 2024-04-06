@@ -18,7 +18,7 @@ class BaseAPI:
                 + f"/status/{tweet['id_str']}",
                 "author": f"{tweet['user']['name']} #{tweet['user']['screen_name']}",
                 "text": tweet["text"],
-            }
+            },
         )
 
     @staticmethod

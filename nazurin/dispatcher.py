@@ -99,7 +99,8 @@ class NazurinDispatcher(Dispatcher):
         if config.ENV == "production":
             logger.info("Set webhook")
             self.executor.set_webhook(
-                webhook_path="/" + config.TOKEN, web_app=self.server
+                webhook_path="/" + config.TOKEN,
+                web_app=self.server,
             )
             # Tell aiohttp to use main thread event loop instead of creating a new one
             # otherwise bot commands will run in a different loop

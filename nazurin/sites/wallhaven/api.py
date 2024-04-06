@@ -25,7 +25,7 @@ class Wallhaven:
                 if response.status == HTTPStatus.UNAUTHORIZED:
                     raise NazurinError(
                         "You need to log in to view this wallpaper. "
-                        + "Please ensure that you have set a valid API key."
+                        + "Please ensure that you have set a valid API key.",
                     )
                 response.raise_for_status()
                 wallpaper = await response.json()
@@ -54,7 +54,7 @@ class Wallhaven:
                 wallpaper["file_size"],
                 wallpaper["dimension_x"],
                 wallpaper["dimension_y"],
-            )
+            ),
         ]
 
     @staticmethod
@@ -76,5 +76,5 @@ class Wallhaven:
         for tag in wallpaper["tags"]:
             tags += "#" + tag["name"].strip().replace(" ", "_") + " "
         return Caption(
-            {"url": wallpaper["url"], "source": wallpaper["source"], "tags": tags}
+            {"url": wallpaper["url"], "source": wallpaper["source"], "tags": tags},
         )

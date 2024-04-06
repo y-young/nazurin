@@ -45,7 +45,8 @@ class Mongo(DatabaseDriver):
 
     async def update(self, data: dict) -> bool:
         result = await self._collection.update_one(
-            {"_id": self._document}, {"$set": data}
+            {"_id": self._document},
+            {"$set": data},
         )
         return result.modified_count == 1
 

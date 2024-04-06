@@ -17,7 +17,10 @@ class Cloudant(DatabaseDriver):
     def __init__(self):
         """Connect to database."""
         self.client = CloudantBase.iam(
-            USERNAME, APIKEY, timeout=5, adapter=HTTPAdapter(max_retries=RETRIES)
+            USERNAME,
+            APIKEY,
+            timeout=5,
+            adapter=HTTPAdapter(max_retries=RETRIES),
         )
         self.client.connect()
         self.db = self.client[DATABASE]

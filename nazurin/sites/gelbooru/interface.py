@@ -8,7 +8,7 @@ from .config import COLLECTION
 
 patterns = [
     # https://gelbooru.com/index.php?page=post&s=view&id=123456
-    r"gelbooru\.com/index\.php\?page=post&s=view&id=(\d+)"
+    r"gelbooru\.com/index\.php\?page=post&s=view&id=(\d+)",
 ]
 
 

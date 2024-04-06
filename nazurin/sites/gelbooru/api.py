@@ -45,7 +45,7 @@ class Gelbooru:
                 self.get_thumbnail(post),
                 width=post["width"],
                 height=post["height"],
-            )
+            ),
         )
         return imgs
 
@@ -80,7 +80,7 @@ class Gelbooru:
                 "url": "https://gelbooru.com/index.php"
                 f"?page=post&s=view&id={post['id']}",
                 "tags": tag_string,
-            }
+            },
         )
 
     @staticmethod

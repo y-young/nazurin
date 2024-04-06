@@ -27,7 +27,9 @@ class Danbooru:
         self.post_list = async_wrap(self.api.post_list)
 
     async def get_post(
-        self, post_id: Optional[int] = None, md5: Optional[str] = None
+        self,
+        post_id: Optional[int] = None,
+        md5: Optional[str] = None,
     ) -> dict:
         """Fetch a post."""
         try:
@@ -42,12 +44,14 @@ class Danbooru:
         if "file_url" not in post:
             raise NazurinError(
                 "You may need a gold account to view this post\nSource: "
-                + post["source"]
+                + post["source"],
             )
         return post
 
     async def view(
-        self, post_id: Optional[int] = None, md5: Optional[str] = None
+        self,
+        post_id: Optional[int] = None,
+        md5: Optional[str] = None,
     ) -> DanbooruIllust:
         post = await self.get_post(post_id, md5)
         illust = self.parse_post(post)
@@ -72,7 +76,7 @@ class Danbooru:
                     post["file_size"],
                     post["image_width"],
                     post["image_height"],
-                )
+                ),
             )
         else:  # danbooru has non-image posts, such as #animated
             files.append(File(filename, url, destination))
@@ -91,7 +95,7 @@ class Danbooru:
                 "parent_id": post["parent_id"],
                 "pixiv_id": post["pixiv_id"],
                 "has_children": post["has_children"],
-            }
+            },
         )
         return DanbooruIllust(int(post["id"]), imgs, caption, post, files)
 

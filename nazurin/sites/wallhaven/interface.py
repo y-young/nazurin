@@ -9,7 +9,7 @@ from .config import COLLECTION
 patterns = [
     # http://whvn.cc/94x38z
     # https://wallhaven.cc/w/94x38z
-    r"(?:wallhaven|whvn)\.cc\/(?:w\/)?([\w]+)"
+    r"(?:wallhaven|whvn)\.cc\/(?:w\/)?([\w]+)",
 ]
 
 

@@ -23,7 +23,9 @@ async def twitter_view(message: Message, command: Command.CommandObj):
 
 
 @dp.message_handler(
-    Command(["twitter_download"]), args="STATUS_ID", description="Download tweet"
+    Command(["twitter_download"]),
+    args="STATUS_ID",
+    description="Download tweet",
 )
 async def twitter_download(message: Message, command: Command.CommandObj):
     try:

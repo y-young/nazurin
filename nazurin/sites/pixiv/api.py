@@ -139,7 +139,9 @@ class Pixiv:
         return Ugoira(illust.id, video, caption, illust, files)
 
     async def bookmark(
-        self, artwork_id: int, privacy: PixivPrivacy = PixivPrivacy.PUBLIC
+        self,
+        artwork_id: int,
+        privacy: PixivPrivacy = PixivPrivacy.PUBLIC,
     ):
         response = await self.call(Pixiv.illust_bookmark_add, artwork_id, privacy.value)
         if "error" in response:
@@ -160,7 +162,7 @@ class Pixiv:
                 "access_token": Pixiv.api.access_token,
                 "refresh_token": Pixiv.api.refresh_token,
                 "updated_time": Pixiv.updated_time,
-            }
+            },
         )
         logger.info("Pixiv tokens updated")
 
@@ -206,7 +208,9 @@ class Pixiv:
             logger.info("Calling FFmpeg with command: {}", cmd)
             try:
                 output = subprocess.check_output(
-                    args, stderr=subprocess.STDOUT, shell=False
+                    args,
+                    stderr=subprocess.STDOUT,
+                    shell=False,
                 )
             except subprocess.CalledProcessError as error:
                 logger.error(
@@ -261,7 +265,7 @@ class Pixiv:
                         thumbnail=self.get_thumbnail(url),
                         width=width,
                         height=height,
-                    )
+                    ),
                 )
                 # For multi-page illusts,
                 # width & height will be the size of the first page,
@@ -285,7 +289,7 @@ class Pixiv:
                     thumbnail=self.get_thumbnail(url),
                     width=width,
                     height=height,
-                )
+                ),
             )
         return imgs
 
@@ -307,7 +311,7 @@ class Pixiv:
                 "total_bookmarks": illust.total_bookmarks,
                 "url": "pixiv.net/i/" + str(illust.id),
                 "bookmarked": illust.is_bookmarked,
-            }
+            },
         )
         return caption
 
@@ -357,12 +361,13 @@ class Pixiv:
                 if retry:
                     random_ua = f"PixivAndroidApp/6.{random.randrange(0, 60)}.0"
                     logger.info(
-                        "Blocked by CloudFlare, retry with random UA: {}", random_ua
+                        "Blocked by CloudFlare, retry with random UA: {}",
+                        random_ua,
                     )
                     Pixiv.api.additional_headers = {"User-Agent": random_ua}
                     return await self.auth(retry=False)
                 logger.error(error)
                 raise NazurinError(
-                    "Blocked by CloudFlare security check, please try again later."
+                    "Blocked by CloudFlare security check, please try again later.",
                 ) from None
             raise error

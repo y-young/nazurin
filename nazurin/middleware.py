@@ -23,5 +23,7 @@ class AuthMiddleware(BaseMiddleware):
 class LoggingMiddleware(BaseMiddleware):
     async def on_process_message(self, message: Message, _data: dict):
         logger.info(
-            "Message {}: {}", message.message_id, message.text or message.caption
+            "Message {}: {}",
+            message.message_id,
+            message.text or message.caption,
         )

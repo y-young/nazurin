@@ -6,6 +6,7 @@ COLLECTION = "kemono"
 with env.prefixed("KEMONO_"):
     with env.prefixed("FILE_"):
         DESTINATION: str = env.str(
-            "PATH", default="Kemono/{service}/{username} ({user})/{title} ({id})"
+            "PATH",
+            default="Kemono/{service}/{username} ({user})/{title} ({id})",
         )
         FILENAME: str = env.str("NAME", default="{pretty_name}")

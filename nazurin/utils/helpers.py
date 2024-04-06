@@ -40,14 +40,14 @@ async def handle_bad_request(message: Message, error: BadRequest):
             "Failed to send image as photo, maybe the size is too big, "
             "consider using download option or try again.\n"
             f"Message: {message.text}\n"
-            f"Error: {error}"
+            f"Error: {error}",
         )
     elif "Group send failed" in str(error):
         await message.reply(
             "Failed to send images because one of them is too large, "
             "consider using download option or try again.\n"
             f"Message: {message.text}\n"
-            f"Error: {error}"
+            f"Error: {error}",
         )
     else:
         raise error
@@ -78,7 +78,8 @@ def sanitize_filename(name: str) -> str:
 
 
 def sanitize_path(
-    path: os.PathLike, sanitize: Callable[[str], str] = sanitize_path_segment
+    path: os.PathLike,
+    sanitize: Callable[[str], str] = sanitize_path_segment,
 ) -> pathlib.PurePath:
     """
     Remove invalid characters from a path.

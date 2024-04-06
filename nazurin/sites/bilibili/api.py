@@ -30,7 +30,7 @@ class Bilibili:
                 if code != 0:
                     raise NazurinError(
                         f"Failed to get dynamic: code = {code}, "
-                        f"message = {data['message']}"
+                        f"message = {data['message']}",
                     )
         item = data["data"]["item"]
         return self.cleanup_item(item)
@@ -70,7 +70,7 @@ class Bilibili:
                     size,
                     pic["width"],
                     pic["height"],
-                )
+                ),
             )
         return imgs
 
@@ -108,7 +108,7 @@ class Bilibili:
             {
                 "author": "#" + modules["module_author"]["name"],
                 "content": modules["module_dynamic"]["desc"]["text"],
-            }
+            },
         )
 
     @staticmethod

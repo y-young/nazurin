@@ -39,14 +39,14 @@ async def show_help(message: Message, command: Command.CommandObj):
             小さな小さな賢将, can help you collect images from various sites.
 
             <b>Commands:</b>
-            """
+            """,
         )
         + dp.commands.help_text()
         + dedent(
             """
 
             PS: Send a URL of supported sites to collect image(s)
-            """
+            """,
         ),
     )
 

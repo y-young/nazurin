@@ -8,5 +8,6 @@ with env.prefixed("DEVIANT_ART_"):
         DESTINATION: str = env.str("PATH", default="DeviantArt")
         FILENAME: str = env.str("NAME", default="{title} - {deviationId}")
         DOWNLOAD_FILENAME: str = env.str(
-            "DOWNLOAD_NAME", default="{title} - {deviationId} - {prettyName}"
+            "DOWNLOAD_NAME",
+            default="{title} - {deviationId} - {prettyName}",
         )

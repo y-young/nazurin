@@ -10,7 +10,9 @@ api = Zerochan()
 
 
 @dp.message_handler(
-    Command(["zerochan"]), args="POST_ID", description="View Zerochan post"
+    Command(["zerochan"]),
+    args="POST_ID",
+    description="View Zerochan post",
 )
 async def zerochan_view(message: Message, command: Command.CommandObj):
     try:
@@ -25,7 +27,9 @@ async def zerochan_view(message: Message, command: Command.CommandObj):
 
 
 @dp.message_handler(
-    Command(["zerochan_download"]), args="POST_ID", description="Download Zerochan post"
+    Command(["zerochan_download"]),
+    args="POST_ID",
+    description="Download Zerochan post",
 )
 async def zerochan_download(message: Message, command: Command.CommandObj):
     try:

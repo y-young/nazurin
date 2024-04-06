@@ -81,7 +81,8 @@ def retry_after(func):
                 return result
             except RetryAfter as error:
                 logger.opt(depth=1).warning(
-                    "Hit flood limit, retry after {} seconds", error.timeout + 1
+                    "Hit flood limit, retry after {} seconds",
+                    error.timeout + 1,
                 )
                 await asyncio.sleep(error.timeout + 1)
 

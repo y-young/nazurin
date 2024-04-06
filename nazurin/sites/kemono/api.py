@@ -33,7 +33,11 @@ class Kemono:
 
     @network_retry
     async def get_post_revision(
-        self, service: str, user_id: str, post_id: str, revision_id: str
+        self,
+        service: str,
+        user_id: str,
+        post_id: str,
+        revision_id: str,
     ) -> dict:
         """Fetch a post revision."""
         api = f"{self.API_BASE}/{service}/user/{user_id}/post/{post_id}/revisions"
@@ -67,7 +71,11 @@ class Kemono:
                 return username
 
     async def fetch(
-        self, service: str, user_id: str, post_id: str, revision_id: Union[str, None]
+        self,
+        service: str,
+        user_id: str,
+        post_id: str,
+        revision_id: Union[str, None],
     ) -> Illust:
         if revision_id:
             post = await self.get_post_revision(service, user_id, post_id, revision_id)
@@ -98,7 +106,9 @@ class Kemono:
 
             # Handle images
             destination, filename = self.get_storage_dest(
-                post, f"{image_index} - {file['name']}", path
+                post,
+                f"{image_index} - {file['name']}",
+                path,
             )
             thumbnail = "https://img.kemono.su/thumbnail/data" + path
             images.append(
@@ -107,7 +117,7 @@ class Kemono:
                     url,
                     destination,
                     thumbnail,
-                )
+                ),
             )
             image_index += 1
 
@@ -160,7 +170,7 @@ class Kemono:
                 "title": post["title"],
                 "author": "#" + post["username"],
                 "url": Kemono.get_url(post),
-            }
+            },
         )
 
     @staticmethod

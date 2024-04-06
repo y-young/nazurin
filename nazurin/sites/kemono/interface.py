@@ -15,7 +15,7 @@ patterns = [
     # https://kemono.party/gumroad/user/12345/post/aBc1d2
     # https://kemono.su/subscribestar/user/abcdef/post/12345
     # https://kemono.su/fanbox/user/12345/post/12345/revision/12345
-    r"kemono\.(?:party|su)/(\w+)/user/([\w-]+)/post/([\w-]+)(?:/revision/(\d+))?"
+    r"kemono\.(?:party|su)/(\w+)/user/([\w-]+)/post/([\w-]+)(?:/revision/(\d+))?",
 ]
 
 

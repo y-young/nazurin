@@ -17,7 +17,8 @@ from nazurin.utils.helpers import run_in_pool
 
 GD_FOLDER = env.str("GD_FOLDER")
 GD_CREDENTIALS = env.str(
-    "GD_CREDENTIALS", default=env.str("GOOGLE_APPLICATION_CREDENTIALS")
+    "GD_CREDENTIALS",
+    default=env.str("GOOGLE_APPLICATION_CREDENTIALS"),
 )
 FOLDER_MIME = "application/vnd.google-apps.folder"
 
@@ -27,7 +28,7 @@ class GoogleDrive:
 
     drive = GDrive()
     create_file: Callable[[dict], Awaitable[GoogleDriveFile]] = async_wrap(
-        drive.CreateFile
+        drive.CreateFile,
     )
 
     def __init__(self):
@@ -43,11 +44,13 @@ class GoogleDrive:
             if GD_CREDENTIALS.startswith("{"):
                 credentials = json.loads(GD_CREDENTIALS)
                 gauth.credentials = ServiceAccountCredentials.from_json_keyfile_dict(
-                    credentials, scope
+                    credentials,
+                    scope,
                 )
             else:
                 gauth.credentials = ServiceAccountCredentials.from_json_keyfile_name(
-                    GD_CREDENTIALS, scope
+                    GD_CREDENTIALS,
+                    scope,
                 )
         else:
             raise NazurinError("Credentials not found for Google Drive storage.")

@@ -102,7 +102,7 @@ class Moebooru:
                 post["file_size"],
                 post["width"],
                 post["height"],
-            )
+            ),
         ]
         return imgs
 
@@ -148,7 +148,7 @@ class Moebooru:
                 "source": source,
                 "parent_id": post["parent_id"],
                 "has_children": post["has_children"],
-            }
+            },
         )
         return caption
 

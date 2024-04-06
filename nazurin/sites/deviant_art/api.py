@@ -34,7 +34,8 @@ class DeviantArt:
             "csrf_token": self.csrf_token,
         }
         async with Request(
-            cookies=DeviantArt.cookies, headers={"Referer": BASE_URL}
+            cookies=DeviantArt.cookies,
+            headers={"Referer": BASE_URL},
         ) as request:
             async with request.get(api, params=params) as response:
                 if response.status == HTTPStatus.NOT_FOUND:
@@ -78,13 +79,16 @@ class DeviantArt:
                 original_file["filesize"],
                 original_file["width"],
                 original_file["height"],
-            )
+            ),
         ]
         return imgs
 
     @staticmethod
     def get_storage_dest(
-        deviation: dict, filename: str, *, is_download: bool = False
+        deviation: dict,
+        filename: str,
+        *,
+        is_download: bool = False,
     ) -> Tuple[str, str]:
         """
         Format destination and filename.
@@ -138,7 +142,9 @@ class DeviantArt:
         # Duplicate attribute on top level for convenience
         deviation["prettyName"] = deviation["media"]["prettyName"]
         destination, filename = self.get_storage_dest(
-            deviation, filename, is_download=True
+            deviation,
+            filename,
+            is_download=True,
         )
         return File(filename, f"{url.geturl()}?token={token}", destination)
 
@@ -149,11 +155,11 @@ class DeviantArt:
                 "title": deviation["title"],
                 "author": f"#{deviation['author']['username']}",
                 "url": deviation["url"],
-            }
+            },
         )
         if "tags" in deviation["extended"]:
             caption["tags"] = " ".join(
-                ["#" + tag["name"] for tag in deviation["extended"]["tags"]]
+                ["#" + tag["name"] for tag in deviation["extended"]["tags"]],
             )
         return caption
 
@@ -186,7 +192,8 @@ class DeviantArt:
             else:
                 thumbnail = types["preview"]
             thumbnail = base_uri + thumbnail["c"].replace(
-                "<prettyName>", media["prettyName"]
+                "<prettyName>",
+                media["prettyName"],
             )
             thumbnail = f"{thumbnail}?token={token}"
         elif base_uri.endswith(".gif"):  # TODO: Send GIFs properly
