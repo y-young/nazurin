@@ -13,10 +13,11 @@ extend-select = [
   "INP", # flake8-no-pep420
   "ISC", # flake8-implicit-str-concat
   "N", # pep8-naming
+  "PERF", # perflint
   "PL", # pylint
   "RSE102", # unnecessary-paren-on-raise-exception
   "SIM", # flake8-simplify
   "T20", # flake8-print
   "UP", # pyupgrade
 ]
-ignore = ["UP007"]
+ignore = ["UP007", "PERF203"]

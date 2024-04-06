@@ -59,7 +59,7 @@ def scan():
         flag = False
         source = None
 
-        for _, pattern in patterns.items():
+        for pattern in patterns.values():
             match = re.search(pattern, filename, re.IGNORECASE)
             if match:
                 flag = True

@@ -222,8 +222,6 @@ def check_image(path: Union[str, os.PathLike]) -> bool:
 
 async def run_in_pool(tasks: Iterable[Coroutine], pool_size: int):
     scheduler = await aiojobs.create_scheduler(limit=pool_size)
-    jobs: List[aiojobs.Job] = []
-    for task in tasks:
-        jobs.append(await scheduler.spawn(task))
+    jobs: List[aiojobs.Job] = [await scheduler.spawn(task) for task in tasks]
     await asyncio.gather(*[job.wait() for job in jobs])
     await scheduler.close()

@@ -51,9 +51,8 @@ class NazurinBot(Bot):
         reply_to: Optional[int] = None,
     ):
         await self.send_chat_action(chat_id, ChatActions.UPLOAD_PHOTO)
-        media = []
-        for img in imgs:
-            media.append(InputMediaPhoto(await img.display_url()))  # TODO
+        # TODO: Fetch display URL in batch
+        media = [InputMediaPhoto(await img.display_url()) for img in imgs]
         media[0].caption = caption
         await self.send_media_group(chat_id, media, reply_to_message_id=reply_to)
 

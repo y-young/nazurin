@@ -21,8 +21,6 @@ class Storage:
         logger.info("Loaded {} storage(s), using: {}", len(self.disks), STORAGE)
 
     async def store(self, illust: Illust):
-        tasks = []
-        for disk in self.disks:
-            tasks.append(disk.store(illust.all_files))
+        tasks = [disk.store(illust.all_files) for disk in self.disks]
         await asyncio.gather(*tasks)
         logger.info("Storage completed")
