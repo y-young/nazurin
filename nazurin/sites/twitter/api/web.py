@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import json
 import secrets
 from datetime import datetime, timezone
 from http import HTTPStatus
 from http.cookies import SimpleCookie
-from typing import ClassVar, List
+from typing import ClassVar
 
 from nazurin.models import Illust, Image
 from nazurin.utils.decorators import Cache, network_retry
@@ -121,7 +123,7 @@ class WebAPI(BaseAPI):
         if "extended_entities" not in tweet:
             raise NazurinError("No photo found.")
         media = tweet["extended_entities"]["media"]
-        imgs: List[Image] = []
+        imgs: list[Image] = []
         for medium in media:
             if medium["type"] == "photo":
                 index = len(imgs)
