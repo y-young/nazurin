@@ -17,7 +17,7 @@ class AuthMiddleware(BaseMiddleware):
             or message.from_user.username in config.ALLOW_USERNAME
         ):
             return
-        raise CancelHandler()
+        raise CancelHandler
 
 
 class LoggingMiddleware(BaseMiddleware):

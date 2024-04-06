@@ -14,6 +14,8 @@ extend-select = [
   "ISC", # flake8-implicit-str-concat
   "N", # pep8-naming
   "PL", # pylint
+  "RSE102", # unnecessary-paren-on-raise-exception
+  "T20", # flake8-print
   "UP", # pyupgrade
 ]
 ignore = ["UP007"]
