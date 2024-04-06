@@ -72,7 +72,7 @@ class Wallhaven:
 
     @staticmethod
     def build_caption(wallpaper) -> Caption:
-        tags = str()
+        tags = ""
         for tag in wallpaper["tags"]:
             tags += "#" + tag["name"].strip().replace(" ", "_") + " "
         return Caption(

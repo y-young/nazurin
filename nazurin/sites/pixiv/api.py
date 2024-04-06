@@ -292,7 +292,7 @@ class Pixiv:
     @staticmethod
     def build_caption(illust) -> Caption:
         """Build media caption from an artwork."""
-        tags = str()
+        tags = ""
         for tag in illust.tags:
             if TRANSLATION and tag.translated_name:
                 tag_name = tag.translated_name

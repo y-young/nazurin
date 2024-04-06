@@ -97,7 +97,7 @@ class Zerochan:
     @staticmethod
     def build_caption(post) -> Caption:
         """Build media caption from an post."""
-        tag_string = artists = source = str()
+        tag_string = artists = source = ""
         for tag, tag_type in post["tags"].items():
             if tag_type == "Mangaka":
                 artists += tag + " "

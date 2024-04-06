@@ -133,7 +133,7 @@ class Moebooru:
         """Build media caption from an post."""
         title = post["tags"]
         source = post["source"]
-        tag_string = artists = str()
+        tag_string = artists = ""
         for tag, tag_type in tags.items():
             if tag_type == "artist":
                 artists += tag + " "

@@ -70,7 +70,7 @@ class Gelbooru:
     @staticmethod
     def build_caption(post) -> Caption:
         tags = post["tags"].split(" ")
-        tag_string = str()
+        tag_string = ""
         for tag in tags:
             tag_string += "#" + tag + " "
         return Caption(

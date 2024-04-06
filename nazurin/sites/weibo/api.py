@@ -80,7 +80,7 @@ class Weibo:
     def build_caption(self, post) -> Caption:
         user = post["user"]
         tags = self.get_tags(post)
-        tag_string = str()
+        tag_string = ""
         for tag in tags:
             tag_string += "#" + tag + " "
         return Caption(

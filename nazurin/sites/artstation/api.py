@@ -80,7 +80,7 @@ class Artstation:
     def build_caption(post) -> Caption:
         user = post["user"]
         tags = post["tags"]
-        tag_string = str()
+        tag_string = ""
         for tag in tags:
             tag_string += "#" + tag + " "
         return Caption(

@@ -79,7 +79,7 @@ class Danbooru:
 
         # Build media caption
         tags = post["tag_string"].split(" ")
-        tag_string = str()
+        tag_string = ""
         for character in tags:
             tag_string += "#" + character + " "
         caption = Caption(
@@ -128,7 +128,7 @@ class Danbooru:
         copyrights = Danbooru._format_copyrights(post["tag_string_copyright"])
         artists = Danbooru._format_artists(post["tag_string_artist"])
         extension = path.splitext(post["file_url"])[1]
-        filename = str()
+        filename = ""
 
         if characters:
             filename += characters + " "
