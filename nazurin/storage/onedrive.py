@@ -141,7 +141,7 @@ class OneDrive:
             await self.auth(initialize=True)
 
     @network_retry
-    async def auth(self, initialize=False):
+    async def auth(self, *, initialize=False):
         # https://docs.microsoft.com/zh-cn/azure/active-directory/develop/v2-oauth2-auth-code-flow
         url = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
         data = {
@@ -209,7 +209,7 @@ class OneDrive:
         headers = self.with_credentials()
         range_start = 0
         total_size = await file.size()
-        total_size_str = naturalsize(total_size, True)
+        total_size_str = naturalsize(total_size, binary=True)
         logger.info(
             "[File {}] Start upload, total size: {}...", file.name, total_size_str
         )
@@ -227,7 +227,7 @@ class OneDrive:
                 logger.info(
                     "[File {}] Uploaded {} / {}",
                     file.name,
-                    naturalsize(range_start, True),
+                    naturalsize(range_start, binary=True),
                     total_size_str,
                 )
         logger.info("[File {}] Upload completed", file.name)

@@ -61,7 +61,7 @@ class Moebooru:
         caption = self.build_caption(post, tags)
         return Illust(post_id, imgs, caption, post)
 
-    def pool(self, pool_id: int, jpeg=False):
+    def pool(self, pool_id: int, *, jpeg=False):
         client = MoebooruBase(self.site)
         info = client.pool_posts(id=pool_id)
         posts = info["posts"]
@@ -77,8 +77,8 @@ class Moebooru:
         caption = Caption({"name": info["name"], "description": info["description"]})
         return imgs, caption
 
-    async def download_pool(self, pool_id, jpeg=False):
-        imgs, caption = self.pool(pool_id, jpeg)
+    async def download_pool(self, pool_id, *, jpeg=False):
+        imgs, caption = self.pool(pool_id, jpeg=jpeg)
         pool_name = caption["name"]
         await ensure_existence_async(os.path.join(TEMP_DIR, pool_name))
         for key, img in enumerate(imgs):

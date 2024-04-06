@@ -29,7 +29,7 @@ class Mega:
     create_folder = async_wrap(api.create_folder)
 
     @network_retry
-    async def login(self, initialize=False):
+    async def login(self, *, initialize=False):
         await Mega.api_login(MEGA_USER, MEGA_PASS)
         if initialize:
             await Mega.collection.insert(
@@ -62,7 +62,7 @@ class Mega:
                 await self.login(initialize=True)
 
     @network_retry
-    async def upload(self, file: File, folders: dict = None, retry: bool = False):
+    async def upload(self, file: File, folders: dict = None, *, retry: bool = False):
         path = file.destination.as_posix()
         try:
             destination = (

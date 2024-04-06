@@ -22,7 +22,7 @@ class Telegram:
                 logger.warning(
                     "File {} exceeds size limit ({}) and won't be save to Telegram",
                     file.name,
-                    naturalsize(size, True),
+                    naturalsize(size, binary=True),
                 )
                 continue
             tasks.append(bot.send_doc(file, chat_id=ALBUM_ID))

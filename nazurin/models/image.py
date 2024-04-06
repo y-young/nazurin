@@ -80,7 +80,9 @@ class Image(File):
                 headers = response.headers
                 if "Content-Length" in headers:
                     self._size = int(headers["Content-Length"])
-                    logger.info("Got image size: {}", naturalsize(self._size, True))
+                    logger.info(
+                        "Got image size: {}", naturalsize(self._size, binary=True)
+                    )
                 else:
                     logger.info("Failed to get image size")
                 return self._size

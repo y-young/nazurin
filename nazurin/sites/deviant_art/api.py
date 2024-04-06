@@ -24,9 +24,9 @@ class DeviantArt:
     cookies: SimpleCookie = None
 
     @network_retry
-    async def get_deviation(self, deviation_id: int, retry: bool = False) -> dict:
+    async def get_deviation(self, deviation_id: int, *, retry: bool = False) -> dict:
         """Fetch a deviation."""
-        await self.require_csrf_token(retry)
+        await self.require_csrf_token(refresh=retry)
         api = f"{BASE_URL}/_napi/da-user-profile/shared_api/deviation/extended_fetch"
         params = {
             "type": "art",
@@ -50,7 +50,7 @@ class DeviantArt:
                         and not retry
                     ):
                         logger.info("CSRF token seems expired, refreshing...")
-                        return await self.get_deviation(deviation_id, True)
+                        return await self.get_deviation(deviation_id, retry=True)
                     raise NazurinError(data["errorDescription"])
 
                 deviation = data["deviation"]
@@ -84,7 +84,7 @@ class DeviantArt:
 
     @staticmethod
     def get_storage_dest(
-        deviation: dict, filename: str, is_download: bool = False
+        deviation: dict, filename: str, *, is_download: bool = False
     ) -> Tuple[str, str]:
         """
         Format destination and filename.
@@ -137,7 +137,9 @@ class DeviantArt:
 
         # Duplicate attribute on top level for convenience
         deviation["prettyName"] = deviation["media"]["prettyName"]
-        destination, filename = self.get_storage_dest(deviation, filename, True)
+        destination, filename = self.get_storage_dest(
+            deviation, filename, is_download=True
+        )
         return File(filename, f"{url.geturl()}?token={token}", destination)
 
     @staticmethod
@@ -208,7 +210,7 @@ class DeviantArt:
         return f"{header}.{payload}."
 
     @network_retry
-    async def require_csrf_token(self, refresh: bool = False) -> None:
+    async def require_csrf_token(self, *, refresh: bool = False) -> None:
         if self.csrf_token and not refresh:
             return
         logger.info("Fetching CSRF token...")

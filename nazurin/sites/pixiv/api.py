@@ -342,7 +342,7 @@ class Pixiv:
         thumbnail = pre + "_master1200.jpg"
         return thumbnail
 
-    async def auth(self, retry=True):
+    async def auth(self, *, retry=True):
         try:
             await Pixiv.api_auth()
             if not retry:

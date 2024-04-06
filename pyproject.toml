@@ -3,6 +3,7 @@ target-version = "py38"
 
 [tool.ruff.lint]
 extend-select = [
+  "FBT", # flake8-boolean-trap
   "I", # isort
   "N", # pep8-naming
   "PL", # pylint
