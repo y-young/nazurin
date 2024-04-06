@@ -1,4 +1,3 @@
-# pylint: disable=import-error, wrong-import-position, global-statement
 """
 Helper script to scan artworks from local directory and write metadata to database.
 Run this script in the root directory of the project.
@@ -18,7 +17,8 @@ from nazurin.sites import SiteManager
 from nazurin.sites.moebooru.config import COLLECTIONS as MOEBOORU_COLLECTIONS
 
 logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
 )
 logger = logging.getLogger("helper")
 sites = SiteManager()
@@ -51,7 +51,7 @@ def scan():
         "danbooru_new": r"^danbooru (\d+)",
         "zerochan": r"^Zerochan (\d+)",
     }
-    global file_cnt
+    global file_cnt  # noqa: PLW0603
     files = glob.glob(directory + "*")
     for path in files:
         file_cnt = file_cnt + 1
@@ -59,7 +59,7 @@ def scan():
         flag = False
         source = None
 
-        for source, pattern in patterns.items():
+        for _, pattern in patterns.items():
             match = re.search(pattern, filename, re.IGNORECASE)
             if match:
                 flag = True
@@ -130,12 +130,12 @@ def print_result():
 
 
 def main():
-    global artworks, success, directory
+    global artworks, success, directory  # noqa: PLW0603
     for source in SITES:
         processed[source] = []
     directory = input("Directory path (ends with slash): ")
-    print("Skip sites(enter site name in SITES, separated with comma):")
-    print("SITES=" + str(SITES))
+    logger.info("Skip sites(enter site name in SITES, separated with comma):")
+    logger.info("SITES=%s", SITES)
     skipped = input()
     skipped = skipped.split(",")
     db = Database().driver()
@@ -143,7 +143,7 @@ def main():
     for filename, source, match in scan():
         origin_id, site = parse_source(source, match)
         if source == "danbooru_new":
-            source = site = "danbooru"
+            source = site = "danbooru"  # noqa: PLW2901
         if site in skipped:
             continue
 
@@ -157,7 +157,6 @@ def main():
 
         try:
             data = process(filename, source, match, origin_id)
-        # pylint: disable=broad-except
         except Exception as err:
             logger.error("❌ %s: (id: %s) %s", filename, origin_id, err)
             error.append((filename, origin_id, err))
