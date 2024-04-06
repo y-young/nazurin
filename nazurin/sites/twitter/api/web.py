@@ -214,44 +214,44 @@ class WebAPI(BaseAPI):
             headers = {}
         headers.update(WebAPI.headers)
 
-        async with Request(headers=headers, cookies=WebAPI.cookies) as request:
-            async with request.request(method, url, **kwargs) as response:
-                if not response.ok:
-                    result = await response.text()
-                    logger.error("Web API Error: {}, {}", response.status, result)
-                    if response.status == HTTPStatus.UNAUTHORIZED:
-                        raise NazurinError(
-                            f"Failed to authenticate Twitter web API: {result}, "
-                            "try updating auth token.",
+        async with Request(
+            headers=headers,
+            cookies=WebAPI.cookies,
+        ) as request, request.request(method, url, **kwargs) as response:
+            if not response.ok:
+                result = await response.text()
+                logger.error("Web API Error: {}, {}", response.status, result)
+                if response.status == HTTPStatus.UNAUTHORIZED:
+                    raise NazurinError(
+                        f"Failed to authenticate Twitter web API: {result}, "
+                        "try updating auth token.",
+                    )
+                if response.status == HTTPStatus.TOO_MANY_REQUESTS:
+                    headers = response.headers
+                    detail = ""
+                    if (
+                        Headers.RATE_LIMIT_LIMIT in headers
+                        and Headers.RATE_LIMIT_RESET in headers
+                    ):
+                        rate_limit = int(headers[Headers.RATE_LIMIT_LIMIT])
+                        reset_time = int(headers[Headers.RATE_LIMIT_RESET])
+                        logger.error(
+                            "Rate limited, limit: {}, reset: {}",
+                            rate_limit,
+                            reset_time,
                         )
-                    if response.status == HTTPStatus.TOO_MANY_REQUESTS:
-                        headers = response.headers
-                        detail = ""
-                        if (
-                            Headers.RATE_LIMIT_LIMIT in headers
-                            and Headers.RATE_LIMIT_RESET in headers
-                        ):
-                            rate_limit = int(headers[Headers.RATE_LIMIT_LIMIT])
-                            reset_time = int(headers[Headers.RATE_LIMIT_RESET])
-                            logger.error(
-                                "Rate limited, limit: {}, reset: {}",
-                                rate_limit,
-                                reset_time,
-                            )
-                            reset_time = datetime.fromtimestamp(
-                                reset_time,
-                                tz=timezone.utc,
-                            )
-                            detail = (
-                                f"Rate limit: {rate_limit}, Reset time: {reset_time}"
-                            )
-                        raise NazurinError(
-                            "Hit API rate limit, please try again later. " + detail,
+                        reset_time = datetime.fromtimestamp(
+                            reset_time,
+                            tz=timezone.utc,
                         )
-                    raise NazurinError(f"Twitter web API error: {result}")
-                result = await response.json()
-                self._update_cookies(response.cookies)
-                return result
+                        detail = f"Rate limit: {rate_limit}, Reset time: {reset_time}"
+                    raise NazurinError(
+                        "Hit API rate limit, please try again later. " + detail,
+                    )
+                raise NazurinError(f"Twitter web API error: {result}")
+            result = await response.json()
+            self._update_cookies(response.cookies)
+            return result
 
     def _update_cookies(self, cookies: SimpleCookie):
         WebAPI.cookies.update(cookies)

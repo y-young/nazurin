@@ -29,13 +29,12 @@ class Moebooru:
     @network_retry
     async def get_post(self, post_id: int):
         url = "https://" + self.url + "/post/show/" + str(post_id)
-        async with Request() as request:
-            async with request.get(url) as response:
-                try:
-                    response.raise_for_status()
-                except ClientResponseError as err:
-                    raise NazurinError(err) from None
-                response_text = await response.text()
+        async with Request() as request, request.get(url) as response:
+            try:
+                response.raise_for_status()
+            except ClientResponseError as err:
+                raise NazurinError(err) from None
+            response_text = await response.text()
         soup = BeautifulSoup(response_text, "html.parser")
         tag = soup.find(id="post-view").find(recursive=False)
         if tag.name == "script":
@@ -67,10 +66,7 @@ class Moebooru:
         posts = info["posts"]
         imgs = []
         for post in posts:
-            if not jpeg:
-                url = post["file_url"]
-            else:
-                url = post["jpeg_url"]
+            url = post["file_url"] if not jpeg else post["jpeg_url"]
             name, _ = self.parse_url(url)
             destination, filename = self.get_storage_dest(post, name)
             imgs.append(Image(filename, url, destination))

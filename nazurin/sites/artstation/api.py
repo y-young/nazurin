@@ -16,13 +16,12 @@ class Artstation:
     async def get_post(self, post_id: str):
         """Fetch a post."""
         api = f"https://www.artstation.com/projects/{post_id}.json"
-        async with Request() as request:
-            async with request.get(api) as response:
-                if response.status == HTTPStatus.NOT_FOUND:
-                    raise NazurinError("Post not found")
-                response.raise_for_status()
-                post = await response.json()
-                return post
+        async with Request() as request, request.get(api) as response:
+            if response.status == HTTPStatus.NOT_FOUND:
+                raise NazurinError("Post not found")
+            response.raise_for_status()
+            post = await response.json()
+            return post
 
     async def fetch(self, post_id: str) -> Illust:
         post = await self.get_post(post_id)

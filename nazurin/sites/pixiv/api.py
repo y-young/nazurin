@@ -171,7 +171,7 @@ class Pixiv:
         await self.require_auth()
         response = await func(*args)
         if (
-            "error" in response.keys() and "invalid_grant" in response.error.message
+            "error" in response and "invalid_grant" in response.error.message
         ):  # Access token expired
             await self.refresh_token()
             response = await func(*args)

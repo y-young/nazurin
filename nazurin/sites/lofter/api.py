@@ -23,22 +23,21 @@ class Lofter:
     async def get_post(self, username: str, permalink: str) -> dict:
         """Fetch a post."""
         (blog_id, post_id) = await self.get_real_id(username, permalink)
-        async with Request(headers={"User-Agent": self.UA}) as request:
-            async with request.post(
-                self.API,
-                data={
-                    "targetblogid": blog_id,
-                    "postid": post_id,
-                },
-            ) as response:
-                response.raise_for_status()
+        async with Request(headers={"User-Agent": self.UA}) as request, request.post(
+            self.API,
+            data={
+                "targetblogid": blog_id,
+                "postid": post_id,
+            },
+        ) as response:
+            response.raise_for_status()
 
-                data = await response.json()
-                if data["meta"]["status"] != HTTPStatus.OK:
-                    raise NazurinError(data["meta"]["msg"])
+            data = await response.json()
+            if data["meta"]["status"] != HTTPStatus.OK:
+                raise NazurinError(data["meta"]["msg"])
 
-                post = data["response"]["posts"][0]["post"]
-                return post
+            post = data["response"]["posts"][0]["post"]
+            return post
 
     async def fetch(self, username: str, permalink: str) -> Illust:
         post = await self.get_post(username, permalink)
@@ -106,17 +105,16 @@ class Lofter:
     async def get_real_id(self, username: str, post_id: str) -> Tuple[int, int]:
         """Get real numeric blog ID and post ID."""
         api = f"https://{username}.lofter.com/post/{post_id}"
-        async with Request() as request:
-            async with request.get(api) as response:
-                if response.status == HTTPStatus.NOT_FOUND:
-                    raise NazurinError("Post not found")
-                response.raise_for_status()
+        async with Request() as request, request.get(api) as response:
+            if response.status == HTTPStatus.NOT_FOUND:
+                raise NazurinError("Post not found")
+            response.raise_for_status()
 
-                response_text = await response.text()
-                soup = BeautifulSoup(response_text, "html.parser")
-                iframe = soup.find("iframe", id="control_frame")
-                if not iframe:
-                    raise NazurinError("Failed to get real post ID")
-                src = urlparse(iframe.get("src"))
-                query = parse_qs(src.query)
-                return (query["blogId"][0], query["postId"][0])
+            response_text = await response.text()
+            soup = BeautifulSoup(response_text, "html.parser")
+            iframe = soup.find("iframe", id="control_frame")
+            if not iframe:
+                raise NazurinError("Failed to get real post ID")
+            src = urlparse(iframe.get("src"))
+            query = parse_qs(src.query)
+            return (query["blogId"][0], query["postId"][0])

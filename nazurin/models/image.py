@@ -75,18 +75,17 @@ class Image(File):
         self._size = self._size or await super().size()
         if self._size:
             return self._size
-        async with Request(**kwargs) as request:
-            async with request.head(self.url) as response:
-                headers = response.headers
-                if "Content-Length" in headers:
-                    self._size = int(headers["Content-Length"])
-                    logger.info(
-                        "Got image size: {}",
-                        naturalsize(self._size, binary=True),
-                    )
-                else:
-                    logger.info("Failed to get image size")
-                return self._size
+        async with Request(**kwargs) as request, request.head(self.url) as response:
+            headers = response.headers
+            if "Content-Length" in headers:
+                self._size = int(headers["Content-Length"])
+                logger.info(
+                    "Got image size: {}",
+                    naturalsize(self._size, binary=True),
+                )
+            else:
+                logger.info("Failed to get image size")
+            return self._size
 
     def __post_init__(self):
         if self._size:

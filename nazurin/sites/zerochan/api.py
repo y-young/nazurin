@@ -16,16 +16,15 @@ from .config import DESTINATION, FILENAME
 class Zerochan:
     @network_retry
     async def get_post(self, post_id: int):
-        async with Request() as request:
-            async with request.get(
-                "https://www.zerochan.net/" + str(post_id),
-            ) as response:
-                response.raise_for_status()
+        async with Request() as request, request.get(
+            "https://www.zerochan.net/" + str(post_id),
+        ) as response:
+            response.raise_for_status()
 
-                # Override post_id if there's a redirection TODO: Check
-                if response.history:
-                    post_id = response.url.path[1:]
-                response_text = await response.text()
+            # Override post_id if there's a redirection TODO: Check
+            if response.history:
+                post_id = response.url.path[1:]
+            response_text = await response.text()
 
         soup = BeautifulSoup(response_text, "html.parser")
         info = soup.find("script", {"type": "application/ld+json"}).contents

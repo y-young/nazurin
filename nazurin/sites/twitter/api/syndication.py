@@ -24,14 +24,16 @@ class SyndicationAPI(BaseAPI):
             "id": str(status_id),
             "lang": "en",
         }
-        async with Request() as request:
-            async with request.get(self.API_URL, params=params) as response:
-                if response.status == HTTPStatus.NOT_FOUND:
-                    raise NazurinError("Tweet not found or unavailable.")
-                response.raise_for_status()
-                tweet = await response.json()
-                del tweet["__typename"]
-                return tweet
+        async with Request() as request, request.get(
+            self.API_URL,
+            params=params,
+        ) as response:
+            if response.status == HTTPStatus.NOT_FOUND:
+                raise NazurinError("Tweet not found or unavailable.")
+            response.raise_for_status()
+            tweet = await response.json()
+            del tweet["__typename"]
+            return tweet
 
     async def fetch(self, status_id: int) -> Illust:
         """Fetch & return tweet images and information."""

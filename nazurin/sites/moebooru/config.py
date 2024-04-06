@@ -7,7 +7,6 @@ COLLECTIONS = {
     "lolibooru.moe": "lolibooru",
 }
 
-with env.prefixed("MOEBOORU_"):
-    with env.prefixed("FILE_"):
-        DESTINATION: str = env.str("PATH", default="{site_name}")
-        FILENAME: str = env.str("NAME", default="{filename}")
+with env.prefixed("MOEBOORU_"), env.prefixed("FILE_"):
+    DESTINATION: str = env.str("PATH", default="{site_name}")
+    FILENAME: str = env.str("NAME", default="{filename}")

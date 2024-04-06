@@ -36,27 +36,23 @@ class DeviantArt:
         async with Request(
             cookies=DeviantArt.cookies,
             headers={"Referer": BASE_URL},
-        ) as request:
-            async with request.get(api, params=params) as response:
-                if response.status == HTTPStatus.NOT_FOUND:
-                    raise NazurinError("Deviation not found")
-                response.raise_for_status()
+        ) as request, request.get(api, params=params) as response:
+            if response.status == HTTPStatus.NOT_FOUND:
+                raise NazurinError("Deviation not found")
+            response.raise_for_status()
 
-                data = await response.json()
-                if "error" in data:
-                    logger.error(data)
-                    # If CSRF token is invalid, try to get a new one
-                    if (
-                        data.get("errorDetails", {}).get("csrf") == "invalid"
-                        and not retry
-                    ):
-                        logger.info("CSRF token seems expired, refreshing...")
-                        return await self.get_deviation(deviation_id, retry=True)
-                    raise NazurinError(data["errorDescription"])
+            data = await response.json()
+            if "error" in data:
+                logger.error(data)
+                # If CSRF token is invalid, try to get a new one
+                if data.get("errorDetails", {}).get("csrf") == "invalid" and not retry:
+                    logger.info("CSRF token seems expired, refreshing...")
+                    return await self.get_deviation(deviation_id, retry=True)
+                raise NazurinError(data["errorDescription"])
 
-                deviation = data["deviation"]
-                del deviation["extended"]["relatedContent"]
-                return deviation
+            deviation = data["deviation"]
+            del deviation["extended"]["relatedContent"]
+            return deviation
 
     async def fetch(self, deviation_id: str) -> Illust:
         deviation = await self.get_deviation(deviation_id)
@@ -170,7 +166,7 @@ class DeviantArt:
 
         media = deviation["media"]
         base_uri = media["baseUri"]
-        tokens = media["token"] if "token" in media else []
+        tokens = media.get("token", [])
         types = {}
         for type_ in media["types"]:
             types[type_["t"]] = type_
@@ -221,20 +217,19 @@ class DeviantArt:
         if self.csrf_token and not refresh:
             return
         logger.info("Fetching CSRF token...")
-        async with Request() as request:
-            async with request.get(BASE_URL) as response:
-                response.raise_for_status()
-                pattern = re.compile(r"window\.__CSRF_TOKEN__ = '(\S+)';")
-                content = await response.text()
-                match = pattern.search(content)
-                if not match:
-                    raise NazurinError("Unable to get CSRF token")
-                DeviantArt.csrf_token = match.group(1)
-                # CSRF token must be used along with the cookies returned,
-                # otherwise will be considered invalid
-                DeviantArt.cookies = response.cookies
-                logger.info(
-                    "Fetched CSRF token: {}, cookies: {}",
-                    DeviantArt.csrf_token,
-                    DeviantArt.cookies,
-                )
+        async with Request() as request, request.get(BASE_URL) as response:
+            response.raise_for_status()
+            pattern = re.compile(r"window\.__CSRF_TOKEN__ = '(\S+)';")
+            content = await response.text()
+            match = pattern.search(content)
+            if not match:
+                raise NazurinError("Unable to get CSRF token")
+            DeviantArt.csrf_token = match.group(1)
+            # CSRF token must be used along with the cookies returned,
+            # otherwise will be considered invalid
+            DeviantArt.cookies = response.cookies
+            logger.info(
+                "Fetched CSRF token: {}, cookies: {}",
+                DeviantArt.csrf_token,
+                DeviantArt.cookies,
+            )

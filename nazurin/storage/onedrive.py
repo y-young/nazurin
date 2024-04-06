@@ -150,17 +150,16 @@ class OneDrive:
             "refresh_token": self.refresh_token or OD_RF_TOKEN,
             "grant_type": "refresh_token",
         }
-        async with Request() as request:
-            async with request.post(url, data=data) as response:
-                response_json = await response.json()
-                if "error" in response_json:
-                    logger.error(response_json)
-                    raise NazurinError(
-                        f"OneDrive authorization error: {response_json['error_description']}",
-                    )
-                self.access_token = response_json["access_token"]
-                self.refresh_token = response_json["refresh_token"]
-                self.expires_at = time.time() + response_json["expires_in"]
+        async with Request() as request, request.post(url, data=data) as response:
+            response_json = await response.json()
+            if "error" in response_json:
+                logger.error(response_json)
+                raise NazurinError(
+                    f"OneDrive authorization error: {response_json['error_description']}",
+                )
+            self.access_token = response_json["access_token"]
+            self.refresh_token = response_json["refresh_token"]
+            self.expires_at = time.time() + response_json["expires_in"]
         credentials = {
             "access_token": self.access_token,
             "refresh_token": self.refresh_token,
@@ -189,14 +188,17 @@ class OneDrive:
         # make a request with access token
         _headers = self.with_credentials(headers)
         _headers["Content-Type"] = "application/json"
-        async with Request(headers=_headers) as session:
-            async with session.request(method, url, **kwargs) as response:
-                if not response.ok:
-                    logger.error(await response.text())
-                response.raise_for_status()
-                if "application/json" in response.headers["Content-Type"]:
-                    return await response.json()
-                return await response.text()
+        async with Request(headers=_headers) as session, session.request(
+            method,
+            url,
+            **kwargs,
+        ) as response:
+            if not response.ok:
+                logger.error(await response.text())
+            response.raise_for_status()
+            if "application/json" in response.headers["Content-Type"]:
+                return await response.json()
+            return await response.text()
 
     async def stream_upload(self, file: File, url: str):
         @network_retry

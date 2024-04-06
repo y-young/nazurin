@@ -19,19 +19,18 @@ class Bilibili:
         api = (
             f"https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?id={dynamic_id}"
         )
-        async with Request() as request:
-            async with request.get(api) as response:
-                response.raise_for_status()
-                data = await response.json()
-                # For some IDs, the API returns code 0 but empty content
-                code = data.get("code")
-                if code == ERROR_NOT_FOUND or "data" not in data:
-                    raise NazurinError("Dynamic not found")
-                if code != 0:
-                    raise NazurinError(
-                        f"Failed to get dynamic: code = {code}, "
-                        f"message = {data['message']}",
-                    )
+        async with Request() as request, request.get(api) as response:
+            response.raise_for_status()
+            data = await response.json()
+            # For some IDs, the API returns code 0 but empty content
+            code = data.get("code")
+            if code == ERROR_NOT_FOUND or "data" not in data:
+                raise NazurinError("Dynamic not found")
+            if code != 0:
+                raise NazurinError(
+                    f"Failed to get dynamic: code = {code}, "
+                    f"message = {data['message']}",
+                )
         item = data["data"]["item"]
         return self.cleanup_item(item)
 

@@ -18,12 +18,11 @@ class Weibo:
     async def get_post(self, post_id: str):
         """Fetch a post."""
         api = f"https://m.weibo.cn/detail/{post_id}"
-        async with Request() as request:
-            async with request.get(api) as response:
-                response.raise_for_status()
-                html = await response.text()
-                post = self.parse_html(html)
-                return post
+        async with Request() as request, request.get(api) as response:
+            response.raise_for_status()
+            html = await response.text()
+            post = self.parse_html(html)
+            return post
 
     async def fetch(self, post_id: str) -> WeiboIllust:
         post = await self.get_post(post_id)

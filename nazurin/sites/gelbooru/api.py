@@ -17,14 +17,13 @@ class Gelbooru:
             "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&id="
             + str(post_id)
         )
-        async with Request() as request:
-            async with request.get(api) as response:
-                response.raise_for_status()
-                response_json = await response.json()
-                if "post" not in response_json:
-                    raise NazurinError("Post not found")
-                post = response_json["post"][0]
-                return post
+        async with Request() as request, request.get(api) as response:
+            response.raise_for_status()
+            response_json = await response.json()
+            if "post" not in response_json:
+                raise NazurinError("Post not found")
+            post = response_json["post"][0]
+            return post
 
     async def fetch(self, post_id: int) -> Illust:
         post = await self.get_post(post_id)

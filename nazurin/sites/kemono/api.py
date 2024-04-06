@@ -21,15 +21,14 @@ class Kemono:
     async def get_post(self, service: str, user_id: str, post_id: str) -> dict:
         """Fetch an post."""
         api = f"{self.API_BASE}/{service}/user/{user_id}/post/{post_id}"
-        async with Request() as request:
-            async with request.get(api) as response:
-                response.raise_for_status()
-                post = await response.json()
-                if not post:
-                    raise NazurinError("Post not found")
-                username = await self.get_username(service, user_id)
-                post["username"] = username
-                return post
+        async with Request() as request, request.get(api) as response:
+            response.raise_for_status()
+            post = await response.json()
+            if not post:
+                raise NazurinError("Post not found")
+            username = await self.get_username(service, user_id)
+            post["username"] = username
+            return post
 
     @network_retry
     async def get_post_revision(
@@ -41,34 +40,32 @@ class Kemono:
     ) -> dict:
         """Fetch a post revision."""
         api = f"{self.API_BASE}/{service}/user/{user_id}/post/{post_id}/revisions"
-        async with Request() as request:
-            async with request.get(api) as response:
-                response.raise_for_status()
-                revisions = await response.json()
-                post = None
-                for revision in revisions:
-                    if str(revision["revision_id"]) == revision_id:
-                        post = revision
-                        break
-                if not post:
-                    raise NazurinError("Post revision not found")
-                username = await self.get_username(service, user_id)
-                post["username"] = username
-                return post
+        async with Request() as request, request.get(api) as response:
+            response.raise_for_status()
+            revisions = await response.json()
+            post = None
+            for revision in revisions:
+                if str(revision["revision_id"]) == revision_id:
+                    post = revision
+                    break
+            if not post:
+                raise NazurinError("Post revision not found")
+            username = await self.get_username(service, user_id)
+            post["username"] = username
+            return post
 
     @network_retry
     async def get_username(self, service: str, user_id: str) -> str:
         url = f"https://kemono.su/{service}/user/{user_id}"
-        async with Request() as request:
-            async with request.get(url) as response:
-                response.raise_for_status()
-                response_text = await response.text()
-                soup = BeautifulSoup(response_text, "html.parser")
-                tag = soup.find("meta", attrs={"name": "artist_name"})
-                if not tag:
-                    return ""
-                username = tag.get("content", "")
-                return username
+        async with Request() as request, request.get(url) as response:
+            response.raise_for_status()
+            response_text = await response.text()
+            soup = BeautifulSoup(response_text, "html.parser")
+            tag = soup.find("meta", attrs={"name": "artist_name"})
+            if not tag:
+                return ""
+            username = tag.get("content", "")
+            return username
 
     async def fetch(
         self,

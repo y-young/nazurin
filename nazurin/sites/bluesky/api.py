@@ -18,13 +18,15 @@ class Bluesky:
         https://www.docs.bsky.app/docs/api/com-atproto-identity-resolve-handle
         """
         api = "https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle"
-        async with Request() as request:
-            async with request.get(api, params={"handle": handle}) as response:
-                data = await response.json()
-                if "error" in data:
-                    raise NazurinError(data["message"])
-                response.raise_for_status()
-                return data["did"]
+        async with Request() as request, request.get(
+            api,
+            params={"handle": handle},
+        ) as response:
+            data = await response.json()
+            if "error" in data:
+                raise NazurinError(data["message"])
+            response.raise_for_status()
+            return data["did"]
 
     @network_retry
     async def get_post_thread(self, uri: str, depth: int, parent_height: int):
@@ -34,13 +36,12 @@ class Bluesky:
         """
         api = "https://public.api.bsky.app/xrpc/app.bsky.feed.getPostThread"
         params = {"uri": uri, "depth": depth, "parentHeight": parent_height}
-        async with Request() as request:
-            async with request.get(api, params=params) as response:
-                data = await response.json()
-                if "error" in data:
-                    raise NazurinError(data["message"])
-                response.raise_for_status()
-                return data["thread"]["post"]
+        async with Request() as request, request.get(api, params=params) as response:
+            data = await response.json()
+            if "error" in data:
+                raise NazurinError(data["message"])
+            response.raise_for_status()
+            return data["thread"]["post"]
 
     async def fetch(self, user_handle: str, post_rkey: str) -> Illust:
         """Fetch images and detail."""

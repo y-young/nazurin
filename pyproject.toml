@@ -15,6 +15,7 @@ extend-select = [
   "N", # pep8-naming
   "PL", # pylint
   "RSE102", # unnecessary-paren-on-raise-exception
+  "SIM", # flake8-simplify
   "T20", # flake8-print
   "UP", # pyupgrade
 ]
