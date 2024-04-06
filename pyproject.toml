@@ -8,7 +8,9 @@ extend-select = [
   "COM", # flake8-commas
   "DTZ", # flake8-datetimez
   "FBT", # flake8-boolean-trap
+  "G", # flake8-logging-format
   "I", # isort
+  "INP", # flake8-no-pep420
   "ISC", # flake8-implicit-str-concat
   "N", # pep8-naming
   "PL", # pylint
