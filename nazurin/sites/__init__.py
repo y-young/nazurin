@@ -52,9 +52,9 @@ class SiteManager:
                 module, snake_to_pascal(module_name)
             )()
             if hasattr(module, "patterns") and hasattr(module, "handle"):
-                priority = getattr(module, "PRIORITY")
-                patterns = getattr(module, "patterns")
-                handle = getattr(module, "handle")
+                priority = module.PRIORITY
+                patterns = module.patterns
+                handle = module.handle
                 self.sources.append(
                     Source(
                         priority=priority,
