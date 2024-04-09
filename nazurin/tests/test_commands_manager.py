@@ -1,7 +1,7 @@
 import unittest
 from textwrap import dedent
 
-from aiogram.dispatcher.filters import Command
+from aiogram.filters import Command
 from aiogram.types import BotCommand
 
 from nazurin.commands import CommandsManager
@@ -14,24 +14,19 @@ class TestCommandsManager(unittest.TestCase):
 
     def register_commands(self):
         self.manager.register(
-            Command(["first", "alternative"]),
+            Command("first", "alternative"),
             description="First Command",
             help_text="First Command Help Text",
         )
         self.manager.register(
-            Command(["second"]),
+            Command("second"),
             args="ARG",
             description="Second Command",
         )
 
     def test_resolve_names(self):
         names = ["first", "second"]
-        self.assertEqual(self.manager.resolve_names(Command(names)), names)
-        self.assertEqual(self.manager.resolve_names(commands=names), names)
-        self.assertEqual(
-            self.manager.resolve_names(Command(["second"]), commands=["first"]),
-            names,
-        )
+        self.assertEqual(self.manager.resolve_names(Command(*names)), names)
 
     def test_command_list(self):
         self.manager.reset()
@@ -39,9 +34,9 @@ class TestCommandsManager(unittest.TestCase):
         self.assertEqual(
             list(self.manager.list()),
             [
-                BotCommand("alternative", "First Command"),
-                BotCommand("first", "First Command"),
-                BotCommand("second", "Second Command"),
+                BotCommand(command="alternative", description="First Command"),
+                BotCommand(command="first", description="First Command"),
+                BotCommand(command="second", description="Second Command"),
             ],
         )
 

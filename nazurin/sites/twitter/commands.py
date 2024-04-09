@@ -1,4 +1,4 @@
-from aiogram.dispatcher.filters import Command
+from aiogram.filters import Command, CommandObject
 from aiogram.types import Message
 
 from nazurin import bot, dp
@@ -9,8 +9,8 @@ from .api import Twitter
 twitter = Twitter()
 
 
-@dp.message_handler(Command(["twitter"]), args="STATUS_ID", description="View tweet")
-async def twitter_view(message: Message, command: Command.CommandObj):
+@dp.message_handler(Command("twitter"), args="STATUS_ID", description="View tweet")
+async def twitter_view(message: Message, command: CommandObject):
     try:
         status_id = int(command.args)
     except (IndexError, ValueError, TypeError) as e:
@@ -23,11 +23,11 @@ async def twitter_view(message: Message, command: Command.CommandObj):
 
 
 @dp.message_handler(
-    Command(["twitter_download"]),
+    Command("twitter_download"),
     args="STATUS_ID",
     description="Download tweet",
 )
-async def twitter_download(message: Message, command: Command.CommandObj):
+async def twitter_download(message: Message, command: CommandObject):
     try:
         status_id = int(command.args)
     except (IndexError, ValueError, TypeError) as e:

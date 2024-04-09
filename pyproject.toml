@@ -21,4 +21,4 @@ extend-select = [
   "T20", # flake8-print
   "UP", # pyupgrade
 ]
-ignore = ["UP007", "PERF203"]
+ignore = ["UP007", "PERF203", "COM812", "ISC001"]

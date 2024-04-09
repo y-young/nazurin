@@ -14,12 +14,9 @@ from typing import Callable, Coroutine, Iterable, List, Union
 import aiofiles
 import aiofiles.os
 import aiojobs
+from aiogram.enums import MessageEntityType
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import Message
-from aiogram.utils.exceptions import (
-    BadRequest,
-    InvalidHTTPUrlContent,
-    WrongFileIdentifier,
-)
 from PIL import Image
 
 from nazurin.models import Caption
@@ -31,18 +28,26 @@ FILENAME_MAX_LENGTH = 255
 CAPTION_MAX_LENGTH = 1024
 
 
-async def handle_bad_request(message: Message, error: BadRequest):
+WRONG_FILE_IDENTIFIER = "Wrong file identifier/HTTP URL specified"
+INVALID_HTTP_URL_CONTENT = "Failed to get HTTP URL content"
+GROUP_SEND_FAILED = "Group send failed"
+
+
+async def handle_bad_request(message: Message, error: TelegramBadRequest):
     logger.error("BadRequest exception: {}", error)
     if not message:
         return
-    if isinstance(error, (WrongFileIdentifier, InvalidHTTPUrlContent)):
+    if (
+        WRONG_FILE_IDENTIFIER in error.message
+        or INVALID_HTTP_URL_CONTENT in error.message
+    ):
         await message.reply(
             "Failed to send image as photo, maybe the size is too big, "
             "consider using download option or try again.\n"
             f"Message: {message.text}\n"
             f"Error: {error}",
         )
-    elif "Group send failed" in str(error):
+    elif GROUP_SEND_FAILED in error.message:
         await message.reply(
             "Failed to send images because one of them is too large, "
             "consider using download option or try again.\n"
@@ -114,9 +119,9 @@ def get_urls_from_message(message: Message) -> List[str]:
     text = text.encode("utf-16-le")
     urls = []
     for item in entities:
-        if item.type == "text_link":
+        if item.type == MessageEntityType.TEXT_LINK:
             urls.append(item.url)
-        elif item.type == "url":
+        elif item.type == MessageEntityType.URL:
             offset = item.offset
             length = item.length
             urls.append(text[offset * 2 : (offset + length) * 2].decode("utf-16-le"))

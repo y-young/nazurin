@@ -1,3 +1,4 @@
+import hashlib
 from os import path
 from typing import List, Optional
 
@@ -12,6 +13,8 @@ TOKEN: str = env.str("TOKEN")
 
 # Webhook url, eg: https://xxx.fly.dev/, should end with '/'
 WEBHOOK_URL: str = env.str("WEBHOOK_URL", default=None)
+WEBHOOK_PATH = "/webhook"
+WEBHOOK_SECRET = hashlib.sha256(TOKEN.encode()).hexdigest()
 HOST: str = env.str("HOST", default="0.0.0.0")
 # Port is automatically set if on Heroku or fly.io
 PORT: int = env.int("PORT", default=80)

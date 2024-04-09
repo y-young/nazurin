@@ -2,7 +2,7 @@ import dataclasses
 from textwrap import dedent
 from typing import Iterator, List, Optional
 
-from aiogram.dispatcher.filters import Command
+from aiogram.filters import Command
 from aiogram.types import BotCommand
 
 
@@ -44,12 +44,11 @@ class CommandsManager:
     def register(
         self,
         *custom_filters,
-        commands=None,
         args="",
         description="",
         help_text="",
     ) -> None:
-        names = self.resolve_names(*custom_filters, commands=commands)
+        names = self.resolve_names(*custom_filters)
         if not names:
             return
         command = NazurinCommand(
@@ -60,8 +59,8 @@ class CommandsManager:
         )
         self.commands.append(command)
 
-    def resolve_names(self, *custom_filters, commands=None) -> List[str]:
-        names = commands or []
+    def resolve_names(self, *custom_filters) -> List[str]:
+        names = []
         for custom_filter in custom_filters:
             if isinstance(custom_filter, Command):
                 names += custom_filter.commands
@@ -70,7 +69,7 @@ class CommandsManager:
     def list(self) -> Iterator[BotCommand]:
         for command in self.commands:
             for name in command.names:
-                yield BotCommand(name, command.description)
+                yield BotCommand(command=name, description=command.description)
 
     def help_text(self) -> str:
         return "\n".join(

@@ -8,13 +8,14 @@ from aiojobs.aiohttp import setup as setup_jobs
 from aiojobs.aiohttp import spawn
 
 from nazurin import config
+from nazurin.bot import NazurinBot
 from nazurin.utils import logger
 from nazurin.utils.exceptions import NazurinError
 from nazurin.utils.helpers import format_error
 
 
 class NazurinServer(web.Application):
-    def __init__(self, bot):
+    def __init__(self, bot: NazurinBot):
         super().__init__()
         self.bot = bot
         cors = aiohttp_cors.setup(self)

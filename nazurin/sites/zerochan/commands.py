@@ -1,4 +1,4 @@
-from aiogram.dispatcher.filters import Command
+from aiogram.filters import Command, CommandObject
 from aiogram.types import Message
 
 from nazurin import bot, dp
@@ -10,11 +10,11 @@ api = Zerochan()
 
 
 @dp.message_handler(
-    Command(["zerochan"]),
+    Command("zerochan"),
     args="POST_ID",
     description="View Zerochan post",
 )
-async def zerochan_view(message: Message, command: Command.CommandObj):
+async def zerochan_view(message: Message, command: CommandObject):
     try:
         post_id = int(command.args)
     except (IndexError, ValueError, TypeError) as e:
@@ -27,11 +27,11 @@ async def zerochan_view(message: Message, command: Command.CommandObj):
 
 
 @dp.message_handler(
-    Command(["zerochan_download"]),
+    Command("zerochan_download"),
     args="POST_ID",
     description="Download Zerochan post",
 )
-async def zerochan_download(message: Message, command: Command.CommandObj):
+async def zerochan_download(message: Message, command: CommandObject):
     try:
         post_id = int(command.args)
     except (IndexError, ValueError, TypeError) as e:

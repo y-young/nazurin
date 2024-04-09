@@ -1,4 +1,4 @@
-from aiogram.dispatcher.filters import Command
+from aiogram.filters import Command, CommandObject
 from aiogram.types import Message
 
 from nazurin import bot, dp
@@ -10,11 +10,11 @@ danbooru = Danbooru()
 
 
 @dp.message_handler(
-    Command(["danbooru"]),
+    Command("danbooru"),
     args="POST_ID",
     description="View Danbooru post",
 )
-async def danbooru_view(message: Message, command: Command.CommandObj):
+async def danbooru_view(message: Message, command: CommandObject):
     try:
         post_id = int(command.args)
     except (IndexError, ValueError, TypeError) as e:
@@ -27,11 +27,11 @@ async def danbooru_view(message: Message, command: Command.CommandObj):
 
 
 @dp.message_handler(
-    Command(["danbooru_download"]),
+    Command("danbooru_download"),
     args="POST_ID",
     description="Download Danbooru post",
 )
-async def danbooru_download(message: Message, command: Command.CommandObj):
+async def danbooru_download(message: Message, command: CommandObject):
     try:
         post_id = int(command.args)
     except (IndexError, ValueError, TypeError) as e:

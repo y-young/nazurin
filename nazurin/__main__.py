@@ -4,31 +4,34 @@ import shutil
 import traceback
 from textwrap import dedent
 
-from aiogram.dispatcher.filters import Command, IDFilter
-from aiogram.types import ChatActions, Message, Update
-from aiogram.utils.exceptions import TelegramAPIError
+from aiogram import flags
+from aiogram.enums import ChatAction
+from aiogram.exceptions import TelegramAPIError
+from aiogram.filters import Command, CommandObject
+from aiogram.types import ErrorEvent, Message
 from aiohttp import ClientResponseError
 
 from nazurin import config, dp
 from nazurin.utils import logger
-from nazurin.utils.decorators import Cache, chat_action
+from nazurin.utils.decorators import Cache
 from nazurin.utils.exceptions import InvalidCommandUsageError, NazurinError
+from nazurin.utils.filters import IDFilter
 from nazurin.utils.helpers import format_error
 
 
-@dp.message_handler(commands=["start"], description="Get help")
-@chat_action(ChatActions.TYPING)
+@dp.message_handler(Command("start"), description="Get help")
+@flags.chat_action(ChatAction.TYPING)
 async def start(message: Message):
     await show_help(message, None)
 
 
 @dp.message_handler(
-    commands=["help"],
+    Command("help"),
     args="[COMMAND]",
     description="Get help of all commands or a specific command",
 )
-@chat_action(ChatActions.TYPING)
-async def show_help(message: Message, command: Command.CommandObj):
+@flags.chat_action(ChatAction.TYPING)
+async def show_help(message: Message, command: CommandObject):
     if command and command.args:
         help_text = dp.commands.help(command.args)
         await message.reply(help_text or "Command not found.")
@@ -51,15 +54,14 @@ async def show_help(message: Message, command: Command.CommandObj):
     )
 
 
-@dp.message_handler(commands=["ping"], description="Pong")
-@chat_action(ChatActions.TYPING)
+@dp.message_handler(Command("ping"), description="Pong")
 async def ping(message: Message):
     await message.reply("Pong!")
 
 
 @dp.message_handler(
     IDFilter(config.ADMIN_ID),
-    commands=["set_commands"],
+    Command("set_commands"),
     description="Set commands",
 )
 async def set_commands(message: Message):
@@ -69,7 +71,7 @@ async def set_commands(message: Message):
 
 @dp.message_handler(
     IDFilter(config.ADMIN_ID),
-    commands=["clear_cache"],
+    Command("clear_cache"),
     description="Clear cache",
 )
 async def clear_cache(message: Message):
@@ -84,11 +86,12 @@ async def clear_cache(message: Message):
         await message.reply(error.strerror)
 
 
-@dp.errors_handler()
-async def on_error(update: Update, exception: Exception):
+@dp.error()
+async def on_error(event: ErrorEvent):
+    update = event.update
     message = update.message
     try:
-        raise exception
+        raise event.exception
     except InvalidCommandUsageError as error:
         await message.reply(dp.commands.help(error.command))
     except ClientResponseError as error:

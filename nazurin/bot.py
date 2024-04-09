@@ -2,10 +2,11 @@ import asyncio
 from time import time
 from typing import List, Optional
 
-from aiogram import Bot
-from aiogram.types import ChatActions, InputFile, InputMediaPhoto, Message
-from aiogram.types.message import ParseMode
-from aiogram.utils.exceptions import BadRequest
+from aiogram import Bot, flags
+from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram.enums import ChatAction, ParseMode
+from aiogram.exceptions import TelegramBadRequest
+from aiogram.types import FSInputFile, InputMediaPhoto, Message
 
 from nazurin import config
 from nazurin.database import Database
@@ -26,7 +27,14 @@ class NazurinBot(Bot):
     send_message = retry_after(Bot.send_message)
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, parse_mode=ParseMode.HTML, **kwargs)
+        session = AiohttpSession(proxy=config.PROXY) if config.PROXY else None
+        super().__init__(
+            *args,
+            token=config.TOKEN,
+            parse_mode=ParseMode.HTML,
+            session=session,
+            **kwargs,
+        )
         self.sites = SiteManager()
         self.storage = Storage()
         self.cleanup_task = None
@@ -43,6 +51,7 @@ class NazurinBot(Bot):
             self.cleanup_task.cancel()
 
     @retry_after
+    @flags.chat_action(ChatAction.UPLOAD_PHOTO)
     async def send_single_group(
         self,
         imgs: List[Image],
@@ -50,9 +59,8 @@ class NazurinBot(Bot):
         chat_id: int,
         reply_to: Optional[int] = None,
     ):
-        await self.send_chat_action(chat_id, ChatActions.UPLOAD_PHOTO)
         # TODO: Fetch display URL in batch
-        media = [InputMediaPhoto(await img.display_url()) for img in imgs]
+        media = [InputMediaPhoto(media=await img.display_url()) for img in imgs]
         media[0].caption = caption
         await self.send_media_group(chat_id, media, reply_to_message_id=reply_to)
 
@@ -90,21 +98,21 @@ class NazurinBot(Bot):
             if isinstance(illust, Ugoira):
                 await self.send_animation(
                     chat_id,
-                    InputFile(illust.video.path),
+                    FSInputFile(illust.video.path),  # TODO: Handle URL
                     caption=sanitize_caption(illust.caption),
                     reply_to_message_id=reply_to,
                 )
             else:
                 await self.send_photos(illust, chat_id, reply_to)
-        except BadRequest as error:
+        except TelegramBadRequest as error:
             await handle_bad_request(message, error)
 
     @retry_after
+    @flags.chat_action(ChatAction.UPLOAD_DOCUMENT)
     async def send_doc(self, file: File, chat_id, message_id=None):
-        await self.send_chat_action(chat_id, ChatActions.UPLOAD_DOCUMENT)
         await self.send_document(
             chat_id,
-            InputFile(file.path),
+            FSInputFile(file.path),
             reply_to_message_id=message_id,
         )
 
@@ -133,7 +141,7 @@ class NazurinBot(Bot):
             await self.send_illust(illust, message, config.GALLERY_ID)
         elif (
             message
-            and message.is_forward()
+            and message.forward_origin is not None
             and message.photo
             # If there're multiple images,
             # then send a new message instead of forwarding an existing one,

@@ -1,4 +1,4 @@
-from aiogram.dispatcher.filters import Command
+from aiogram.filters import Command, CommandObject
 from aiogram.types import Message
 
 from nazurin import bot, dp
@@ -10,11 +10,11 @@ moebooru = Moebooru()
 
 
 @dp.message_handler(
-    Command(["yandere"]),
+    Command("yandere"),
     args="POST_ID",
     description="View yandere post",
 )
-async def yandere_view(message: Message, command: Command.CommandObj):
+async def yandere_view(message: Message, command: CommandObject):
     try:
         post_id = int(command.args)
     except (IndexError, ValueError, TypeError) as e:
@@ -27,11 +27,11 @@ async def yandere_view(message: Message, command: Command.CommandObj):
 
 
 @dp.message_handler(
-    Command(["yandere_download"]),
+    Command("yandere_download"),
     args="POST_ID",
     description="Download yandere post",
 )
-async def yandere_download(message: Message, command: Command.CommandObj):
+async def yandere_download(message: Message, command: CommandObject):
     try:
         post_id = int(command.args)
     except (IndexError, ValueError, TypeError) as e:
@@ -45,11 +45,11 @@ async def yandere_download(message: Message, command: Command.CommandObj):
 
 
 @dp.message_handler(
-    Command(["konachan"]),
+    Command("konachan"),
     args="POST_ID",
     description="Download Konachan post",
 )
-async def konachan_view(message: Message, command: Command.CommandObj):
+async def konachan_view(message: Message, command: CommandObject):
     try:
         post_id = int(command.args)
     except (IndexError, ValueError, TypeError) as e:
@@ -62,11 +62,11 @@ async def konachan_view(message: Message, command: Command.CommandObj):
 
 
 @dp.message_handler(
-    Command(["konachan_download"]),
+    Command("konachan_download"),
     args="POST_ID",
     description="Download Konachan post",
 )
-async def konachan_download(message: Message, command: Command.CommandObj):
+async def konachan_download(message: Message, command: CommandObject):
     try:
         post_id = int(command.args)
     except (IndexError, ValueError, TypeError) as e:
