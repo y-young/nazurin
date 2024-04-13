@@ -68,7 +68,7 @@ class File:
     async def download(self, session: NazurinRequestSession) -> Optional[int]:
         if await self.exists():
             logger.info("File {} already exists", self.path)
-            return True
+            return await self.size()
         await ensure_existence_async(TEMP_DIR)
         logger.info("Downloading {} to {}...", self.url, self.path)
         await session.download(self.url, self.path)
