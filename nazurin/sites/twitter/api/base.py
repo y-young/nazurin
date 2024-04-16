@@ -83,7 +83,7 @@ class BaseAPI:
         file = File(filename, best_variant, destination)
         async with Request() as session:
             await file.download(session)
-        return Ugoira(file, BaseAPI.build_caption(tweet), tweet)
+        return Ugoira(int(tweet["id_str"]), file, BaseAPI.build_caption(tweet), tweet)
 
     @staticmethod
     def parse_photo(tweet: dict, photo: dict, index: int):
