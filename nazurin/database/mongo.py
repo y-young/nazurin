@@ -1,6 +1,7 @@
+from functools import lru_cache
 from typing import Optional, Union
 
-from motor.motor_asyncio import AsyncIOMotorClient
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from pymongo.errors import DuplicateKeyError
 
 from nazurin.config import env
@@ -13,11 +14,16 @@ class Mongo(DatabaseDriver):
 
     def __init__(self):
         """Load credentials and initialize client."""
-        uri = env.str("MONGO_URI", default="mongodb://localhost:27017/nazurin")
-        self.client = AsyncIOMotorClient(uri)
-        self.db = self.client.get_default_database()
+        self.db = self.get_database()
         self._collection = None
         self._document = None
+
+    @classmethod
+    @lru_cache
+    def get_database(cls) -> AsyncIOMotorDatabase:
+        uri = env.str("MONGO_URI", default="mongodb://localhost:27017/nazurin")
+        client = AsyncIOMotorClient(uri)
+        return client.get_default_database()
 
     def collection(self, key: str):
         self._collection = self.db[key]
