@@ -92,9 +92,7 @@ class Mega:
         tasks = [self.ensure_existence(destination) for destination in destinations]
         logger.info("Creating folders: {}", destinations)
         folder_ids = await asyncio.gather(*tasks)
-        folders = {}
-        for destination, folder_id in zip(destinations, folder_ids):
-            folders[destination] = folder_id
+        folders = dict(zip(destinations, folder_ids))
 
         tasks = [self.upload(file, folders) for file in files]
         await run_in_pool(tasks, MAX_PARALLEL_UPLOAD)

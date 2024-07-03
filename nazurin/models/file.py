@@ -57,12 +57,10 @@ class File:
         return None
 
     async def exists(self) -> bool:
-        if (
+        return (
             os.path.exists(self.path)
             and (await aiofiles.os.stat(self.path)).st_size != 0
-        ):
-            return True
-        return False
+        )
 
     @network_retry
     async def download(self, session: NazurinRequestSession) -> Optional[int]:
