@@ -76,9 +76,7 @@ class GoogleDrive:
         tasks = [self.create_folders(destination) for destination in destinations]
         logger.info("Creating folders: {}", destinations)
         folder_ids = await asyncio.gather(*tasks)
-        folders = {}
-        for destination, folder_id in zip(destinations, folder_ids):
-            folders[destination] = folder_id
+        folders = dict(zip(destinations, folder_ids))
 
         tasks = [self.upload(item, folders) for item in files]
         await run_in_pool(tasks, MAX_PARALLEL_UPLOAD)
