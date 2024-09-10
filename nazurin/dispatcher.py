@@ -42,7 +42,7 @@ class NazurinDispatcher(Dispatcher):
         self.bot.init()
         self.message.register(
             self.update_collection,
-            F.text | F.photo,
+            F.entities | F.caption_entities,
             URLFilter(),
         )
 
