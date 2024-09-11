@@ -3,6 +3,7 @@ from time import time
 from typing import List, Optional
 
 from aiogram import Bot, flags
+from aiogram.client.default import DefaultBotProperties
 from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.enums import ChatAction, ParseMode
 from aiogram.exceptions import TelegramBadRequest
@@ -31,7 +32,7 @@ class NazurinBot(Bot):
         super().__init__(
             *args,
             token=config.TOKEN,
-            parse_mode=ParseMode.HTML,
+            default=DefaultBotProperties(parse_mode=ParseMode.HTML),
             session=session,
             **kwargs,
         )
