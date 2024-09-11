@@ -10,7 +10,7 @@ from .illust import Illust
 class Ugoira(Illust):
     video: File = None
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         id: Union[int, str],
         video,
