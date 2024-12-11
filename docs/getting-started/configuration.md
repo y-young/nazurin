@@ -130,7 +130,7 @@ Telegram username of the users allowed to use this bot, separated by commas.
 
 _Changed in v2._
 
-## GROUP_ID
+## ALLOW_GROUP
 
 :material-lightbulb-on: Optional
 

@@ -56,11 +56,11 @@ If you're using the Docker image, ffmpeg is already included.
 
   : Default is none.
 
-- `ALLOW_GROUP` is renamed to `GROUP_ID`
+- `GROUP_ID` is renamed to `ALLOW_GROUP`
 
   : Set IDs of groups in which all members have access to this bot, separated by commas.
 
-  : e.g.: `GROUP_ID = -12345,-23456`
+  : e.g.: `ALLOW_GROUP = -12345,-23456`
 
 - `ADMIN_ID`
 

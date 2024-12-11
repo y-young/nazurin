@@ -56,11 +56,11 @@ Nazurin 现已内置一个 API 服务器，搭配 [Nazurin 扩展程序](https:/
 
   : 默认为空。
 
-- `ALLOW_GROUP` is renamed to `GROUP_ID`
+- 添加 `ALLOW_GROUP` 以替换 `GROUP_ID`
 
   : 群组 ID 列表，以英文逗号分隔，其中的成员均可使用此机器人。
 
-  : 例如：`GROUP_ID = -12345,-23456`
+  : 例如：`ALLOW_GROUP = -12345,-23456`
 
 - `ADMIN_ID`
 

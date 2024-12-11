@@ -130,7 +130,7 @@ _在 v2 中变更。_
 
 _在 v2 中变更。_
 
-## GROUP_ID
+## ALLOW_GROUP
 
 :material-lightbulb-on: 可选
 
