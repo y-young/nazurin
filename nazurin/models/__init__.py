@@ -7,4 +7,4 @@ from .illust import Illust
 from .image import Image
 from .ugoira import Ugoira
 
-__all__ = ["Caption", "File", "Illust", "Image", "Ugoira", "Document"]
+__all__ = ["Caption", "Document", "File", "Illust", "Image", "Ugoira"]
