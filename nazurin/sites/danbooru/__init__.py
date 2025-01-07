@@ -5,4 +5,4 @@ from .commands import *  # noqa: F403
 from .config import PRIORITY
 from .interface import handle, patterns
 
-__all__ = ["Danbooru", "PRIORITY", "patterns", "handle"]
+__all__ = ["PRIORITY", "Danbooru", "handle", "patterns"]
