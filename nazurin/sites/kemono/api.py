@@ -3,8 +3,6 @@ from datetime import datetime, timezone
 from mimetypes import guess_type
 from typing import ClassVar, Tuple, Union
 
-from bs4 import BeautifulSoup
-
 from nazurin.models import Caption, Illust, Image
 from nazurin.models.file import File
 from nazurin.utils import Request
@@ -26,6 +24,7 @@ class Kemono:
             post = await response.json()
             if not post:
                 raise NazurinError("Post not found")
+            post = post["post"]
             username = await self.get_username(service, user_id)
             post["username"] = username
             return post
@@ -56,16 +55,11 @@ class Kemono:
 
     @network_retry
     async def get_username(self, service: str, user_id: str) -> str:
-        url = f"https://kemono.su/{service}/user/{user_id}"
+        url = f"{self.API_BASE}/{service}/user/{user_id}/profile"
         async with Request() as request, request.get(url) as response:
             response.raise_for_status()
-            response_text = await response.text()
-            soup = BeautifulSoup(response_text, "html.parser")
-            tag = soup.find("meta", attrs={"name": "artist_name"})
-            if not tag:
-                return ""
-            username = tag.get("content", "")
-            return username
+            profile = await response.json()
+            return profile.get("name", "")
 
     async def fetch(
         self,
