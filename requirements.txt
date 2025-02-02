@@ -24,6 +24,7 @@ tinydb~=4.5.2
 firebase-admin~=6.1.0
 # Mongo:
 motor~=3.4.0
+pymongo<4.9
 dnspython~=2.1.0
 # Cloudant:
 cloudant~=2.15.0
