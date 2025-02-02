@@ -1,10 +1,10 @@
 ARG PYTHON_VERSION=3.8
 
 ARG CURL_IMPERSONATE_VERSION=0.5-chrome
-FROM lwthiker/curl-impersonate:${CURL_IMPERSONATE_VERSION} as curl
+FROM lwthiker/curl-impersonate:${CURL_IMPERSONATE_VERSION} AS curl
 
 # Builder
-FROM python:${PYTHON_VERSION}-alpine as builder
+FROM python:${PYTHON_VERSION}-alpine AS builder
 
 RUN apk add --update git build-base libffi-dev curl-dev
 
