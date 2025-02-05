@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 from http import HTTPStatus
-from typing import List, Tuple
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
@@ -29,7 +28,7 @@ class Artstation:
         caption = self.build_caption(post)
         return Illust(post_id, imgs, caption, post)
 
-    def get_images(self, post) -> List[Image]:
+    def get_images(self, post) -> list[Image]:
         """Get images from post."""
         if "assets" not in post:
             raise NazurinError("No asset found.")
@@ -56,7 +55,7 @@ class Artstation:
         return imgs
 
     @staticmethod
-    def get_storage_dest(post: dict, asset: dict, index: int = 0) -> Tuple[str, str]:
+    def get_storage_dest(post: dict, asset: dict, index: int = 0) -> tuple[str, str]:
         """
         Format destination and filename.
         """
@@ -92,7 +91,7 @@ class Artstation:
         )
 
     @staticmethod
-    def parse_url(src: str) -> Tuple[str, str, str]:
+    def parse_url(src: str) -> tuple[str, str, str]:
         """Get filename, original file url & thumbnail url of the original image
 
         eg:

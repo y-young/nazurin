@@ -1,7 +1,7 @@
 import asyncio
 import functools
 from functools import partial, wraps
-from typing import Callable, ClassVar, List
+from typing import Callable, ClassVar
 
 import tenacity
 from aiogram.exceptions import TelegramRetryAfter
@@ -75,7 +75,7 @@ def retry_after(func):
 
 
 class Cache:
-    cached_functions: ClassVar[List[Callable]] = []
+    cached_functions: ClassVar[list[Callable]] = []
 
     @staticmethod
     def lru(*args, **kwargs):

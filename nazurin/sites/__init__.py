@@ -4,7 +4,7 @@ import re
 from glob import glob
 from importlib import import_module
 from os import path
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Callable, Optional
 
 from pydantic import BaseModel, ConfigDict
 
@@ -13,13 +13,13 @@ from nazurin.models.document import Document
 from nazurin.utils import logger
 from nazurin.utils.helpers import snake_to_pascal
 
-HandlerResult = Tuple[Illust, Document]
+HandlerResult = tuple[Illust, Document]
 SourceHandler = Callable[[re.Match], HandlerResult]
 
 
 class Source(BaseModel):
     priority: int
-    patterns: List[str]
+    patterns: list[str]
     handler: SourceHandler
     name: str
 
@@ -35,8 +35,8 @@ class SiteManager:
     """Site plugin manager."""
 
     def __init__(self):
-        self.sites: Dict[str, object] = {}
-        self.sources: List[Source] = []
+        self.sites: dict[str, object] = {}
+        self.sources: list[Source] = []
 
     def load(self):
         """Dynamically load all site plugins."""
@@ -70,7 +70,7 @@ class SiteManager:
     def api(self, site: str):
         return self.sites[site]
 
-    def match(self, urls: List[str]) -> Optional[MatchResult]:
+    def match(self, urls: list[str]) -> Optional[MatchResult]:
         sources = self.sources
         urls = str.join(",", urls)
         result: Optional[MatchResult] = None

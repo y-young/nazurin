@@ -5,7 +5,7 @@ description = "Images collection done right. A Telegram bot that helps you colle
 readme = "README.md"
 authors = [{ name = "y-young", email = "i@gpx.moe" }]
 license-files = ["LICENSE"]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: MIT License",
@@ -54,7 +54,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.ruff]
-target-version = "py38"
+target-version = "py39"
 
 [tool.ruff.lint]
 extend-select = [
@@ -82,4 +82,4 @@ ignore = ["UP007", "PERF203", "COM812", "ISC001"]
 mega-py = { git = "https://github.com/y-young/mega.py", rev = "6015359" }
 
 [dependency-groups]
-dev = ["pre-commit~=3.3.0", "pytest~=8.3.3"]
+dev = ["pre-commit~=3.3.0", "pytest~=8.3.3", "ruff~=0.8.6"]

@@ -1,7 +1,6 @@
 import json
 import os
 import re
-from typing import List, Tuple
 
 from nazurin.models import Caption
 from nazurin.utils import Request
@@ -36,7 +35,7 @@ class Weibo:
             referer=f"https://m.weibo.cn/detail/{post_id}",
         )
 
-    def get_images(self, post) -> List[WeiboImage]:
+    def get_images(self, post) -> list[WeiboImage]:
         """Get images from post."""
         if "pics" not in post:
             raise NazurinError("No image found")
@@ -59,7 +58,7 @@ class Weibo:
         return imgs
 
     @staticmethod
-    def get_storage_dest(post: dict, pic: dict, index: int) -> Tuple[str, str]:
+    def get_storage_dest(post: dict, pic: dict, index: int) -> tuple[str, str]:
         """
         Format destination and filename.
         """
@@ -93,7 +92,7 @@ class Weibo:
         )
 
     @staticmethod
-    def get_tags(post) -> List[str]:
+    def get_tags(post) -> list[str]:
         if "text" not in post or not post["text"]:
             return []
         regex = r"#(\S+)#"
@@ -103,7 +102,7 @@ class Weibo:
         return matches
 
     @staticmethod
-    def parse_pic(pic: dict) -> Tuple[str, str, str, int, int]:
+    def parse_pic(pic: dict) -> tuple[str, str, str, int, int]:
         """Get original file url & thumbnail url of the picture
 
         eg:

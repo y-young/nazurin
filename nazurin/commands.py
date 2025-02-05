@@ -1,6 +1,7 @@
 import dataclasses
+from collections.abc import Iterator
 from textwrap import dedent
-from typing import Iterator, List, Optional
+from typing import Optional
 
 from aiogram.filters import Command
 from aiogram.types import BotCommand
@@ -8,7 +9,7 @@ from aiogram.types import BotCommand
 
 @dataclasses.dataclass
 class NazurinCommand:
-    names: List[str]
+    names: list[str]
     args: str
     description: str
     help_text: str
@@ -39,7 +40,7 @@ class NazurinCommand:
 
 class CommandsManager:
     def __init__(self) -> None:
-        self.commands: List[NazurinCommand] = []
+        self.commands: list[NazurinCommand] = []
 
     def register(
         self,
@@ -59,7 +60,7 @@ class CommandsManager:
         )
         self.commands.append(command)
 
-    def resolve_names(self, *custom_filters) -> List[str]:
+    def resolve_names(self, *custom_filters) -> list[str]:
         names = []
         for custom_filter in custom_filters:
             if isinstance(custom_filter, Command):

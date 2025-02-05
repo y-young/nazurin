@@ -1,7 +1,6 @@
 import asyncio
 import os
 import shutil
-from typing import List
 
 from nazurin.config import DATA_DIR, STORAGE_DIR
 from nazurin.models import File
@@ -21,7 +20,7 @@ class Local:
             os.path.join(os.path.join(DATA_DIR, file.destination), file.name),
         )
 
-    async def store(self, files: List[File]):
+    async def store(self, files: list[File]):
         destinations = {file.destination for file in files}
         tasks = [
             ensure_existence_async(os.path.join(DATA_DIR, destination))

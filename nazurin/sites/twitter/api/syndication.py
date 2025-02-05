@@ -1,5 +1,4 @@
 from http import HTTPStatus
-from typing import List
 
 from nazurin.models import Illust, Image, Ugoira
 from nazurin.utils import Request
@@ -24,10 +23,13 @@ class SyndicationAPI(BaseAPI):
             "id": str(status_id),
             "lang": "en",
         }
-        async with Request() as request, request.get(
-            self.API_URL,
-            params=params,
-        ) as response:
+        async with (
+            Request() as request,
+            request.get(
+                self.API_URL,
+                params=params,
+            ) as response,
+        ):
             if response.status == HTTPStatus.NOT_FOUND:
                 raise NazurinError("Tweet not found or unavailable.")
             response.raise_for_status()
@@ -44,7 +46,7 @@ class SyndicationAPI(BaseAPI):
         caption = self.build_caption(tweet)
         return Illust(status_id, imgs, caption, tweet)
 
-    def get_images(self, tweet) -> List[Image]:
+    def get_images(self, tweet) -> list[Image]:
         """Get all images in a tweet."""
         if "photos" not in tweet:
             raise NazurinError("No photo found.")

@@ -2,7 +2,6 @@ import json
 import os
 from datetime import datetime, timezone
 from http import HTTPStatus
-from typing import List, Tuple
 from urllib.parse import parse_qs, urlparse
 
 from bs4 import BeautifulSoup
@@ -23,13 +22,16 @@ class Lofter:
     async def get_post(self, username: str, permalink: str) -> dict:
         """Fetch a post."""
         (blog_id, post_id) = await self.get_real_id(username, permalink)
-        async with Request(headers={"User-Agent": self.UA}) as request, request.post(
-            self.API,
-            data={
-                "targetblogid": blog_id,
-                "postid": post_id,
-            },
-        ) as response:
+        async with (
+            Request(headers={"User-Agent": self.UA}) as request,
+            request.post(
+                self.API,
+                data={
+                    "targetblogid": blog_id,
+                    "postid": post_id,
+                },
+            ) as response,
+        ):
             response.raise_for_status()
 
             data = await response.json()
@@ -54,7 +56,7 @@ class Lofter:
         return Illust(int(post["id"]), imgs, caption, post)
 
     @staticmethod
-    def get_images(post: dict) -> List[Image]:
+    def get_images(post: dict) -> list[Image]:
         """Get images from post."""
         if "photoLinks" not in post:
             raise NazurinError("No images found")
@@ -78,7 +80,7 @@ class Lofter:
         return imgs
 
     @staticmethod
-    def get_storage_dest(post: dict, filename: str, index: int) -> Tuple[str, str]:
+    def get_storage_dest(post: dict, filename: str, index: int) -> tuple[str, str]:
         """
         Format destination and filename.
         """
@@ -102,7 +104,7 @@ class Lofter:
         return (DESTINATION.format_map(context), filename + extension)
 
     @network_retry
-    async def get_real_id(self, username: str, post_id: str) -> Tuple[int, int]:
+    async def get_real_id(self, username: str, post_id: str) -> tuple[int, int]:
         """Get real numeric blog ID and post ID."""
         api = f"https://{username}.lofter.com/post/{post_id}"
         async with Request() as request, request.get(api) as response:

@@ -1,7 +1,7 @@
 # Nazurin
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/5cbfed1b51a644b187ed5d9521a4ea95)](https://www.codacy.com/manual/y-young/nazurin?utm_source=github.com&utm_medium=referral&utm_content=y-young/nazurin&utm_campaign=Badge_Grade)
-![](https://img.shields.io/badge/python->%3D%203.8-blue)
+![](https://img.shields.io/badge/python->%3D%203.9-blue)
 ![](https://img.shields.io/badge/-Telegram-blue.svg?logo=telegram)
 
 [Documentation](https://nazurin.readthedocs.io/) | [中文文档](https://nazurin.readthedocs.io/zh/)

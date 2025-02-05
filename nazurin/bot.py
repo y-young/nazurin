@@ -1,6 +1,6 @@
 import asyncio
 from time import time
-from typing import List, Optional
+from typing import Optional
 
 from aiogram import Bot, flags
 from aiogram.client.default import DefaultBotProperties
@@ -55,7 +55,7 @@ class NazurinBot(Bot):
     @flags.chat_action(ChatAction.UPLOAD_PHOTO)
     async def send_single_group(
         self,
-        imgs: List[Image],
+        imgs: list[Image],
         caption: str,
         chat_id: int,
         reply_to: Optional[int] = None,
@@ -134,7 +134,7 @@ class NazurinBot(Bot):
 
     async def send_to_gallery(
         self,
-        urls: List[str],
+        urls: list[str],
         illust: Illust,
         message: Optional[Message] = None,
     ):
@@ -157,7 +157,7 @@ class NazurinBot(Bot):
 
     async def update_collection(
         self,
-        urls: List[str],
+        urls: list[str],
         message: Optional[Message] = None,
     ):
         result = self.sites.match(urls)
