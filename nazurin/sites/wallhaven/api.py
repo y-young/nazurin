@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 from http import HTTPStatus
-from typing import List, Tuple
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
@@ -42,7 +41,7 @@ class Wallhaven:
         return Illust(wallpaper_id, imgs, caption, wallpaper)
 
     @staticmethod
-    def get_images(wallpaper) -> List[Image]:
+    def get_images(wallpaper) -> list[Image]:
         url = wallpaper["path"]
         thumbnail = wallpaper["thumbs"]["large"]
         destination, filename = Wallhaven.get_storage_dest(wallpaper)
@@ -59,7 +58,7 @@ class Wallhaven:
         ]
 
     @staticmethod
-    def get_storage_dest(wallpaper: dict) -> Tuple[str, str]:
+    def get_storage_dest(wallpaper: dict) -> tuple[str, str]:
         """
         Format destination and filename.
         """

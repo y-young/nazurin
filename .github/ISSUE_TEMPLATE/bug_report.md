@@ -1,10 +1,9 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
-
+title: ""
+labels: ""
+assignees: ""
 ---
 
 **Describe the bug**
@@ -12,6 +11,7 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
+
 1. Send '...' / Invoke '...' command
 2. See error
 
@@ -23,8 +23,9 @@ Logs are usually critical to identify the cause of a bug, please paste the compl
 **Make sure to remove or mask all secrets, such as bot token and personal information!**
 
 **Environment (please complete the following information):**
- - OS: [e.g. Ubuntu]
- - Python Version [e.g. 3.8]
+
+- OS: [e.g. Ubuntu]
+- Python Version [e.g. 3.9]
 
 **Additional context**
 Add any other context about the problem here.

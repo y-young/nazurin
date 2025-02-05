@@ -2,7 +2,7 @@ import asyncio
 import os
 import pathlib
 import time
-from typing import List, Optional
+from typing import Optional
 from urllib.parse import quote
 
 from humanize import naturalsize
@@ -60,7 +60,7 @@ class OneDrive:
         # upload
         await self.stream_upload(file, response["uploadUrl"])
 
-    async def store(self, files: List[File]):
+    async def store(self, files: list[File]):
         await self.require_auth()
 
         # Create necessary folders in advance
@@ -188,11 +188,14 @@ class OneDrive:
         # make a request with access token
         _headers = self.with_credentials(headers)
         _headers["Content-Type"] = "application/json"
-        async with Request(headers=_headers) as session, session.request(
-            method,
-            url,
-            **kwargs,
-        ) as response:
+        async with (
+            Request(headers=_headers) as session,
+            session.request(
+                method,
+                url,
+                **kwargs,
+            ) as response,
+        ):
             if not response.ok:
                 logger.error(await response.text())
             response.raise_for_status()

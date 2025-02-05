@@ -2,7 +2,7 @@
 
 import asyncio
 import importlib
-from typing import ClassVar, List
+from typing import ClassVar
 
 from nazurin.config import STORAGE
 from nazurin.models import Illust
@@ -12,7 +12,7 @@ from nazurin.utils import logger
 class Storage:
     """Storage manager."""
 
-    disks: ClassVar[List[object]] = []
+    disks: ClassVar[list[object]] = []
 
     def load(self):
         """Dynamically load all storage drivers."""

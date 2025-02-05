@@ -1,4 +1,5 @@
-from typing import Any, Awaitable, Callable, Dict
+from collections.abc import Awaitable
+from typing import Any, Callable
 
 from aiogram import BaseMiddleware
 from aiogram.types import Message, Update
@@ -10,9 +11,9 @@ from nazurin.utils import logger
 class AuthMiddleware(BaseMiddleware):
     async def __call__(
         self,
-        handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+        handler: Callable[[Message, dict[str, Any]], Awaitable[Any]],
         event: Update,
-        data: Dict[str, Any],
+        data: dict[str, Any],
     ):
         if config.IS_PUBLIC:
             return await handler(event, data)
@@ -29,9 +30,9 @@ class AuthMiddleware(BaseMiddleware):
 class LoggingMiddleware(BaseMiddleware):
     async def __call__(
         self,
-        handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+        handler: Callable[[Message, dict[str, Any]], Awaitable[Any]],
         event: Message,
-        data: Dict[str, Any],
+        data: dict[str, Any],
     ):
         logger.info(
             "Message {}: {}",

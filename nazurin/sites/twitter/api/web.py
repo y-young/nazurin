@@ -216,10 +216,13 @@ class WebAPI(BaseAPI):
             headers = {}
         headers.update(WebAPI.headers)
 
-        async with Request(
-            headers=headers,
-            cookies=WebAPI.cookies,
-        ) as request, request.request(method, url, **kwargs) as response:
+        async with (
+            Request(
+                headers=headers,
+                cookies=WebAPI.cookies,
+            ) as request,
+            request.request(method, url, **kwargs) as response,
+        ):
             if not response.ok:
                 result = await response.text()
                 logger.error("Web API Error: {}, {}", response.status, result)

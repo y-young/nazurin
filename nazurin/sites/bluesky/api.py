@@ -1,5 +1,4 @@
 import os
-from typing import List, Tuple
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
@@ -18,10 +17,13 @@ class Bluesky:
         https://www.docs.bsky.app/docs/api/com-atproto-identity-resolve-handle
         """
         api = "https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle"
-        async with Request() as request, request.get(
-            api,
-            params={"handle": handle},
-        ) as response:
+        async with (
+            Request() as request,
+            request.get(
+                api,
+                params={"handle": handle},
+            ) as response,
+        ):
             data = await response.json()
             if "error" in data:
                 raise NazurinError(data["message"])
@@ -63,7 +65,7 @@ class Bluesky:
         return f"at://{authority}/{collection}/{rkey}"
 
     @staticmethod
-    def get_images(item: dict) -> List[Image]:
+    def get_images(item: dict) -> list[Image]:
         """Get all images in a post."""
         embed_images = item["embed"]["images"]
         if not embed_images or len(embed_images) == 0:
@@ -84,7 +86,7 @@ class Bluesky:
         return imgs
 
     @staticmethod
-    def get_storage_dest(item: dict, pic: dict, index: int = 0) -> Tuple[str, str]:
+    def get_storage_dest(item: dict, pic: dict, index: int = 0) -> tuple[str, str]:
         """
         Format destination and filename.
         """

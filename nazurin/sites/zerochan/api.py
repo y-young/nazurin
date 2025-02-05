@@ -1,7 +1,6 @@
 import json
 import os
 from datetime import datetime
-from typing import List, Tuple
 from urllib.parse import unquote
 
 from bs4 import BeautifulSoup
@@ -16,9 +15,12 @@ from .config import DESTINATION, FILENAME
 class Zerochan:
     @network_retry
     async def get_post(self, post_id: int):
-        async with Request() as request, request.get(
-            "https://www.zerochan.net/" + str(post_id),
-        ) as response:
+        async with (
+            Request() as request,
+            request.get(
+                "https://www.zerochan.net/" + str(post_id),
+            ) as response,
+        ):
             response.raise_for_status()
 
             # Override post_id if there's a redirection TODO: Check
@@ -60,7 +62,7 @@ class Zerochan:
         return Illust(post_id, imgs, caption, post)
 
     @staticmethod
-    def get_images(post) -> List[Image]:
+    def get_images(post) -> list[Image]:
         url = post["file_url"]
         destination, filename = Zerochan.get_storage_dest(post)
         return [
@@ -76,7 +78,7 @@ class Zerochan:
         ]
 
     @staticmethod
-    def get_storage_dest(post: dict) -> Tuple[str, str]:
+    def get_storage_dest(post: dict) -> tuple[str, str]:
         """
         Format destination and filename.
         """
