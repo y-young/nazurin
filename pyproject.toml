@@ -12,32 +12,31 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
-    "aiofiles~=23.2.1",
-    "aiogram~=3.13.0",
-    "aiohttp~=3.9.0",
+    "aiofiles~=24.1.0",
+    "aiogram~=3.17.0",
+    "aiohttp~=3.11.12",
     "aiohttp-cors~=0.7.0",
-    "aiohttp-socks~=0.8.4",
-    "aiojobs==1.2.0",
+    "aiohttp-socks~=0.10.1",
+    "aiojobs==1.3.0",
     "async-lru~=2.0.2",
-    "beautifulsoup4~=4.10.0",
+    "beautifulsoup4~=4.13.3",
     "cloudant~=2.15.0",
     "curl-cffi~=0.7.4",
     "dnspython~=2.1.0",
-    "environs~=11.0.0",
-    "firebase-admin~=6.1.0",
-    "humanize~=4.8.0",
-    "loguru~=0.6.0",
+    "environs~=14.1.0",
+    "firebase-admin~=6.6.0",
+    "humanize~=4.11.0",
+    "loguru~=0.7.3",
     "mega-py",
-    "minio~=7.1.16",
-    "motor~=3.4.0",
-    "pillow~=10.1.0",
+    "minio~=7.2.15",
+    "motor~=3.7.0",
+    "pillow~=11.1.0",
     "pixivpy3~=3.7.2",
     "pybooru~=4.2.2",
-    "pydantic~=2.7.1",
-    "pydrive2~=1.15.1",
-    "pymongo<4.9",
-    "tenacity~=8.2.2",
-    "tinydb~=4.5.2",
+    "pydantic~=2.10.6",
+    "pydrive2~=1.21.3",
+    "tenacity~=9.0.0",
+    "tinydb~=4.8.2",
 ]
 
 [project.scripts]
@@ -82,4 +81,4 @@ ignore = ["UP007", "PERF203", "COM812", "ISC001"]
 mega-py = { git = "https://github.com/y-young/mega.py", rev = "6015359" }
 
 [dependency-groups]
-dev = ["pre-commit~=3.3.0", "pytest~=8.3.3", "ruff~=0.8.6"]
+dev = ["pre-commit~=4.1.0", "pytest~=8.3.3", "ruff~=0.9.4"]
