@@ -146,8 +146,7 @@ class Kemono:
     @staticmethod
     def get_url(post: dict) -> str:
         url = (
-            f"https://kemono.su/{post['service']}"
-            f"/user/{post['user']}/post/{post['id']}"
+            f"https://kemono.su/{post['service']}/user/{post['user']}/post/{post['id']}"
         )
         revision = post.get("revision_id")
         if revision:
