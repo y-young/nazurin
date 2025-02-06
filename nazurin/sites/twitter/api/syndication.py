@@ -22,6 +22,7 @@ class SyndicationAPI(BaseAPI):
             "features": "tfw_tweet_edit_backend:on",
             "id": str(status_id),
             "lang": "en",
+            "token": str(status_id),
         }
         async with (
             Request() as request,
