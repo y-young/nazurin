@@ -4,13 +4,10 @@
 
 ### 手动部署
 
-!!! tip "提示"
-
-    你可以在安装前注释掉 `requirements.txt` 中不需要的依赖。
-
-1.  安装依赖：`pip install -r requirements.txt`
-2.  在 `.env` 中设置所需的环境变量，可参照 `.env.example`
-3.  启动：`python -m nazurin`
+1.  安装[uv](https://docs.astral.sh/uv/getting-started/installation/)
+2.  创建虚拟环境并安装依赖：`uv sync`
+3.  在 `.env` 中设置所需的环境变量，可参照 `.env.example`
+4.  启动：`uv run nazurin` 或 `python -m nazurin`
 
 ### Docker
 
