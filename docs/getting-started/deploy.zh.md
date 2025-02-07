@@ -20,7 +20,7 @@
 
 !!! note "注意"
 
-    Fly.io 的 256MB 免费内存不足以运行 ffmpeg 转换（Pixiv ugoira 动图到 MP4），提升到 512MB 应能正常工作，但这会带来额外的费用开销。
+    Fly.io 的 256MB 免费内存不足以运行 ffmpeg 转换（Pixiv ugoira 动图到 MP4），请确保至少分配 128MB 的 Swap 内存，详情请参考 `fly.toml`。
 
 ### 全新部署
 
