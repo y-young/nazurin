@@ -4,8 +4,10 @@ import json
 import secrets
 from datetime import datetime, timezone
 from http import HTTPStatus
-from http.cookies import SimpleCookie
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
+
+if TYPE_CHECKING:
+    from http.cookies import SimpleCookie
 
 from nazurin.models import Illust, Image
 from nazurin.utils.decorators import Cache, network_retry

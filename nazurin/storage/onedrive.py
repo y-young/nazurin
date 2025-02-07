@@ -155,7 +155,8 @@ class OneDrive:
             if "error" in response_json:
                 logger.error(response_json)
                 raise NazurinError(
-                    f"OneDrive authorization error: {response_json['error_description']}",
+                    "OneDrive authorization error: "
+                    + response_json["error_description"],
                 )
             self.access_token = response_json["access_token"]
             self.refresh_token = response_json["refresh_token"]
@@ -261,10 +262,8 @@ class OneDrive:
         """
 
         def sanitize(segment: str) -> str:
-            if segment.endswith("."):
-                segment = segment[:-1]
-            if segment.startswith("~"):
-                segment = segment[1:]
+            segment = segment.removesuffix(".")
+            segment = segment.removeprefix("~")
             if len(segment) == 0:
                 segment = "_"
             return segment

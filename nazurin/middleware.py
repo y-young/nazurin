@@ -25,6 +25,7 @@ class AuthMiddleware(BaseMiddleware):
             or message.from_user.username in config.ALLOW_USERNAME
         ):
             return await handler(event, data)
+        return None
 
 
 class LoggingMiddleware(BaseMiddleware):
