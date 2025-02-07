@@ -13,10 +13,7 @@ COLLECTION = "twitter"
 
 with env.prefixed("TWITTER_"):
     API: TwitterAPI = env.enum(
-        "API",
-        type=TwitterAPI,
-        default=TwitterAPI.WEB.value,
-        ignore_case=True,
+        "API", enum=TwitterAPI, default=TwitterAPI.WEB, by_value=True
     )
     # Auth token for web API
     AUTH_TOKEN: str = env.str("AUTH_TOKEN", default=None)

@@ -1,7 +1,8 @@
 import abc
 import os
+from collections.abc import AsyncGenerator
 from contextlib import AbstractAsyncContextManager, asynccontextmanager
-from typing import AsyncContextManager, AsyncGenerator, Optional, Union
+from typing import Optional, Union
 
 import aiofiles
 import cloudscraper
@@ -26,7 +27,7 @@ class NazurinRequestSession(AbstractAsyncContextManager):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def get(self, *args, **kwargs) -> AsyncContextManager:
+    async def get(self, *args, **kwargs) -> AbstractAsyncContextManager:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -127,7 +128,7 @@ class CurlRequest(CurlSession, NazurinRequestSession):
 
 class CloudScraperRequest(NazurinRequestSession):
     """
-    Wrapped curl_cffi AsyncSession to impersonate a browser,
+    Wrapped CloudScraper to pass CloudFlare checks,
     with timeout and proxy support.
     """
 

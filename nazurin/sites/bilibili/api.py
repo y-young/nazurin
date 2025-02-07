@@ -1,6 +1,5 @@
 import os
 from datetime import datetime, timezone
-from typing import List, Tuple
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
@@ -43,7 +42,7 @@ class Bilibili:
         return Illust(int(dynamic_id), imgs, caption, item)
 
     @staticmethod
-    def get_images(item: dict) -> List[Image]:
+    def get_images(item: dict) -> list[Image]:
         """Get all images in a dynamic card."""
         major_items = item["modules"]["module_dynamic"]["major"]
         if not major_items:
@@ -74,7 +73,7 @@ class Bilibili:
         return imgs
 
     @staticmethod
-    def get_storage_dest(item: dict, pic: dict, index: int = 0) -> Tuple[str, str]:
+    def get_storage_dest(item: dict, pic: dict, index: int = 0) -> tuple[str, str]:
         """
         Format destination and filename.
         """

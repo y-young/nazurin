@@ -1,5 +1,3 @@
-from typing import List
-
 from humanize import naturalsize
 
 from nazurin import bot
@@ -12,7 +10,7 @@ ALBUM_ID = env.int("ALBUM_ID")
 
 
 class Telegram:
-    async def store(self, files: List[File]):
+    async def store(self, files: list[File]):
         tasks = []
         for file in files:
             size = await file.size()

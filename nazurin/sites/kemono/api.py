@@ -1,7 +1,7 @@
 import os
 from datetime import datetime, timezone
 from mimetypes import guess_type
-from typing import ClassVar, Tuple, Union
+from typing import ClassVar, Union
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.models.file import File
@@ -116,7 +116,7 @@ class Kemono:
         return Illust("_".join(identifier), images, caption, post, download_files)
 
     @staticmethod
-    def get_storage_dest(post: dict, pretty_name: str, path: str) -> Tuple[str, str]:
+    def get_storage_dest(post: dict, pretty_name: str, path: str) -> tuple[str, str]:
         """
         Format destination and filename.
         """
@@ -146,8 +146,7 @@ class Kemono:
     @staticmethod
     def get_url(post: dict) -> str:
         url = (
-            f"https://kemono.su/{post['service']}"
-            f"/user/{post['user']}/post/{post['id']}"
+            f"https://kemono.su/{post['service']}/user/{post['user']}/post/{post['id']}"
         )
         revision = post.get("revision_id")
         if revision:

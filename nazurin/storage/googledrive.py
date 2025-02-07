@@ -1,7 +1,8 @@
 import asyncio
 import json
+from collections.abc import Awaitable
 from pathlib import PurePath
-from typing import Awaitable, Callable, List, Optional
+from typing import Callable, Optional
 
 from oauth2client.service_account import ServiceAccountCredentials
 from pydrive2.auth import GoogleAuth
@@ -66,7 +67,7 @@ class GoogleDrive:
         f.SetContentFile(file.path)
         f.Upload()
 
-    async def store(self, files: List[File]):
+    async def store(self, files: list[File]):
         # Create necessary folders in advance
         destinations = {
             # Compute relative path to STORAGE_DIR, which is GD_FOLDER

@@ -1,5 +1,5 @@
 import asyncio
-from typing import List, Optional
+from typing import Optional
 
 from mega import Mega as MegaBase
 from mega.errors import RequestError
@@ -84,7 +84,7 @@ class Mega:
                 await self.login()
                 await self.upload(file, folders, retry=True)
 
-    async def store(self, files: List[File]):
+    async def store(self, files: list[File]):
         await self.require_auth()
 
         # Create necessary folders in advance

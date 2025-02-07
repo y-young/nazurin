@@ -20,9 +20,9 @@ with env.prefixed("PIXIV_"):
     TRANSLATION: str = env.str("TRANSLATION", default=None)
     BOOKMARK_PRIVACY: PixivPrivacy = env.enum(
         "BOOKMARK_PRIVACY",
-        type=PixivPrivacy,
-        default=PixivPrivacy.PUBLIC.value,
-        ignore_case=True,
+        enum=PixivPrivacy,
+        default=PixivPrivacy.PUBLIC,
+        by_value=True,
     )
 
     with env.prefixed("FILE_"):

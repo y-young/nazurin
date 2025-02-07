@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional, Tuple
+from typing import Optional
 from urllib.parse import urlparse
 
 from nazurin.models import Caption, Illust, Image
@@ -31,7 +31,7 @@ class Gelbooru:
         caption = self.build_caption(post)
         return Illust(int(post_id), imgs, caption, post)
 
-    def get_images(self, post) -> List[Image]:
+    def get_images(self, post) -> list[Image]:
         """Get images from post."""
         url = post["file_url"]
         imgs = []
@@ -49,7 +49,7 @@ class Gelbooru:
         return imgs
 
     @staticmethod
-    def get_storage_dest(post: dict) -> Tuple[str, str]:
+    def get_storage_dest(post: dict) -> tuple[str, str]:
         """
         Format destination and filename.
         """

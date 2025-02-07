@@ -4,8 +4,10 @@ import json
 import secrets
 from datetime import datetime, timezone
 from http import HTTPStatus
-from http.cookies import SimpleCookie
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
+
+if TYPE_CHECKING:
+    from http.cookies import SimpleCookie
 
 from nazurin.models import Illust, Image
 from nazurin.utils.decorators import Cache, network_retry
@@ -216,10 +218,13 @@ class WebAPI(BaseAPI):
             headers = {}
         headers.update(WebAPI.headers)
 
-        async with Request(
-            headers=headers,
-            cookies=WebAPI.cookies,
-        ) as request, request.request(method, url, **kwargs) as response:
+        async with (
+            Request(
+                headers=headers,
+                cookies=WebAPI.cookies,
+            ) as request,
+            request.request(method, url, **kwargs) as response,
+        ):
             if not response.ok:
                 result = await response.text()
                 logger.error("Web API Error: {}, {}", response.status, result)

@@ -61,8 +61,6 @@ jobs:
         id: build
         uses: docker/build-push-action@v6
         with:
-          # Result in an empty layer in GHCR if set to true
-          provenance: false
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,"name=${{ env.DOCKERHUB_REPO }},${{ env.GHCR_REPO }}",push-by-digest=true,name-canonical=true,push=true
@@ -84,6 +82,10 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - build
+    permissions:
+      packages: write
+      id-token: write
+      attestations: write
     steps:
       - name: Download digests
         uses: actions/download-artifact@v4
@@ -96,6 +98,8 @@ jobs:
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: index
         with:
           images: |
             ${{ env.DOCKERHUB_REPO }}
@@ -123,6 +127,26 @@ jobs:
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
             $(printf '${{ env.GHCR_REPO }}@sha256:%s ' *)
       - name: Inspect image
+        id: inspect
         run: |
           docker buildx imagetools inspect ${{ env.DOCKERHUB_REPO }}:${{ steps.meta.outputs.version }}
           docker buildx imagetools inspect ${{ env.GHCR_REPO }}:${{ steps.meta.outputs.version }}
+          digest="$(
+            docker buildx imagetools inspect \
+              ${{ env.GHCR_REPO }}:${{ steps.meta.outputs.version }} \
+              --format '{{json .Manifest}}' \
+            | jq -r '.digest'
+          )"
+          echo "digest=${digest}" >> "$GITHUB_OUTPUT"
+      - name: Generate artifact attestation (Docker Hub)
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: index.docker.io/${{ env.DOCKERHUB_REPO }}
+          subject-digest: ${{ steps.inspect.outputs.digest }}
+          push-to-registry: true
+      - name: Generate artifact attestation (GitHub)
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.GHCR_REPO }}
+          subject-digest: ${{ steps.inspect.outputs.digest }}
+          push-to-registry: true

@@ -4,13 +4,10 @@
 
 ### 手动部署
 
-!!! tip "提示"
-
-    你可以在安装前注释掉 `requirements.txt` 中不需要的依赖。
-
-1.  安装依赖：`pip install -r requirements.txt`
-2.  在 `.env` 中设置所需的环境变量，可参照 `.env.example`
-3.  启动：`python -m nazurin`
+1.  安装[uv](https://docs.astral.sh/uv/getting-started/installation/)
+2.  创建虚拟环境并安装依赖：`uv sync`
+3.  在 `.env` 中设置所需的环境变量，可参照 `.env.example`
+4.  启动：`uv run nazurin` 或 `python -m nazurin`
 
 ### Docker
 
@@ -23,7 +20,7 @@
 
 !!! note "注意"
 
-    Fly.io 的 256MB 免费内存不足以运行 ffmpeg 转换（Pixiv ugoira 动图到 MP4），提升到 512MB 应能正常工作，但这会带来额外的费用开销。
+    Fly.io 的 256MB 免费内存不足以运行 ffmpeg 转换（Pixiv ugoira 动图到 MP4），请确保至少分配 128MB 的 Swap 内存，详情请参考 `fly.toml`。
 
 ### 全新部署
 

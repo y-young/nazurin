@@ -1,6 +1,5 @@
 import mimetypes
 import pathlib
-from typing import List
 
 from minio import Minio
 
@@ -46,7 +45,7 @@ class S3:
             or "application/octet-stream",
         )
 
-    async def store(self, files: List[File]):
+    async def store(self, files: list[File]):
         await self.check_bucket()
 
         tasks = [self.upload(file) for file in files]

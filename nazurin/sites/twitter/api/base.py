@@ -1,5 +1,4 @@
 import os
-from typing import Tuple
 
 from nazurin.models import Caption, File, Image, Ugoira
 from nazurin.utils import Request
@@ -24,7 +23,7 @@ class BaseAPI:
         )
 
     @staticmethod
-    def parse_url(src: str) -> Tuple[str, str, str]:
+    def parse_url(src: str) -> tuple[str, str, str]:
         """Get filename, original file url & thumbnail url of the original image
 
         eg:
@@ -42,7 +41,7 @@ class BaseAPI:
         return basename, (url + "&name=orig"), (url + "&name=large")
 
     @staticmethod
-    def get_storage_dest(filename: str, tweet: dict, index: int = 0) -> Tuple[str, str]:
+    def get_storage_dest(filename: str, tweet: dict, index: int = 0) -> tuple[str, str]:
         """
         Format destination and filename.
         """
