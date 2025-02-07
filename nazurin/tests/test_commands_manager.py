@@ -26,49 +26,41 @@ class TestCommandsManager(unittest.TestCase):
 
     def test_resolve_names(self):
         names = ["first", "second"]
-        self.assertEqual(self.manager.resolve_names(Command(*names)), names)
+        assert self.manager.resolve_names(Command(*names)) == names
 
     def test_command_list(self):
         self.manager.reset()
         self.register_commands()
-        self.assertEqual(
-            list(self.manager.list()),
-            [
-                BotCommand(command="alternative", description="First Command"),
-                BotCommand(command="first", description="First Command"),
-                BotCommand(command="second", description="Second Command"),
-            ],
-        )
+        assert list(self.manager.list()) == [
+            BotCommand(command="alternative", description="First Command"),
+            BotCommand(command="first", description="First Command"),
+            BotCommand(command="second", description="Second Command"),
+        ]
 
     def test_help_text(self):
         self.manager.reset()
         self.register_commands()
-        self.assertEqual(
-            self.manager.help_text(),
-            "/alternative, /first — First Command\n/second ARG — Second Command",
-        )
+        expected = "/alternative, /first — First Command\n/second ARG — Second Command"
+        assert self.manager.help_text() == expected
 
     def test_command_help(self):
         self.manager.reset()
         self.register_commands()
-        self.assertEqual(
-            self.manager.help("alternative"),
-            dedent(
-                """
+        expected = dedent(
+            """
             First Command
             <b>Usage:</b> /alternative, /first
 
             First Command Help Text
             """,
-            ),
         )
-        self.assertEqual(
-            self.manager.help("second"),
-            dedent(
-                """
+        assert self.manager.help("alternative") == expected
+
+        expected = dedent(
+            """
             Second Command
             <b>Usage:</b> /second ARG
             """,
-            ),
         )
-        self.assertIsNone(self.manager.help("third"))
+        assert self.manager.help("second") == expected
+        assert self.manager.help("third") is None

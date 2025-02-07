@@ -57,25 +57,36 @@ target-version = "py39"
 
 [tool.ruff.lint]
 extend-select = [
+    "ASYNC",  # flake8-async
     "B",      # flake8-bugbear
     "C4",     # flake8-comprehensions
     "COM",    # flake8-commas
     "DTZ",    # flake8-datetimez
+    "E",      # pycodestyle
+    "F",      # pyflakes
     "FBT",    # flake8-boolean-trap
+    "FURB",   # refurb
     "G",      # flake8-logging-format
     "I",      # isort
     "INP",    # flake8-no-pep420
     "ISC",    # flake8-implicit-str-concat
     "N",      # pep8-naming
     "PERF",   # perflint
+    "PIE",    # flake8-pie
     "PL",     # pylint
+    "PT",     # flake8-pytest-style
+    "Q",      # flake8-quotes
+    "RET",    # flake8-return
     "RSE102", # unnecessary-paren-on-raise-exception
     "RUF",    # ruff
     "SIM",    # flake8-simplify
     "T20",    # flake8-print
+    "TC",     # flake8-type-checking
     "UP",     # pyupgrade
+    "W",      # pycodestyle,
+    "YTT",    # flake8-2020
 ]
-ignore = ["UP007", "PERF203", "COM812", "ISC001"]
+ignore = ["UP007", "PERF203", "COM812", "ISC001", "RET504"]
 
 [tool.uv.sources]
 mega-py = { git = "https://github.com/y-young/mega.py", rev = "6015359" }

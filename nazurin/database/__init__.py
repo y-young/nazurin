@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 import importlib
-from ctypes import Union
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 
 from nazurin.config import DATABASE
 
