@@ -20,7 +20,8 @@
 
 !!! note
 
-    The 256MB free RAM on fly.io is not enough to run ffmpeg conversion (Pixiv ugoira to MP4), scaling to 512MB should work but will introduce extra costs.
+    The 256MB free RAM on fly.io is not enough to run ffmpeg conversion (Pixiv ugoira to MP4), be sure to enable at least 128MB of swap,
+    refer to `fly.toml` for details.
 
 ### Fresh Setup
 
