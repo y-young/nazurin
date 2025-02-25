@@ -1,12 +1,11 @@
 import json
 import os
+import re
 from datetime import datetime, timezone
 from http import HTTPStatus
 from typing import List, Tuple
-from urllib.parse import parse_qs, urlparse
 
 from bs4 import BeautifulSoup
-import re
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
