@@ -112,7 +112,7 @@ class Lofter:
             "sec-fetch-mode": "navigate",
             "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/135 Mobile/15E148 Version/15.0",
             "accept-language": "en-US,en;q=0.9",
-            "sec-fetch-dest": "document"
+            "sec-fetch-dest": "document",
         }
 
         async with Request(headers=headers) as request, request.get(api) as response:
@@ -122,17 +122,21 @@ class Lofter:
 
             response_text = await response.text()
             soup = BeautifulSoup(response_text, "html.parser")
-            script_tag = soup.find('script', text=re.compile('window.__initialize_data__'))
+            script_tag = soup.find(
+                "script", text=re.compile("window.__initialize_data__")
+            )
             if not script_tag:
                 raise NazurinError("Failed to get real post ID")
             script_content = script_tag.string
-            match = re.search(r'window\.__initialize_data__\s*=\s*({.*});?', script_content, re.DOTALL)
+            match = re.search(
+                r"window\.__initialize_data__\s*=\s*({.*});?", script_content, re.DOTALL
+            )
             if not match:
                 raise NazurinError("Failed to get real post ID")
             json_str = match.group(1)
             data = json.loads(json_str)
             # 根据数据层级获取 id 和 blogId
-            post_view = data['postData']['data']['postData']['postView']
-            post_id = post_view['id']
-            blog_id = post_view['blogId']
+            post_view = data["postData"]["data"]["postData"]["postView"]
+            post_id = post_view["id"]
+            blog_id = post_view["blogId"]
             return (blog_id, post_id)
