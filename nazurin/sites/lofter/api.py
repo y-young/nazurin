@@ -6,6 +6,7 @@ from typing import List, Tuple
 from urllib.parse import parse_qs, urlparse
 
 from bs4 import BeautifulSoup
+import re
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
@@ -17,7 +18,7 @@ from .config import DESTINATION, FILENAME
 
 class Lofter:
     API = "https://api.lofter.com/oldapi/post/detail.api"
-    UA = "LOFTER/6.24.0 (iPhone; iOS 15.4.1; Scale/3.00)"
+    UA = "LOFTER/8.1.12 (iPhone; iOS 18.3.1; Scale/3.00)"
 
     @network_retry
     async def get_post(self, username: str, permalink: str) -> dict:
@@ -105,16 +106,34 @@ class Lofter:
     async def get_real_id(self, username: str, post_id: str) -> Tuple[int, int]:
         """Get real numeric blog ID and post ID."""
         api = f"https://{username}.lofter.com/post/{post_id}"
-        async with Request() as request, request.get(api) as response:
+        headers = {
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "sec-fetch-site": "none",
+            "accept-encoding": "gzip, deflate, br",
+            "sec-fetch-mode": "navigate",
+            "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/135 Mobile/15E148 Version/15.0",
+            "accept-language": "en-US,en;q=0.9",
+            "sec-fetch-dest": "document"
+        }
+
+        async with Request(headers=headers) as request, request.get(api) as response:
             if response.status == HTTPStatus.NOT_FOUND:
                 raise NazurinError("Post not found")
             response.raise_for_status()
 
             response_text = await response.text()
             soup = BeautifulSoup(response_text, "html.parser")
-            iframe = soup.find("iframe", id="control_frame")
-            if not iframe:
+            script_tag = soup.find('script', text=re.compile('window.__initialize_data__'))
+            if not script_tag:
                 raise NazurinError("Failed to get real post ID")
-            src = urlparse(iframe.get("src"))
-            query = parse_qs(src.query)
-            return (query["blogId"][0], query["postId"][0])
+            script_content = script_tag.string
+            match = re.search(r'window\.__initialize_data__\s*=\s*({.*});?', script_content, re.DOTALL)
+            if not match:
+                raise NazurinError("Failed to get real post ID")
+            json_str = match.group(1)
+            data = json.loads(json_str)
+            # 根据数据层级获取 id 和 blogId
+            post_view = data['postData']['data']['postData']['postView']
+            post_id = post_view['id']
+            blog_id = post_view['blogId']
+            return (blog_id, post_id)
