@@ -2,12 +2,20 @@ from __future__ import annotations
 
 import json
 import secrets
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from http import HTTPStatus
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, ClassVar, Optional
+from urllib.parse import urlparse
+
+import bs4
+from x_client_transaction import ClientTransaction
 
 if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
     from http.cookies import SimpleCookie
+
+    from aiohttp import ClientResponse
 
 from nazurin.models import Illust, Image
 from nazurin.utils.decorators import Cache, network_retry
@@ -27,6 +35,8 @@ class Headers:
     AUTH_TYPE = "x-twitter-auth-type"
     RATE_LIMIT_LIMIT = "x-rate-limit-limit"
     RATE_LIMIT_RESET = "x-rate-limit-reset"
+    CLIENT_TRANSACTION_ID = "x-client-transaction-id"
+    REFERER = "referer"
 
 
 class AuthorizationToken:
@@ -45,7 +55,7 @@ class AuthorizationToken:
 class TweetDetailAPI:
     # From Fritter
     GUEST = "3XDB26fBve-MmjHaWTUZxA/TweetDetail"
-    LOGGED_IN = "q94uRCEn65LZThakYcPT6g/TweetDetail"
+    LOGGED_IN = "_8aYOgEDz35BrBcBal1-_w/TweetDetail"
 
 
 ERROR_MESSAGES = {
@@ -54,13 +64,14 @@ ERROR_MESSAGES = {
     "Suspended": "This account has been suspended",
 }
 
+BASE_URL = "https://x.com"
+
 
 class WebAPI(BaseAPI):
     auth_token = AUTH_TOKEN
     headers: ClassVar[dict[str, str]] = {
         "Authorization": AuthorizationToken.GUEST,
-        "Origin": "https://twitter.com",
-        "Referer": "https://twitter.com",
+        Headers.REFERER: BASE_URL,
         Headers.GUEST_TOKEN: "",
         "x-twitter-client-language": "en",
         "x-twitter-active-user": "yes",
@@ -71,37 +82,39 @@ class WebAPI(BaseAPI):
         "withCommunity": True,
         "withQuickPromoteEligibilityTweetFields": False,
         "withBirdwatchNotes": False,
-        "withDownvotePerspective": False,
-        "withReactionsMetadata": False,
-        "withReactionsPerspective": False,
         "withVoice": True,
-        "withV2Timeline": True,
     }
     features: ClassVar[dict[str, bool]] = {
-        "blue_business_profile_image_shape_enabled": False,
-        "rweb_lists_timeline_redesign_enabled": True,
-        "responsive_web_graphql_exclude_directive_enabled": True,
+        "rweb_video_screen_enabled": False,
+        "profile_label_improvements_pcf_label_in_post_enabled": True,
+        "rweb_tipjar_consumption_enabled": True,
         "verified_phone_label_enabled": False,
         "creator_subscriptions_tweet_preview_api_enabled": True,
         "responsive_web_graphql_timeline_navigation_enabled": True,
         "responsive_web_graphql_skip_user_profile_image_extensions_enabled": False,
-        "tweetypie_unmention_optimization_enabled": True,
-        "vibe_api_enabled": True,
+        "premium_content_api_read_enabled": False,
+        "communities_web_enable_tweet_community_results_fetch": True,
+        "c9s_tweet_anatomy_moderator_badge_enabled": True,
+        "responsive_web_grok_analyze_button_fetch_trends_enabled": False,
+        "responsive_web_grok_analyze_post_followups_enabled": True,
+        "responsive_web_jetfuel_frame": False,
+        "responsive_web_grok_share_attachment_enabled": True,
+        "articles_preview_enabled": True,
         "responsive_web_edit_tweet_api_enabled": True,
-        "graphql_is_translatable_rweb_tweet_is_translatable_enabled": False,
+        "graphql_is_translatable_rweb_tweet_is_translatable_enabled": True,
         "view_counts_everywhere_api_enabled": True,
         "longform_notetweets_consumption_enabled": True,
-        "responsive_web_twitter_article_tweet_consumption_enabled": False,
+        "responsive_web_twitter_article_tweet_consumption_enabled": True,
         "tweet_awards_web_tipping_enabled": False,
+        "responsive_web_grok_show_grok_translated_post": False,
+        "responsive_web_grok_analysis_button_from_backend": True,
+        "creator_subscriptions_quote_tweet_preview_enabled": False,
         "freedom_of_speech_not_reach_fetch_enabled": True,
         "standardized_nudges_misinfo": True,
         "tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled": True,
-        "interactive_text_enabled": True,
-        "responsive_web_text_conversations_enabled": False,
-        "longform_notetweets_richtext_consumption_enabled": False,
         "longform_notetweets_rich_text_read_enabled": True,
         "longform_notetweets_inline_media_enabled": True,
-        "responsive_web_media_download_video_enabled": False,
+        "responsive_web_grok_image_annotation_enabled": True,
         "responsive_web_enhance_cards_enabled": False,
     }
 
@@ -151,8 +164,8 @@ class WebAPI(BaseAPI):
         return Illust(status_id, imgs, caption, tweet)
 
     async def tweet_detail(self, tweet_id: str):
-        logger.info("Fetching tweet {} from web API", tweet_id)
-        api = "https://twitter.com/i/api/graphql/" + (
+        logger.info("Fetching tweet {} from web API /TweetDetail", tweet_id)
+        api = f"{BASE_URL}/i/api/graphql/" + (
             TweetDetailAPI.LOGGED_IN if AUTH_TOKEN else TweetDetailAPI.GUEST
         )
         self.headers.update(
@@ -171,7 +184,7 @@ class WebAPI(BaseAPI):
             "features": json.dumps(WebAPI.features),
         }
         await self._require_auth()
-        response = await self._request("GET", api, params=params)
+        response = await self._json_request("GET", api, params=params)
         try:
             return self._process_response(response, tweet_id)
         except KeyError as error:
@@ -182,10 +195,7 @@ class WebAPI(BaseAPI):
 
     async def tweet_result_by_rest_id(self, tweet_id: str):
         logger.info("Fetching tweet {} from web API /TweetResultByRestId", tweet_id)
-        api = (
-            "https://twitter.com/i/api/graphql"
-            "/0hWvDhmW8YQ-S_ib3azIrw/TweetResultByRestId"
-        )
+        api = "https://api.x.com/graphql/zAz9764BcLZOJ0JU2wrd1A/TweetResultByRestId"
         variables = WebAPI.variables
         variables.update({"tweetId": tweet_id})
         params = {
@@ -195,7 +205,7 @@ class WebAPI(BaseAPI):
         # This API uses the same token as logged-in TweetDetail
         self.headers.update({Headers.AUTHORIZATION: AuthorizationToken.LOGGED_IN})
         await self._require_auth()
-        response = await self._request("GET", api, params=params)
+        response = await self._json_request("GET", api, params=params)
         try:
             tweet_result = response["data"]["tweetResult"]
             if "result" not in tweet_result:
@@ -213,26 +223,74 @@ class WebAPI(BaseAPI):
             await self._get_guest_token()
 
     @network_retry
-    async def _request(self, method, url, headers=None, **kwargs):
+    async def _json_request(
+        self,
+        method: str,
+        url: str,
+        headers: Optional[dict] = None,
+        *,
+        require_tid=True,
+        **kwargs,
+    ):
         if not headers:
             headers = {}
+        if require_tid:
+            tid = await self._generate_transaction_id(url)
+            headers[Headers.CLIENT_TRANSACTION_ID] = tid
         headers.update(WebAPI.headers)
 
-        async with (
-            Request(
-                headers=headers,
-                cookies=WebAPI.cookies,
-            ) as request,
-            request.request(method, url, **kwargs) as response,
-        ):
+        async with self._raw_request(method, url, headers, **kwargs) as response:
             if not response.ok:
                 result = await response.text()
-                logger.error("Web API Error: {}, {}", response.status, result)
                 if response.status == HTTPStatus.UNAUTHORIZED:
                     raise NazurinError(
                         f"Failed to authenticate Twitter web API: {result}, "
                         "try updating auth token.",
                     )
+                if response.status == HTTPStatus.NOT_FOUND:
+                    raise NazurinError(
+                        "Twitter API returned status 404, this could be "
+                        "due to a temporary error or an upstream API change."
+                        "Please check if the tweet exists and try again, "
+                        "if the tweet exists but the error persists, "
+                        "raise an issue in GitHub repository."
+                    )
+                raise NazurinError(
+                    f"Twitter web API error ({response.status}, {url=}): {result}"
+                )
+            result = await response.json()
+            return result
+
+    @staticmethod
+    @asynccontextmanager
+    async def _raw_request(
+        method: str, url: str, headers: Optional[dict] = None, **kwargs
+    ) -> AsyncGenerator[ClientResponse, None]:
+        logger.debug(
+            "Sending raw requests: url={}, headers={}, cookies={}",
+            url,
+            headers,
+            WebAPI.cookies,
+        )
+
+        async with (
+            Request(
+                headers=headers,
+                cookies=WebAPI.cookies,
+                # Twitter homepage has long content-security-policy header
+                max_field_size=10000,
+            ) as request,
+            request.request(method, url, **kwargs) as response,
+        ):
+            logger.debug(
+                "Response status={}, headers={}, cookies={}",
+                response.status,
+                response.headers,
+                response.cookies,
+            )
+            if not response.ok:
+                result = await response.text()
+                logger.error("Web API Error: {}, {}", response.status, result)
                 if response.status == HTTPStatus.TOO_MANY_REQUESTS:
                     headers = response.headers
                     detail = ""
@@ -255,16 +313,18 @@ class WebAPI(BaseAPI):
                     raise NazurinError(
                         "Hit API rate limit, please try again later. " + detail,
                     )
-                raise NazurinError(f"Twitter web API error: {result}")
-            result = await response.json()
-            self._update_cookies(response.cookies)
-            return result
+            WebAPI._update_cookies(response.cookies)
+            yield response
 
-    def _update_cookies(self, cookies: SimpleCookie):
+    @staticmethod
+    def _update_cookies(cookies: SimpleCookie):
         WebAPI.cookies.update(cookies)
         # CSRF token is updated after each request
-        if cookies.get("ct0"):
-            WebAPI.headers[Headers.CSRF_TOKEN] = cookies["ct0"].value
+        if csrf_token := cookies.get("ct0"):
+            if csrf_token.value:
+                WebAPI.headers[Headers.CSRF_TOKEN] = csrf_token.value
+            else:
+                del WebAPI.headers[Headers.CSRF_TOKEN]
 
     @Cache.lru(ttl=3600)
     async def _get_guest_token(self):
@@ -272,7 +332,7 @@ class WebAPI(BaseAPI):
         WebAPI.headers[Headers.GUEST_TOKEN] = ""
         WebAPI.cookies["gt"] = ""
         api = "https://api.twitter.com/1.1/guest/activate.json"
-        response = await self._request("POST", api)
+        response = await self._json_request("POST", api, require_tid=False)
         token = response.get("guest_token")
         if not token:
             raise NazurinError(f"Failed to get guest token: {response}")
@@ -382,3 +442,26 @@ class WebAPI(BaseAPI):
         if reason in ERROR_MESSAGES:
             return ERROR_MESSAGES[reason]
         return reason
+
+    @network_retry
+    @Cache.lru(ttl=86400)
+    async def _get_home_page_source(self) -> bs4.BeautifulSoup:
+        logger.info("Fetching Twitter home page source")
+        async with self._raw_request(
+            "GET", f"{BASE_URL}/home" if AUTH_TOKEN else f"{BASE_URL}/"
+        ) as response:
+            response.raise_for_status()
+            source = await response.text()
+        return bs4.BeautifulSoup(source, "html.parser")
+
+    async def _generate_transaction_id(self, url: str, method: str = "GET") -> str:
+        path = urlparse(url).path
+        method = method.upper()
+        try:
+            home_page_source = await self._get_home_page_source()
+            tid_generator = ClientTransaction(home_page_source)
+            return tid_generator.generate_transaction_id(method, path)
+        except Exception as error:
+            message = f"Failed to generate Twitter client transaction ID: {error}"
+            logger.error(message)
+            raise NazurinError(message) from error

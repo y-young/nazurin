@@ -37,6 +37,7 @@ dependencies = [
     "pydrive2~=1.21.3",
     "tenacity~=9.0.0",
     "tinydb~=4.8.2",
+    "xclienttransaction>=0.0.2",
 ]
 
 [project.scripts]
@@ -92,4 +93,9 @@ ignore = ["UP007", "PERF203", "COM812", "ISC001", "RET504"]
 mega-py = { git = "https://github.com/y-young/mega.py", rev = "6015359" }
 
 [dependency-groups]
-dev = ["pre-commit~=4.1.0", "pytest~=8.3.3", "ruff~=0.9.4"]
+dev = [
+    "pre-commit~=4.1.0",
+    "pytest~=8.3.3",
+    "rich>=14.0.0",
+    "ruff~=0.9.4",
+]
