@@ -1,3 +1,4 @@
+import enum
 import hashlib
 from os import path
 from typing import Optional
@@ -55,3 +56,17 @@ TEMP_DIR: str = path.join(DATA_DIR, "temp")
 CLEANUP_INTERVAL: int = env.int("CLEANUP_INTERVAL", default=7)
 ACCESS_LOG_FORMAT: str = '%a "%r" %s %b "%{Referer}i" "%{User-Agent}i"'
 LOG_LEVEL: int = env.log_level("LOG_LEVEL", default="INFO")
+
+
+class FeedbackType(str, enum.Enum):
+    REPLY = "reply"
+    REACTION = "reaction"
+    BOTH = "both"
+
+
+FEEDBACK_TYPE: FeedbackType = env.enum(
+    "FEEDBACK_TYPE",
+    default=FeedbackType.REPLY,
+    enum=FeedbackType,
+    by_value=True,
+)

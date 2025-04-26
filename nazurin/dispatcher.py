@@ -5,11 +5,13 @@ from urllib.parse import urljoin
 from aiogram import Bot, Dispatcher, F
 from aiogram.enums import UpdateType
 from aiogram.types import Message, Update
+from aiogram.types.reaction_type_emoji import ReactionTypeEmoji
 from aiogram.utils.chat_action import ChatActionMiddleware
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from aiohttp import web
 
 from nazurin import config
+from nazurin.config import FeedbackType
 from nazurin.utils import logger
 from nazurin.utils.exceptions import AlreadyExistsError
 from nazurin.utils.filters import URLFilter
@@ -137,6 +139,15 @@ class NazurinDispatcher(Dispatcher):
     async def update_collection(self, message: Message, urls: list[str]):
         try:
             await self.bot.update_collection(urls, message)
-            await message.reply("Done!")
+            if config.FEEDBACK_TYPE in [
+                FeedbackType.REPLY,
+                FeedbackType.BOTH,
+            ]:
+                await message.reply("Done!")
+            if config.FEEDBACK_TYPE in [
+                FeedbackType.REACTION,
+                FeedbackType.BOTH,
+            ]:
+                await message.react([ReactionTypeEmoji(emoji="❤")])
         except AlreadyExistsError as error:
             await message.reply(error.msg)
