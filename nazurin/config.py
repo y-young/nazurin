@@ -54,3 +54,4 @@ DATA_DIR: str = "data"
 TEMP_DIR: str = path.join(DATA_DIR, "temp")
 CLEANUP_INTERVAL: int = env.int("CLEANUP_INTERVAL", default=7)
 ACCESS_LOG_FORMAT: str = '%a "%r" %s %b "%{Referer}i" "%{User-Agent}i"'
+LOG_LEVEL: int = env.log_level("LOG_LEVEL", default="INFO")

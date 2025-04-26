@@ -209,3 +209,11 @@ _Added in v2._
 Temporary directory cleanup interval, in days. Files whose access time is older than 1 day will be deleted during cleanup. Automatic cleanup will be disabled if set to `0`.
 
 _Added in v2.4.1._
+
+## LOG_LEVEL
+
+:material-lightbulb-on: Optional, defaults to `INFO`
+
+Logging level, refer to [Python logging levels](https://docs.python.org/3/howto/logging.html#logging-levels) for possible values.
+
+_Added in v2.9.0._

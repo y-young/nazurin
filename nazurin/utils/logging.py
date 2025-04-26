@@ -3,6 +3,8 @@ import sys
 
 from loguru import logger
 
+from nazurin import config
+
 
 class InterceptHandler(logging.Handler):
     """Intercept Python logging and forward to Loguru."""
@@ -35,7 +37,9 @@ def configure_logging():
         "<level>{level: <8}</level> - "
         "<cyan>{name}</cyan>:<cyan>{line}</cyan> - "
         "{extra[request]} - {message}",
-        level="DEBUG",
+        level=config.LOG_LEVEL,
     )
     logger.configure(extra={"request": ""})
-    logging.basicConfig(handlers=[InterceptHandler()], level=logging.INFO, force=True)
+    logging.basicConfig(
+        handlers=[InterceptHandler()], level=config.LOG_LEVEL, force=True
+    )
