@@ -29,17 +29,18 @@ extra_css:
 plugins:
   - awesome-pages
   - i18n:
-      default_language: en
       languages:
-        en: English
-        zh: 中文（简体）
-      nav_translations:
-        zh:
-          Home: 首页
-          Getting Started: 开始使用
-          Site: 图源
-          Storage: 存储
-          Database: 数据库
+        - locale: en
+          name: English
+          default: true
+        - locale: zh
+          name: 中文（简体）
+          nav_translations:
+            Home: 首页
+            Getting Started: 开始使用
+            Site: 图源
+            Storage: 存储
+            Database: 数据库
   - search
   - git-revision-date-localized:
       enable_creation_date: true
@@ -59,6 +60,6 @@ markdown_extensions:
           case: lower
   - attr_list
   - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - def_list
