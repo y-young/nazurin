@@ -250,10 +250,10 @@ class WebAPI(BaseAPI):
                 if response.status == HTTPStatus.NOT_FOUND:
                     raise NazurinError(
                         "Twitter API returned status 404, this could be "
-                        "due to a temporary error or an upstream API change."
-                        "Please check if the tweet exists and try again, "
+                        "due to a temporary error or an upstream API change. "
+                        "Please check if the tweet exists, clear cache and try again, "
                         "if the tweet exists but the error persists, "
-                        "raise an issue in GitHub repository."
+                        "raise an issue on GitHub."
                     )
                 raise NazurinError(
                     f"Twitter web API error ({response.status}, {url=}): {result}"
@@ -278,7 +278,7 @@ class WebAPI(BaseAPI):
                 headers=headers,
                 cookies=WebAPI.cookies,
                 # Twitter homepage has long content-security-policy header
-                max_field_size=10000,
+                max_field_size=1024 * 48,
             ) as request,
             request.request(method, url, **kwargs) as response,
         ):

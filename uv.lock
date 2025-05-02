@@ -1396,7 +1396,7 @@ requires-dist = [
     { name = "pydrive2", specifier = "~=1.21.3" },
     { name = "tenacity", specifier = "~=9.0.0" },
     { name = "tinydb", specifier = "~=4.8.2" },
-    { name = "xclienttransaction", specifier = ">=0.0.2" },
+    { name = "xclienttransaction", specifier = "~=0.0.7" },
 ]
 
 [package.metadata.requires-dev]
@@ -2278,16 +2278,16 @@ wheels = [
 
 [[package]]
 name = "xclienttransaction"
-version = "0.0.2"
+version = "0.0.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "lxml" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/73/c8/57f92ffc87973a952cb7081f465506714ba64637bda42534bb7d73b7eb37/xclienttransaction-0.0.2.tar.gz", hash = "sha256:e141500f78cc3bdfe78de77b768e58bbaa688b36f28e9df0d84223ca11709c04", size = 7356 }
+sdist = { url = "https://files.pythonhosted.org/packages/f1/28/232c36f02f315c0d5255c1d60f1c64e05cb96beb0105c974792a17c72de6/xclienttransaction-0.0.7.tar.gz", hash = "sha256:3bc4686b6026938b7b2fb617f33284ba7e219a4a2eda3f53caa8642d71b2f639", size = 7860 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/64/73/91b50685030c803633aabcbf5b3274e9f0a07a7d95c806876777eac74874/XClientTransaction-0.0.2-py3-none-any.whl", hash = "sha256:f4ce609fea1e52e3ab73bc35d89b8446500256b8bebce2e87eb8a1a3be3b6d3c", size = 8802 },
+    { url = "https://files.pythonhosted.org/packages/c8/60/ced1b16bd85f8c4ecc0fcd97fd43f58956e2ca227811905ee7fa43e6bf41/xclienttransaction-0.0.7-py3-none-any.whl", hash = "sha256:64330a1aac8963b82d941db8401e909a4537ed2d91cd8cd8d257a5eb6420c4bb", size = 9235 },
 ]
 
 [[package]]

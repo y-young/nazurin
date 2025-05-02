@@ -37,7 +37,7 @@ dependencies = [
     "pydrive2~=1.21.3",
     "tenacity~=9.0.0",
     "tinydb~=4.8.2",
-    "xclienttransaction>=0.0.2",
+    "xclienttransaction~=0.0.7",
 ]
 
 [project.scripts]
