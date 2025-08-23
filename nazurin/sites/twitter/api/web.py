@@ -5,7 +5,7 @@ import secrets
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from http import HTTPStatus
-from typing import TYPE_CHECKING, ClassVar, Optional
+from typing import TYPE_CHECKING, ClassVar
 from urllib.parse import urlparse
 
 import bs4
@@ -227,7 +227,7 @@ class WebAPI(BaseAPI):
         self,
         method: str,
         url: str,
-        headers: Optional[dict] = None,
+        headers: dict | None = None,
         *,
         require_tid=True,
         **kwargs,
@@ -264,7 +264,7 @@ class WebAPI(BaseAPI):
     @staticmethod
     @asynccontextmanager
     async def _raw_request(
-        method: str, url: str, headers: Optional[dict] = None, **kwargs
+        method: str, url: str, headers: dict | None = None, **kwargs
     ) -> AsyncGenerator[ClientResponse, None]:
         logger.debug(
             "Sending raw requests: url={}, headers={}, cookies={}",
