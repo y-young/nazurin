@@ -106,13 +106,7 @@ class Lofter:
         """Get real numeric blog ID and post ID."""
         api = f"https://{username}.lofter.com/post/{post_id}"
         headers = {
-            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "sec-fetch-site": "none",
-            "accept-encoding": "gzip, deflate, br",
-            "sec-fetch-mode": "navigate",
             "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/135 Mobile/15E148 Version/15.0",
-            "accept-language": "en-US,en;q=0.9",
-            "sec-fetch-dest": "document",
         }
 
         async with Request(headers=headers) as request, request.get(api) as response:
@@ -135,7 +129,6 @@ class Lofter:
                 raise NazurinError("Failed to get real post ID")
             json_str = match.group(1)
             data = json.loads(json_str)
-            # 根据数据层级获取 id 和 blogId
             post_view = data["postData"]["data"]["postData"]["postView"]
             post_id = post_view["id"]
             blog_id = post_view["blogId"]
