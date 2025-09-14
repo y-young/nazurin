@@ -1,6 +1,7 @@
+import enum
 import hashlib
 from os import path
-from typing import List, Optional
+from typing import Optional
 
 from environs import Env
 
@@ -19,23 +20,23 @@ HOST: str = env.str("HOST", default="0.0.0.0")
 # Port is automatically set if on Heroku or fly.io
 PORT: int = env.int("PORT", default=80)
 
-STORAGE: List[str] = env.list("STORAGE", subcast=str, default=["Local"])
+STORAGE: list[str] = env.list("STORAGE", subcast=str, default=["Local"])
 STORAGE_DIR: str = env.str("STORAGE_DIR", default="Pictures")
 
 DATABASE: str = env.str("DATABASE", default="Local")
 # Nazurin data collection in database
 NAZURIN_DATA: str = "nazurin"
 # Ignored items in image caption
-CAPTION_IGNORE: List[str] = env.list("CAPTION_IGNORE", subcast=str, default=[])
+CAPTION_IGNORE: list[str] = env.list("CAPTION_IGNORE", subcast=str, default=[])
 
 GALLERY_ID: Optional[int] = env.int("GALLERY_ID", default=None)
 
 ADMIN_ID: int = env.int("ADMIN_ID")
 IS_PUBLIC: bool = env.bool("IS_PUBLIC", default=False)
 # If IS_PUBLIC is True, the following items will be ignored
-ALLOW_ID: List[int] = env.list("ALLOW_ID", subcast=int, default=[])
-ALLOW_USERNAME: List[str] = env.list("ALLOW_USERNAME", default=[])
-ALLOW_GROUP: List[int] = env.list("ALLOW_GROUP", subcast=int, default=[])
+ALLOW_ID: list[int] = env.list("ALLOW_ID", subcast=int, default=[])
+ALLOW_USERNAME: list[str] = env.list("ALLOW_USERNAME", default=[])
+ALLOW_GROUP: list[int] = env.list("ALLOW_GROUP", subcast=int, default=[])
 
 RETRIES: int = env.int("RETRIES", default=5)
 TIMEOUT: int = env.int("TIMEOUT", default=20)
@@ -54,3 +55,18 @@ DATA_DIR: str = "data"
 TEMP_DIR: str = path.join(DATA_DIR, "temp")
 CLEANUP_INTERVAL: int = env.int("CLEANUP_INTERVAL", default=7)
 ACCESS_LOG_FORMAT: str = '%a "%r" %s %b "%{Referer}i" "%{User-Agent}i"'
+LOG_LEVEL: int = env.log_level("LOG_LEVEL", default="INFO")
+
+
+class FeedbackType(str, enum.Enum):
+    REPLY = "reply"
+    REACTION = "reaction"
+    BOTH = "both"
+
+
+FEEDBACK_TYPE: FeedbackType = env.enum(
+    "FEEDBACK_TYPE",
+    default=FeedbackType.REPLY,
+    enum=FeedbackType,
+    by_value=True,
+)

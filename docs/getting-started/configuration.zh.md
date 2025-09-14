@@ -209,3 +209,23 @@ _在 v2 中新增。_
 临时目录清理的间隔时间，单位为天。每次清理时将删除访问时间在一天前的文件。设置为 `0` 时将禁用自动清理。
 
 _在 v2.4.1 中新增。_
+
+## LOG_LEVEL
+
+:material-lightbulb-on: 可选，默认为 `INFO`
+
+日志级别，可选值请参照 [Python 日志级别](https://docs.python.org/zh-cn/3/howto/logging.html#logging-levels)。
+
+_在 v2.9.0 中新增。_
+
+## FEEDBACK_TYPE
+
+:material-lightbulb-on: 可选，默认为 `reply`
+
+图片收藏成功后的反馈方式，可选值如下：
+
+- `reply`：回复原消息
+- `reaction`: 在原消息上添加表情回应
+- `both`：回复并添加表情回应
+
+_在 v2.9.0 中新增。_

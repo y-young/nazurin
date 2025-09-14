@@ -114,7 +114,8 @@ def process(filename, source, match, origin_id):
 
 def print_result():
     logger.info(
-        "Scanned Files: %d, Matched Artworks: %d, Processed: %d, No Match: %d, Error: %d",
+        "Scanned Files: %d, Matched Artworks: %d, "
+        "Processed: %d, No Match: %d, Error: %d",
         file_cnt,
         artworks,
         success,

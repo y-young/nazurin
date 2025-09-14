@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Union
+from typing import Union
 
 from nazurin.config import MAX_PARALLEL_DOWNLOAD
 from nazurin.utils import Request
@@ -14,13 +14,13 @@ from .image import Image
 @dataclass
 class Illust:
     id: Union[int, str]
-    images: List[Image] = field(default_factory=list)
+    images: list[Image] = field(default_factory=list)
     caption: Caption = field(default_factory=Caption)
     metadata: dict = field(default_factory=dict)
-    files: List[File] = field(default_factory=list)
+    files: list[File] = field(default_factory=list)
 
     @property
-    def all_files(self) -> List[File]:
+    def all_files(self) -> list[File]:
         return self.images + self.files
 
     def has_image(self) -> bool:

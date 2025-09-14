@@ -2,7 +2,7 @@ import os
 import re
 from datetime import datetime
 from os import path
-from typing import List, Optional, Tuple
+from typing import Optional
 
 from pybooru import Danbooru as DanbooruBase
 from pybooru import PybooruHTTPError
@@ -100,7 +100,7 @@ class Danbooru:
         return DanbooruIllust(int(post["id"]), imgs, caption, post, files)
 
     @staticmethod
-    def get_storage_dest(post: dict, filename: str) -> Tuple[str, str]:
+    def get_storage_dest(post: dict, filename: str) -> tuple[str, str]:
         """
         Format destination and filename.
         """
@@ -122,7 +122,7 @@ class Danbooru:
         )
 
     @staticmethod
-    def _get_names(post) -> Tuple[str, str]:
+    def _get_names(post) -> tuple[str, str]:
         """
         Build title and filename like that one when downloading on the website,
         usually in the form of "{characters} ({copyrights}) drawn by {artists}".
@@ -179,7 +179,7 @@ class Danbooru:
         return Danbooru._normalize(Danbooru._sentence(artists.split(" ")))
 
     @staticmethod
-    def _sentence(names: List[str]) -> str:
+    def _sentence(names: list[str]) -> str:
         if len(names) == 1:
             return names[0]
         sentence = " ".join(names[:-1])

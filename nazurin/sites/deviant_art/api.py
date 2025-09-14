@@ -5,7 +5,7 @@ import re
 from datetime import datetime
 from http import HTTPStatus
 from http.cookies import SimpleCookie
-from typing import List, Optional, Tuple
+from typing import Optional
 from urllib.parse import urlparse
 
 from nazurin.models import Caption, Illust, Image
@@ -33,10 +33,13 @@ class DeviantArt:
             "deviationid": deviation_id,
             "csrf_token": self.csrf_token,
         }
-        async with Request(
-            cookies=DeviantArt.cookies,
-            headers={"Referer": BASE_URL},
-        ) as request, request.get(api, params=params) as response:
+        async with (
+            Request(
+                cookies=DeviantArt.cookies,
+                headers={"Referer": BASE_URL},
+            ) as request,
+            request.get(api, params=params) as response,
+        ):
             if response.status == HTTPStatus.NOT_FOUND:
                 raise NazurinError("Deviation not found")
             response.raise_for_status()
@@ -61,7 +64,7 @@ class DeviantArt:
         file = await self.get_download(deviation)
         return Illust(deviation_id, imgs, caption, deviation, [file] if file else [])
 
-    def get_images(self, deviation: dict) -> List[Image]:
+    def get_images(self, deviation: dict) -> list[Image]:
         """Get images from deviation."""
         filename, url, thumbnail = self.parse_url(deviation)
         original_file = deviation["extended"]["originalFile"]
@@ -85,7 +88,7 @@ class DeviantArt:
         filename: str,
         *,
         is_download: bool = False,
-    ) -> Tuple[str, str]:
+    ) -> tuple[str, str]:
         """
         Format destination and filename.
 
@@ -159,7 +162,7 @@ class DeviantArt:
             )
         return caption
 
-    def parse_url(self, deviation: dict) -> Tuple[str, str, str]:
+    def parse_url(self, deviation: dict) -> tuple[str, str, str]:
         """
         Get filename, original file url & thumbnail url of deviation.
         """

@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Union
 
 from aiogram.filters.base import Filter
 from aiogram.types import Message
@@ -7,7 +7,7 @@ from .helpers import get_urls_from_message
 
 
 class URLFilter(Filter):
-    async def __call__(self, message: Message) -> Union[bool, Dict]:
+    async def __call__(self, message: Message) -> Union[bool, dict]:
         urls = get_urls_from_message(message)
         if urls:
             return {"urls": urls}

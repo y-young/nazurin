@@ -1,7 +1,7 @@
 # Nazurin
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/5cbfed1b51a644b187ed5d9521a4ea95)](https://www.codacy.com/manual/y-young/nazurin?utm_source=github.com&utm_medium=referral&utm_content=y-young/nazurin&utm_campaign=Badge_Grade)
-![](https://img.shields.io/badge/python->%3D%203.8-blue)
+![](https://img.shields.io/badge/python->%3D%203.9-blue)
 ![](https://img.shields.io/badge/-Telegram-blue.svg?logo=telegram)
 
 [Documentation](https://nazurin.readthedocs.io/) | [中文文档](https://nazurin.readthedocs.io/zh/)
@@ -74,11 +74,10 @@ For more information, see [Documentation](https://nazurin.readthedocs.io/getting
 
 ### Manual
 
-> Tips: You may comment out unused dependencies in `requirements.txt` before installation.
-
-1.  Install dependencies: `pip install -r requirements.txt`
-2.  Set the required environment variables or place them in `.env` file, you may refer to `.env.example` as an example
-3.  Start the bot: `python -m nazurin`
+1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/)
+2. Create virtual environment and install dependencies: `uv sync`
+3. Set the required environment variables or place them in `.env` file, you may refer to `.env.example` as an example
+4. Start the bot: `uv run nazurin` or `python -m nazurin`
 
 ### Docker
 

@@ -1,15 +1,17 @@
 import asyncio
-from typing import ClassVar, List
+from typing import ClassVar
 from urllib.parse import urljoin
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.enums import UpdateType
 from aiogram.types import Message, Update
+from aiogram.types.reaction_type_emoji import ReactionTypeEmoji
 from aiogram.utils.chat_action import ChatActionMiddleware
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from aiohttp import web
 
 from nazurin import config
+from nazurin.config import FeedbackType
 from nazurin.utils import logger
 from nazurin.utils.exceptions import AlreadyExistsError
 from nazurin.utils.filters import URLFilter
@@ -21,7 +23,7 @@ from .server import NazurinServer
 
 
 class NazurinDispatcher(Dispatcher):
-    allowed_updates: ClassVar[List[UpdateType]] = [UpdateType.MESSAGE]
+    allowed_updates: ClassVar[list[UpdateType]] = [UpdateType.MESSAGE]
 
     def __init__(self, bot: NazurinBot):
         super().__init__()
@@ -134,9 +136,18 @@ class NazurinDispatcher(Dispatcher):
         if config.ENV == "production":
             await self.bot.delete_webhook(drop_pending_updates=True)
 
-    async def update_collection(self, message: Message, urls: List[str]):
+    async def update_collection(self, message: Message, urls: list[str]):
         try:
             await self.bot.update_collection(urls, message)
-            await message.reply("Done!")
+            if config.FEEDBACK_TYPE in [
+                FeedbackType.REPLY,
+                FeedbackType.BOTH,
+            ]:
+                await message.reply("Done!")
+            if config.FEEDBACK_TYPE in [
+                FeedbackType.REACTION,
+                FeedbackType.BOTH,
+            ]:
+                await message.react([ReactionTypeEmoji(emoji="❤")])
         except AlreadyExistsError as error:
             await message.reply(error.msg)

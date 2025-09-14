@@ -1,6 +1,5 @@
 import os
 from datetime import datetime, timezone
-from typing import List, Tuple
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
@@ -19,10 +18,14 @@ class Bilibili:
         api = (
             f"https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?id={dynamic_id}"
         )
-        ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0"
-        async with Request(headers={"User-Agent": ua}) as request, request.get(
-            api
-        ) as response:
+        ua = (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) "
+            "Gecko/20100101 Firefox/135.0"
+        )
+        async with (
+            Request(headers={"User-Agent": ua}) as request,
+            request.get(api) as response,
+        ):
             response.raise_for_status()
             data = await response.json()
             # For some IDs, the API returns code 0 but empty content
@@ -46,7 +49,7 @@ class Bilibili:
         return Illust(int(dynamic_id), imgs, caption, item)
 
     @staticmethod
-    def get_images(item: dict) -> List[Image]:
+    def get_images(item: dict) -> list[Image]:
         """Get all images in a dynamic card."""
         major_items = item["modules"]["module_dynamic"]["major"]
         if not major_items:
@@ -77,7 +80,7 @@ class Bilibili:
         return imgs
 
     @staticmethod
-    def get_storage_dest(item: dict, pic: dict, index: int = 0) -> Tuple[str, str]:
+    def get_storage_dest(item: dict, pic: dict, index: int = 0) -> tuple[str, str]:
         """
         Format destination and filename.
         """

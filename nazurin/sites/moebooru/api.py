@@ -1,7 +1,7 @@
 import json
 import os
 from datetime import datetime, timezone
-from typing import List, Optional, Tuple
+from typing import Optional
 from urllib.parse import unquote
 
 from aiohttp.client_exceptions import ClientResponseError
@@ -85,7 +85,7 @@ class Moebooru:
             img.name = pool_name + "/" + img.name
             await img.download()  # TODO
 
-    def get_images(self, post) -> List[Image]:
+    def get_images(self, post) -> list[Image]:
         file_url = post["file_url"]
         name, _ = self.parse_url(file_url)
         destination, filename = self.get_storage_dest(post, name)
@@ -102,7 +102,7 @@ class Moebooru:
         ]
         return imgs
 
-    def get_storage_dest(self, post: dict, filename: str) -> Tuple[str, str]:
+    def get_storage_dest(self, post: dict, filename: str) -> tuple[str, str]:
         """
         Format destination and filename.
         """
@@ -152,7 +152,7 @@ class Moebooru:
         return caption
 
     @staticmethod
-    def parse_url(url: str) -> Tuple[str, str]:
+    def parse_url(url: str) -> tuple[str, str]:
         """
         Parse filename and extension from url.
         """

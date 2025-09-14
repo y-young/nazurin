@@ -4,12 +4,13 @@ import pathlib
 import re
 import shutil
 import time
+from collections.abc import Coroutine, Iterable
 from datetime import datetime
 from html import escape
 from mimetypes import guess_type
 from pathlib import Path
 from string import capwords
-from typing import Callable, Coroutine, Iterable, List, Union
+from typing import Callable, Union
 
 import aiofiles
 import aiofiles.os
@@ -106,7 +107,7 @@ def sanitize_caption(caption: Caption) -> str:
     return content
 
 
-def get_urls_from_message(message: Message) -> List[str]:
+def get_urls_from_message(message: Message) -> list[str]:
     if message.entities:
         entities = message.entities
         text = message.text
@@ -227,6 +228,6 @@ def check_image(path: Union[str, os.PathLike]) -> bool:
 
 async def run_in_pool(tasks: Iterable[Coroutine], pool_size: int):
     scheduler = await aiojobs.create_scheduler(limit=pool_size)
-    jobs: List[aiojobs.Job] = [await scheduler.spawn(task) for task in tasks]
+    jobs: list[aiojobs.Job] = [await scheduler.spawn(task) for task in tasks]
     await asyncio.gather(*[job.wait() for job in jobs])
     await scheduler.close()

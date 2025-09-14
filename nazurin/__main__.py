@@ -102,7 +102,7 @@ async def on_error(event: ErrorEvent):
     except asyncio.TimeoutError:
         traceback.print_exc()
         await message.reply("Error: Timeout, please try again.")
-    except Exception as error:  # pylint: disable=broad-except
+    except Exception as error:
         logger.exception("Update {} caused {}: {}", update, type(error), error)
         if not isinstance(error, TelegramAPIError):
             await message.reply(f"Error: {format_error(error)}")
