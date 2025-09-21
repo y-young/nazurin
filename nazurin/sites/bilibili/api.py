@@ -1,4 +1,5 @@
 import os
+from contextlib import suppress
 from datetime import datetime, timezone
 
 from nazurin.models import Caption, Illust, Image
@@ -112,19 +113,31 @@ class Bilibili:
     @staticmethod
     def build_caption(item: dict) -> Caption:
         modules = item["modules"]
+        content = modules["module_dynamic"]["desc"]
+        if content:
+            content = content.get("text", None)
         return Caption(
             {
                 "author": "#" + modules["module_author"]["name"],
-                "content": modules["module_dynamic"]["desc"]["text"],
+                "content": content,
             },
         )
 
     @staticmethod
     def cleanup_item(item: dict) -> dict:
-        try:
-            del item["basic"]
-            del item["modules"]["module_author"]["avatar"]
-            del item["modules"]["module_more"]
-        except KeyError:
-            pass
+        keys = [
+            ["basic"],
+            ["modules", "module_more"],
+            ["modules", "module_author", "avatar"],
+            ["modules", "module_author", "decorate"],
+            ["modules", "module_author", "pendant"],
+            ["modules", "module_author", "vip"],
+        ]
+        for key in keys:
+            d = item
+            for k in key[:-1]:
+                with suppress(KeyError):
+                    d = d[k]
+            with suppress(KeyError):
+                del d[key[-1]]
         return item
