@@ -1,9 +1,10 @@
 import json
 import os
 import re
+from typing import ClassVar
 
 from nazurin.models import Caption
-from nazurin.utils import Request
+from nazurin.utils import Request, logger
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 from nazurin.utils.helpers import fromasctimeformat
@@ -13,13 +14,31 @@ from .models import WeiboIllust, WeiboImage
 
 
 class Weibo:
+    tid: ClassVar[str] = ""
+    cookies: ClassVar[dict] = {}
+
+    VISITOR_SYSTEM_SUCCESS_CODE: ClassVar[int] = 20000000
+
     @network_retry
     async def get_post(self, post_id: str):
         """Fetch a post."""
-        api = f"https://m.weibo.cn/detail/{post_id}"
-        async with Request() as request, request.get(api) as response:
-            response.raise_for_status()
-            html = await response.text()
+        post_url = f"https://m.weibo.cn/detail/{post_id}"
+        async with (
+            Request(cookies=Weibo.cookies) as request,
+            request.get(post_url) as response,
+        ):
+            if response.url.host == "visitor.passport.weibo.cn":
+                logger.info("Handling Weibo visitor system: {}", response.url)
+                await self._handle_visitor_system(post_url, str(response.url))
+                async with (
+                    Request(cookies=Weibo.cookies) as new_request,
+                    new_request.get(post_url) as new_response,
+                ):
+                    new_response.raise_for_status()
+                    html = await new_response.text()
+            else:
+                response.raise_for_status()
+                html = await response.text()
             post = self.parse_html(html)
             return post
 
@@ -170,3 +189,57 @@ class Weibo:
         except json.JSONDecodeError:
             raise NazurinError("Failed to parse post data") from None
         return post
+
+    async def _handle_visitor_system(
+        self, post_url: str, visitor_system_url: str
+    ) -> None:
+        token_url = "https://visitor.passport.weibo.cn/visitor/genvisitor2"
+        payload = {
+            "cb": "visitor_gray_callback",
+            "ver": "20250916",
+            "tid": Weibo.tid,
+            "from": "weibo",
+            "webdriver": "false",
+            "return_url": post_url,
+        }
+        async with (
+            Request(
+                headers={
+                    "Referer": visitor_system_url,
+                }
+            ) as request,
+            request.post(token_url, data=payload) as response,
+        ):
+            if not response.ok:
+                message = (
+                    "Weibo visitor system token request failed "
+                    f"with status code {response.status}"
+                )
+                logger.error(
+                    "{}: {}",
+                    message,
+                    await response.text(),
+                )
+                raise NazurinError(message)
+            match = re.search(
+                r"visitor_gray_callback\((.*?)\);",
+                await response.text(),
+                re.MULTILINE,
+            )
+            try:
+                data = json.loads(match.group(1)) if match else None
+            except json.JSONDecodeError:
+                data = None
+            if not data or data.get("retcode") != Weibo.VISITOR_SYSTEM_SUCCESS_CODE:
+                logger.error(
+                    "Failed to handle Weibo visitor system, response: {}",
+                    await response.text(),
+                )
+                raise NazurinError("Failed to get token from Weibo visitor system")
+            Weibo.tid = data["data"]["tid"]
+            Weibo.cookies = {
+                "tid": Weibo.tid,
+                "SUB": data["data"]["sub"],
+                "SUBP": data["data"]["subp"],
+            }
+            logger.info("Successfully got token from Weibo visitor system")
