@@ -3,7 +3,7 @@ from contextlib import suppress
 from datetime import datetime, timezone
 
 from nazurin.models import Caption, Illust, Image
-from nazurin.utils import Request
+from nazurin.utils import Request, logger
 from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
@@ -19,24 +19,25 @@ class Bilibili:
         api = (
             f"https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?id={dynamic_id}"
         )
-        ua = (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) "
-            "Gecko/20100101 Firefox/135.0"
-        )
         async with (
-            Request(headers={"User-Agent": ua}) as request,
+            Request(
+                headers={
+                    "Referer": f"https://t.bilibili.com/{dynamic_id}",
+                }
+            ) as request,
             request.get(api) as response,
         ):
             response.raise_for_status()
             data = await response.json()
             # For some IDs, the API returns code 0 but empty content
             code = data.get("code")
-            if code == ERROR_NOT_FOUND or "data" not in data:
+            if code == ERROR_NOT_FOUND:
                 raise NazurinError("Dynamic not found")
-            if code != 0:
+            if code != 0 or "data" not in data:
+                logger.error("Bilibili API returned error: %s", data)
                 raise NazurinError(
                     f"Failed to get dynamic: code = {code}, "
-                    f"message = {data['message']}",
+                    f"message = {data.get('message')}",
                 )
         item = data["data"]["item"]
         return self.cleanup_item(item)
