@@ -6,9 +6,9 @@ import shutil
 import subprocess
 import time
 import zipfile
+from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
-from typing import Callable
 
 import aiofiles
 import aiofiles.os

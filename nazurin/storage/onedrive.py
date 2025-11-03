@@ -2,7 +2,6 @@ import asyncio
 import os
 import pathlib
 import time
-from typing import Optional
 from urllib.parse import quote
 
 from humanize import naturalsize
@@ -73,7 +72,7 @@ class OneDrive:
         await run_in_pool(tasks, MAX_PARALLEL_UPLOAD)
 
     @network_retry
-    async def find_folder(self, name: str) -> Optional[str]:
+    async def find_folder(self, name: str) -> str | None:
         await self.require_auth()
         # https://docs.microsoft.com/zh-cn/graph/api/driveitem-list-children?view=graph-rest-1.0&tabs=http
         url = f"{BASE_URL}/me/drive/root/children"
@@ -240,7 +239,7 @@ class OneDrive:
                 )
         logger.info("[File {}] Upload completed", file.name)
 
-    def with_credentials(self, headers: Optional[dict] = None) -> dict:
+    def with_credentials(self, headers: dict | None = None) -> dict:
         """
         Add credentials to the request header.
         """

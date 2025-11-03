@@ -4,13 +4,12 @@ import pathlib
 import re
 import shutil
 import time
-from collections.abc import Coroutine, Iterable
+from collections.abc import Callable, Coroutine, Iterable
 from datetime import datetime
 from html import escape
 from mimetypes import guess_type
 from pathlib import Path
 from string import capwords
-from typing import Callable, Union
 
 import aiofiles
 import aiofiles.os
@@ -207,7 +206,7 @@ async def remove_files_older_than(path: str, days: int):
 
 
 @async_wrap
-def check_image(path: Union[str, os.PathLike]) -> bool:
+def check_image(path: str | os.PathLike) -> bool:
     """
     Check if file is a valid image and not truncated.
     """

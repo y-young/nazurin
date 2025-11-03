@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Union
 
 from .caption import Caption
 from .file import File
@@ -12,7 +11,7 @@ class Ugoira(Illust):
 
     def __init__(
         self,
-        id: Union[int, str],
+        id: int | str,
         video,
         caption=None,
         metadata=None,

@@ -2,7 +2,6 @@ import os
 import re
 from datetime import datetime
 from os import path
-from typing import Optional
 
 from pybooru import Danbooru as DanbooruBase
 from pybooru import PybooruHTTPError
@@ -28,8 +27,8 @@ class Danbooru:
 
     async def get_post(
         self,
-        post_id: Optional[int] = None,
-        md5: Optional[str] = None,
+        post_id: int | None = None,
+        md5: str | None = None,
     ) -> dict:
         """Fetch a post."""
         try:
@@ -50,8 +49,8 @@ class Danbooru:
 
     async def view(
         self,
-        post_id: Optional[int] = None,
-        md5: Optional[str] = None,
+        post_id: int | None = None,
+        md5: str | None = None,
     ) -> DanbooruIllust:
         post = await self.get_post(post_id, md5)
         illust = self.parse_post(post)

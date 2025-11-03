@@ -1,5 +1,4 @@
 import os
-from typing import Optional
 from urllib.parse import urlparse
 
 from nazurin.models import Caption, Illust, Image
@@ -83,7 +82,7 @@ class Gelbooru:
         )
 
     @staticmethod
-    def get_thumbnail(post) -> Optional[str]:
+    def get_thumbnail(post) -> str | None:
         """
         Get thumbnail URL from post['file_url'].
         eg:

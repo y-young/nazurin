@@ -5,7 +5,7 @@ title: 首页
 # Nazurin
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/5cbfed1b51a644b187ed5d9521a4ea95)](https://www.codacy.com/manual/y-young/nazurin?utm_source=github.com&utm_medium=referral&utm_content=y-young/nazurin&utm_campaign=Badge_Grade)
-![](https://img.shields.io/badge/python->%3D%203.9-blue)
+![](https://img.shields.io/badge/python->%3D%203.10-blue)
 
 小さな小さな賢将，帮助你从各种网站收集 ACG 插画的 Telegram 机器人。
 

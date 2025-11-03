@@ -1,7 +1,6 @@
 import dataclasses
 from collections.abc import Iterator
 from textwrap import dedent
-from typing import Optional
 
 from aiogram.filters import Command
 from aiogram.types import BotCommand
@@ -80,7 +79,7 @@ class CommandsManager:
             ],
         )
 
-    def help(self, command: str) -> Optional[str]:
+    def help(self, command: str) -> str | None:
         for cmd in self.commands:
             if command in cmd.names:
                 return cmd.help

@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import importlib
-from typing import Callable, Union
+from typing import TYPE_CHECKING
 
 from nazurin.config import DATABASE
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class Database:
@@ -21,7 +24,7 @@ class DatabaseDriver:
     def collection(self, key: str) -> DatabaseDriver:
         raise NotImplementedError
 
-    def document(self, key: Union[str, int]) -> DatabaseDriver:
+    def document(self, key: str | int) -> DatabaseDriver:
         raise NotImplementedError
 
     async def get(self) -> dict | None:
@@ -30,7 +33,7 @@ class DatabaseDriver:
     async def exists(self) -> bool:
         raise NotImplementedError
 
-    async def insert(self, key: Union[str, int] | None, data: dict) -> bool:
+    async def insert(self, key: str | int | None, data: dict) -> bool:
         raise NotImplementedError
 
     async def update(self, data: dict) -> bool:

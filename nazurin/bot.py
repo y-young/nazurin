@@ -1,6 +1,5 @@
 import asyncio
 from time import time
-from typing import Optional
 
 from aiogram import Bot, flags
 from aiogram.client.default import DefaultBotProperties
@@ -58,7 +57,7 @@ class NazurinBot(Bot):
         imgs: list[Image],
         caption: str,
         chat_id: int,
-        reply_to: Optional[int] = None,
+        reply_to: int | None = None,
     ):
         # TODO: Fetch display URL in batch
         media = [InputMediaPhoto(media=await img.display_url()) for img in imgs]
@@ -69,7 +68,7 @@ class NazurinBot(Bot):
         self,
         illust: Illust,
         chat_id: int,
-        reply_to: Optional[int] = None,
+        reply_to: int | None = None,
     ):
         caption = sanitize_caption(illust.caption)
         groups = []
@@ -87,8 +86,8 @@ class NazurinBot(Bot):
     async def send_illust(
         self,
         illust: Illust,
-        message: Optional[Message] = None,
-        chat_id: Optional[int] = None,
+        message: Message | None = None,
+        chat_id: int | None = None,
     ):
         reply_to = message.message_id if message else None
         if not chat_id:
@@ -120,7 +119,7 @@ class NazurinBot(Bot):
     async def send_docs(
         self,
         illust: Illust,
-        message: Optional[Message] = None,
+        message: Message | None = None,
         chat_id=None,
     ):
         if message:
@@ -136,7 +135,7 @@ class NazurinBot(Bot):
         self,
         urls: list[str],
         illust: Illust,
-        message: Optional[Message] = None,
+        message: Message | None = None,
     ):
         if isinstance(illust, Ugoira):
             await self.send_illust(illust, message, config.GALLERY_ID)
@@ -158,7 +157,7 @@ class NazurinBot(Bot):
     async def update_collection(
         self,
         urls: list[str],
-        message: Optional[Message] = None,
+        message: Message | None = None,
     ):
         result = self.sites.match(urls)
         if not result:

@@ -5,7 +5,6 @@ import re
 from datetime import datetime
 from http import HTTPStatus
 from http.cookies import SimpleCookie
-from typing import Optional
 from urllib.parse import urlparse
 
 from nazurin.models import Caption, Illust, Image
@@ -114,7 +113,7 @@ class DeviantArt:
         filename = (DOWNLOAD_FILENAME if is_download else FILENAME).format_map(context)
         return (DESTINATION.format_map(context), filename + extension)
 
-    async def get_download(self, deviation: dict) -> Optional[File]:
+    async def get_download(self, deviation: dict) -> File | None:
         if not deviation["isDownloadable"]:
             return None
         download = deviation["extended"]["download"]
