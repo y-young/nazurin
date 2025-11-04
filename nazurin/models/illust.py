@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import Union
 
 from nazurin.config import MAX_PARALLEL_DOWNLOAD
 from nazurin.utils import Request
@@ -13,7 +12,7 @@ from .image import Image
 
 @dataclass
 class Illust:
-    id: Union[int, str]
+    id: int | str
     images: list[Image] = field(default_factory=list)
     caption: Caption = field(default_factory=Caption)
     metadata: dict = field(default_factory=dict)

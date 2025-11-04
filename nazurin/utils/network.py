@@ -2,7 +2,6 @@ import abc
 import os
 from collections.abc import AsyncGenerator
 from contextlib import AbstractAsyncContextManager, asynccontextmanager
-from typing import Optional, Union
 
 import aiofiles
 import cloudscraper
@@ -19,8 +18,8 @@ from nazurin.utils.logging import logger
 class NazurinRequestSession(AbstractAsyncContextManager):
     def __init__(
         self,
-        cookies: Optional[dict] = None,
-        headers: Optional[dict] = None,
+        cookies: dict | None = None,
+        headers: dict | None = None,
         timeout: int = TIMEOUT,
         **kwargs,
     ):
@@ -31,7 +30,7 @@ class NazurinRequestSession(AbstractAsyncContextManager):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def download(self, url: str, destination: Union[str, os.PathLike]):
+    async def download(self, url: str, destination: str | os.PathLike):
         raise NotImplementedError
 
 
@@ -43,8 +42,8 @@ class Request(ClientSession, NazurinRequestSession):
 
     def __init__(
         self,
-        cookies: Optional[dict] = None,
-        headers: Optional[dict] = None,
+        cookies: dict | None = None,
+        headers: dict | None = None,
         timeout: int = TIMEOUT,
         **kwargs,
     ):
@@ -64,7 +63,7 @@ class Request(ClientSession, NazurinRequestSession):
             **kwargs,
         )
 
-    async def download(self, url: str, destination: Union[str, os.PathLike]):
+    async def download(self, url: str, destination: str | os.PathLike):
         async with self.get(url) as response:
             if not response.ok:
                 logger.error("Download failed with status code {}", response.status)
@@ -83,8 +82,8 @@ class CurlRequest(CurlSession, NazurinRequestSession):
 
     def __init__(
         self,
-        cookies: Optional[dict] = None,
-        headers: Optional[dict] = None,
+        cookies: dict | None = None,
+        headers: dict | None = None,
         timeout: int = TIMEOUT,
         **kwargs,
     ):
@@ -112,7 +111,7 @@ class CurlRequest(CurlSession, NazurinRequestSession):
             **kwargs,
         )
 
-    async def download(self, url: str, destination: Union[str, os.PathLike]):
+    async def download(self, url: str, destination: str | os.PathLike):
         async with self.get(url, stream=True) as response:
             if not response.ok:
                 logger.error(
@@ -134,8 +133,8 @@ class CloudScraperRequest(NazurinRequestSession):
 
     def __init__(
         self,
-        cookies: Optional[dict] = None,
-        headers: Optional[dict] = None,
+        cookies: dict | None = None,
+        headers: dict | None = None,
         timeout: int = TIMEOUT,
         **kwargs,
     ):
@@ -155,7 +154,7 @@ class CloudScraperRequest(NazurinRequestSession):
     ) -> AsyncGenerator[cloudscraper.requests.Response, None]:
         yield await async_wrap(self.scraper.get)(*args, timeout=self.timeout, **kwargs)
 
-    async def download(self, url: str, destination: Union[str, os.PathLike]):
+    async def download(self, url: str, destination: str | os.PathLike):
         async with self.get(url, stream=True) as response:
             if not response.ok:
                 logger.error(

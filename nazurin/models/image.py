@@ -1,6 +1,5 @@
 import os
 from dataclasses import dataclass
-from typing import Optional
 
 import aiohttp
 from humanize import naturalsize
@@ -20,7 +19,7 @@ INVALID_IMAGE_RETRIES = 3
 @dataclass
 class Image(File):
     thumbnail: str = None
-    _size: Optional[int] = None
+    _size: int | None = None
     """
     File size in bytes
     """

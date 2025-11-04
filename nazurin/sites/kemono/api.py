@@ -1,7 +1,7 @@
 import os
 from datetime import datetime, timezone
 from mimetypes import guess_type
-from typing import ClassVar, Union
+from typing import ClassVar
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.models.file import File
@@ -66,7 +66,7 @@ class Kemono:
         service: str,
         user_id: str,
         post_id: str,
-        revision_id: Union[str, None],
+        revision_id: str | None,
     ) -> Illust:
         if revision_id:
             post = await self.get_post_revision(service, user_id, post_id, revision_id)

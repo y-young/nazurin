@@ -1,7 +1,8 @@
 import asyncio
 import functools
+from collections.abc import Callable
 from functools import partial, wraps
-from typing import Callable, ClassVar
+from typing import ClassVar
 
 import tenacity
 from aiogram.exceptions import TelegramRetryAfter
@@ -26,7 +27,7 @@ def after_log(retry_state):
 
 def exception_predicate(exception):
     """Predicate to check if we should retry when an exception occurs."""
-    if not isinstance(exception, (ClientError, asyncio.exceptions.TimeoutError)):
+    if not isinstance(exception, ClientError | asyncio.exceptions.TimeoutError):
         return False
     if isinstance(exception, ClientResponseError):
         return exception.status in [408, 429, 500, 502, 503, 504]

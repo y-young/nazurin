@@ -25,7 +25,7 @@ Logs are usually critical to identify the cause of a bug, please paste the compl
 **Environment (please complete the following information):**
 
 - OS: [e.g. Ubuntu]
-- Python Version [e.g. 3.9]
+- Python Version [e.g. 3.10]
 
 **Additional context**
 Add any other context about the problem here.

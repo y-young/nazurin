@@ -1,10 +1,10 @@
 """Nazurin site plugins & plugin manager."""
 
 import re
+from collections.abc import Callable
 from glob import glob
 from importlib import import_module
 from os import path
-from typing import Callable, Optional
 
 from pydantic import BaseModel, ConfigDict
 
@@ -70,10 +70,10 @@ class SiteManager:
     def api(self, site: str):
         return self.sites[site]
 
-    def match(self, urls: list[str]) -> Optional[MatchResult]:
+    def match(self, urls: list[str]) -> MatchResult | None:
         sources = self.sources
         urls = str.join(",", urls)
-        result: Optional[MatchResult] = None
+        result: MatchResult | None = None
         matched_priority = 0
 
         for source in sources:

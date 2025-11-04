@@ -1,5 +1,4 @@
 from functools import lru_cache
-from typing import Optional, Union
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from pymongo.errors import DuplicateKeyError
@@ -29,18 +28,18 @@ class Mongo(DatabaseDriver):
         self._collection = self.db[key]
         return self
 
-    def document(self, key: Union[str, int]):
+    def document(self, key: str | int):
         self._document = key
         return self
 
-    async def get(self) -> Optional[dict]:
+    async def get(self) -> dict | None:
         return await self._collection.find_one({"_id": self._document})
 
     async def exists(self) -> bool:
         count = await self._collection.count_documents({"_id": self._document}, limit=1)
         return count > 0
 
-    async def insert(self, key: Optional[Union[str, int]], data: dict) -> bool:
+    async def insert(self, key: str | int | None, data: dict) -> bool:
         if key:
             data["_id"] = key
         try:

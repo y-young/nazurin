@@ -1,5 +1,4 @@
 import asyncio
-from typing import Optional
 
 from mega import Mega as MegaBase
 from mega.errors import RequestError
@@ -65,7 +64,7 @@ class Mega:
     async def upload(
         self,
         file: File,
-        folders: Optional[dict] = None,
+        folders: dict | None = None,
         *,
         retry: bool = False,
     ):
@@ -92,7 +91,7 @@ class Mega:
         tasks = [self.ensure_existence(destination) for destination in destinations]
         logger.info("Creating folders: {}", destinations)
         folder_ids = await asyncio.gather(*tasks)
-        folders = dict(zip(destinations, folder_ids))
+        folders = dict(zip(destinations, folder_ids, strict=True))
 
         tasks = [self.upload(file, folders) for file in files]
         await run_in_pool(tasks, MAX_PARALLEL_UPLOAD)

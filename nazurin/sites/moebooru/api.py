@@ -1,7 +1,6 @@
 import json
 import os
 from datetime import datetime, timezone
-from typing import Optional
 from urllib.parse import unquote
 
 from aiohttp.client_exceptions import ClientResponseError
@@ -22,7 +21,7 @@ class Moebooru:
     def __init__(self):
         self.url = "yande.re"
 
-    def site(self, site_url: Optional[str] = "yande.re"):
+    def site(self, site_url: str | None = "yande.re"):
         self.url = site_url
         return self
 

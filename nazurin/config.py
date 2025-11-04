@@ -1,7 +1,6 @@
 import enum
 import hashlib
 from os import path
-from typing import Optional
 
 from environs import Env
 
@@ -29,7 +28,7 @@ NAZURIN_DATA: str = "nazurin"
 # Ignored items in image caption
 CAPTION_IGNORE: list[str] = env.list("CAPTION_IGNORE", subcast=str, default=[])
 
-GALLERY_ID: Optional[int] = env.int("GALLERY_ID", default=None)
+GALLERY_ID: int | None = env.int("GALLERY_ID", default=None)
 
 ADMIN_ID: int = env.int("ADMIN_ID")
 IS_PUBLIC: bool = env.bool("IS_PUBLIC", default=False)

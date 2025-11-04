@@ -1,8 +1,7 @@
 import asyncio
 import json
-from collections.abc import Awaitable
+from collections.abc import Awaitable, Callable
 from pathlib import PurePath
-from typing import Callable, Optional
 
 from oauth2client.service_account import ServiceAccountCredentials
 from pydrive2.auth import GoogleAuth
@@ -58,7 +57,7 @@ class GoogleDrive:
         GoogleDrive.drive.auth = gauth
 
     @staticmethod
-    async def upload(file: File, folders: Optional[dict] = None):
+    async def upload(file: File, folders: dict | None = None):
         # Compute relative path to STORAGE_DIR, which is GD_FOLDER
         path = file.destination.relative_to(STORAGE_DIR).as_posix()
         parent = folders[path] if folders else await GoogleDrive.create_folders(path)
@@ -77,7 +76,7 @@ class GoogleDrive:
         tasks = [self.create_folders(destination) for destination in destinations]
         logger.info("Creating folders: {}", destinations)
         folder_ids = await asyncio.gather(*tasks)
-        folders = dict(zip(destinations, folder_ids))
+        folders = dict(zip(destinations, folder_ids, strict=True))
 
         tasks = [self.upload(item, folders) for item in files]
         await run_in_pool(tasks, MAX_PARALLEL_UPLOAD)
@@ -85,7 +84,7 @@ class GoogleDrive:
     @staticmethod
     @Cache.lru()
     @async_wrap
-    def find_folder(name: str, parent: Optional[str] = None) -> str:
+    def find_folder(name: str, parent: str | None = None) -> str:
         query = {
             "q": f"mimeType='{FOLDER_MIME}' and "
             f"title='{name}' and "
@@ -98,7 +97,7 @@ class GoogleDrive:
         return result[0].get("id")
 
     @staticmethod
-    async def create_folder(name: str, parent: Optional[str] = None) -> str:
+    async def create_folder(name: str, parent: str | None = None) -> str:
         metadata = {
             "title": name,
             "mimeType": FOLDER_MIME,
@@ -109,7 +108,7 @@ class GoogleDrive:
         return folder.get("id")
 
     @staticmethod
-    async def create_folders(path: str, parent: Optional[str] = None) -> str:
+    async def create_folders(path: str, parent: str | None = None) -> str:
         """
         Create folders recursively.
 
