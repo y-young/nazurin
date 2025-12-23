@@ -1,4 +1,5 @@
 import os
+from http import HTTPStatus
 from urllib.parse import urlparse
 
 from nazurin.models import Caption, Illust, Image
@@ -6,7 +7,7 @@ from nazurin.utils import Request
 from nazurin.utils.exceptions import NazurinError
 from nazurin.utils.helpers import fromasctimeformat
 
-from .config import DESTINATION, FILENAME
+from .config import API_KEY, DESTINATION, FILENAME, USER_ID
 
 
 class Gelbooru:
@@ -16,7 +17,14 @@ class Gelbooru:
             "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&id="
             + str(post_id)
         )
+        if API_KEY and USER_ID:
+            api += f"&api_key={API_KEY}&user_id={USER_ID}"
         async with Request() as request, request.get(api) as response:
+            if response.status == HTTPStatus.UNAUTHORIZED and not (API_KEY and USER_ID):
+                raise NazurinError(
+                    "Gelbooru API returned 401 error, you need to set API_KEY "
+                    "and USER_ID to access this post."
+                )
             response.raise_for_status()
             response_json = await response.json()
             if "post" not in response_json:
