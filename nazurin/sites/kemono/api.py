@@ -11,24 +11,38 @@ from nazurin.utils.exceptions import NazurinError
 
 from .config import DESTINATION, FILENAME
 
+from urllib.parse import quote
+
 
 class Kemono:
-    API_BASE: ClassVar[str] = "https://kemono.su/api/v1"
+    API_BASE: ClassVar[str] = "https://kemono.cr/api/v1"
+
+    HEADERS: ClassVar[dict] = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "Referer": "https://kemono.cr/",
+        "Accept": "text/css",
+        "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6",
+    }
 
     @network_retry
     async def get_post(self, service: str, user_id: str, post_id: str) -> dict:
-        """Fetch an post."""
+        """Fetch a post."""
         api = f"{self.API_BASE}/{service}/user/{user_id}/post/{post_id}"
-        async with Request() as request, request.get(api) as response:
+        async with Request() as request, request.get(api, headers=self.HEADERS) as response:
+            if response.status == 403:
+                content = await response.text()
+                raise NazurinError(f"403 Forbidden.")
+            
             response.raise_for_status()
-            post = await response.json()
-            if not post:
-                raise NazurinError("Post not found")
-            post = post["post"]
+
+            data = await response.json(content_type=None)
+        
+            post = data.get("post", data) 
+            
             username = await self.get_username(service, user_id)
             post["username"] = username
             return post
-
+            
     @network_retry
     async def get_post_revision(
         self,
@@ -39,9 +53,9 @@ class Kemono:
     ) -> dict:
         """Fetch a post revision."""
         api = f"{self.API_BASE}/{service}/user/{user_id}/post/{post_id}/revisions"
-        async with Request() as request, request.get(api) as response:
+        async with Request() as request, request.get(api, headers=self.HEADERS) as response:
             response.raise_for_status()
-            revisions = await response.json()
+            revisions = await response.json(content_type=None)
             post = None
             for revision in revisions:
                 if str(revision["revision_id"]) == revision_id:
@@ -56,11 +70,13 @@ class Kemono:
     @network_retry
     async def get_username(self, service: str, user_id: str) -> str:
         url = f"{self.API_BASE}/{service}/user/{user_id}/profile"
-        async with Request() as request, request.get(url) as response:
+        async with Request() as request, request.get(url, headers=self.HEADERS) as response:
             response.raise_for_status()
-            profile = await response.json()
+            profile = await response.json(content_type=None)
+            if isinstance(profile, list) and len(profile) > 0:
+                return profile[0].get("name", "")
             return profile.get("name", "")
-
+            
     async def fetch(
         self,
         service: str,
@@ -77,14 +93,19 @@ class Kemono:
         images = []
         download_files = []
         files = [post["file"]] if post.get("file") else []
-        files += post["attachments"]
+        #files += post["attachments"]
+        files += post.get("attachments", [])
+
         if not files:
             raise NazurinError("No files found")
 
         image_index = 0
         for file in files:
             path: str = file["path"]
-            url = "https://c1.kemono.su/data" + path
+            file_name_param = file.get("name", "")
+
+            encoded_filename = quote(file_name_param)
+            url = f"https://n2.kemono.cr/data{path}?f={encoded_filename}"
 
             # Handle non-image files
             if not self.is_image(path):
@@ -101,7 +122,9 @@ class Kemono:
                 f"{image_index} - {file['name']}",
                 path,
             )
-            thumbnail = "https://img.kemono.su/thumbnail/data" + path
+            
+            thumbnail = f"https://img.kemono.cr/thumbnail/data{path}"
+            
             images.append(
                 Image(
                     filename,
@@ -121,12 +144,18 @@ class Kemono:
         Format destination and filename.
         """
 
-        def parse_time(time: str) -> str:
-            return datetime.fromisoformat(time).replace(tzinfo=timezone.utc)
+        def parse_time(time_str):
+            # Define default time (1970-01-01)
+            if not time_str or not isinstance(time_str, str):
+                return datetime(1970, 1, 1, tzinfo=timezone.utc)
+            try:
+                return datetime.fromisoformat(time_str.replace('Z', '+00:00')).replace(tzinfo=timezone.utc)
+            except (ValueError, TypeError):
+                return datetime(1970, 1, 1, tzinfo=timezone.utc)
 
-        added = parse_time(post["added"])
-        edited = parse_time(post["edited"] or post["added"])
-        published = parse_time(post["published"])
+        added = parse_time(post.get("added"))
+        edited = parse_time(post.get("edited") or post.get("added"))
+        published = parse_time(post.get("published") or post.get("added"))
         pretty_name, _ = os.path.splitext(pretty_name)
         filename, extension = os.path.splitext(path)
         context = {
