@@ -17,7 +17,11 @@ class Kemono:
     API_BASE: ClassVar[str] = "https://kemono.cr/api/v1"
 
     HEADERS: ClassVar[dict] = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/145.0.0.0 Safari/537.36"
+        ),
         "Referer": "https://kemono.cr/",
         "Accept": "text/css",
         "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6",
@@ -31,7 +35,7 @@ class Kemono:
             Request() as request,
             request.get(api, headers=self.HEADERS) as response,
         ):
-            if response.status == 403:
+            if response.status == 403: # noqa: PLR2004
                 content = await response.text()
                 raise NazurinError(f"403 Forbidden: {content[:100]}")
 
