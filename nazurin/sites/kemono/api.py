@@ -35,7 +35,7 @@ class Kemono:
             Request() as request,
             request.get(api, headers=self.HEADERS) as response,
         ):
-            if response.status == 403: # noqa: PLR2004
+            if response.status == 403:  # noqa: PLR2004
                 content = await response.text()
                 raise NazurinError(f"403 Forbidden: {content[:100]}")
 
