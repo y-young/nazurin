@@ -2,6 +2,7 @@ import os
 from datetime import datetime, timezone
 from mimetypes import guess_type
 from typing import ClassVar
+from urllib.parse import quote
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.models.file import File
@@ -10,9 +11,6 @@ from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
 from .config import DESTINATION, FILENAME
-
-from urllib.parse import quote
-
 
 class Kemono:
     API_BASE: ClassVar[str] = "https://kemono.cr/api/v1"
@@ -31,7 +29,7 @@ class Kemono:
         async with Request() as request, request.get(api, headers=self.HEADERS) as response:
             if response.status == 403:
                 content = await response.text()
-                raise NazurinError(f"403 Forbidden.")
+                raise NazurinError(f"403 Forbidden: {content[:100]}")
             
             response.raise_for_status()
 
@@ -93,7 +91,6 @@ class Kemono:
         images = []
         download_files = []
         files = [post["file"]] if post.get("file") else []
-        #files += post["attachments"]
         files += post.get("attachments", [])
 
         if not files:
