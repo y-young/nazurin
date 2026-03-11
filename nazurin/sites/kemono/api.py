@@ -12,6 +12,7 @@ from nazurin.utils.exceptions import NazurinError
 
 from .config import DESTINATION, FILENAME
 
+
 class Kemono:
     API_BASE: ClassVar[str] = "https://kemono.cr/api/v1"
 
@@ -26,21 +27,24 @@ class Kemono:
     async def get_post(self, service: str, user_id: str, post_id: str) -> dict:
         """Fetch a post."""
         api = f"{self.API_BASE}/{service}/user/{user_id}/post/{post_id}"
-        async with Request() as request, request.get(api, headers=self.HEADERS) as response:
+        async with (
+            Request() as request,
+            request.get(api, headers=self.HEADERS) as response,
+        ):
             if response.status == 403:
                 content = await response.text()
                 raise NazurinError(f"403 Forbidden: {content[:100]}")
-            
+
             response.raise_for_status()
 
             data = await response.json(content_type=None)
-        
-            post = data.get("post", data) 
-            
+
+            post = data.get("post", data)
+
             username = await self.get_username(service, user_id)
             post["username"] = username
             return post
-            
+
     @network_retry
     async def get_post_revision(
         self,
@@ -51,7 +55,10 @@ class Kemono:
     ) -> dict:
         """Fetch a post revision."""
         api = f"{self.API_BASE}/{service}/user/{user_id}/post/{post_id}/revisions"
-        async with Request() as request, request.get(api, headers=self.HEADERS) as response:
+        async with (
+            Request() as request,
+            request.get(api, headers=self.HEADERS) as response,
+        ):
             response.raise_for_status()
             revisions = await response.json(content_type=None)
             post = None
@@ -68,13 +75,16 @@ class Kemono:
     @network_retry
     async def get_username(self, service: str, user_id: str) -> str:
         url = f"{self.API_BASE}/{service}/user/{user_id}/profile"
-        async with Request() as request, request.get(url, headers=self.HEADERS) as response:
+        async with (
+            Request() as request,
+            request.get(url, headers=self.HEADERS) as response,
+        ):
             response.raise_for_status()
             profile = await response.json(content_type=None)
             if isinstance(profile, list) and len(profile) > 0:
                 return profile[0].get("name", "")
             return profile.get("name", "")
-            
+
     async def fetch(
         self,
         service: str,
@@ -119,9 +129,9 @@ class Kemono:
                 f"{image_index} - {file['name']}",
                 path,
             )
-            
+
             thumbnail = f"https://img.kemono.cr/thumbnail/data{path}"
-            
+
             images.append(
                 Image(
                     filename,
@@ -146,7 +156,9 @@ class Kemono:
             if not time_str or not isinstance(time_str, str):
                 return datetime(1970, 1, 1, tzinfo=timezone.utc)
             try:
-                return datetime.fromisoformat(time_str.replace('Z', '+00:00')).replace(tzinfo=timezone.utc)
+                return datetime.fromisoformat(time_str.replace("Z", "+00:00")).replace(
+                    tzinfo=timezone.utc
+                )
             except (ValueError, TypeError):
                 return datetime(1970, 1, 1, tzinfo=timezone.utc)
 
