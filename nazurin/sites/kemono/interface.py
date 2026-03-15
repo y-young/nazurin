@@ -13,9 +13,9 @@ patterns = [
     # https://kemono.party/boosty/user/abcdef/post/a1b2c3-d4e5f6-7890
     # https://kemono.party/dlsite/user/RG12345/post/RE12345
     # https://kemono.party/gumroad/user/12345/post/aBc1d2
-    # https://kemono.su/subscribestar/user/abcdef/post/12345
-    # https://kemono.su/fanbox/user/12345/post/12345/revision/12345
-    r"kemono\.(?:party|su)/(\w+)/user/([\w-]+)/post/([\w-]+)(?:/revision/(\d+))?",
+    # https://kemono.cr/subscribestar/user/abcdef/post/12345
+    # https://kemono.cr/fanbox/user/12345/post/12345/revision/12345
+    r"kemono\.(?:party|su|cr)/(\w+)/user/([\w-]+)/post/([\w-]+)(?:/revision/(\d+))?",
 ]
 
 
