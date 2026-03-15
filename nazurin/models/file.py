@@ -50,14 +50,14 @@ class File:
         Get file size in bytes
         """
 
-        if os.path.exists(self.path):
+        if await aiofiles.os.path.exists(self.path):
             stat = await aiofiles.os.stat(self.path)
             return stat.st_size
         return None
 
     async def exists(self) -> bool:
         return (
-            os.path.exists(self.path)
+            await aiofiles.os.path.exists(self.path)
             and (await aiofiles.os.stat(self.path)).st_size != 0
         )
 

@@ -1,12 +1,11 @@
 import asyncio
-import os
 import shutil
 import traceback
 from textwrap import dedent
 
+import aiofiles.os
 from aiogram import flags
 from aiogram.enums import ChatAction
-from aiogram.exceptions import TelegramAPIError
 from aiogram.filters import Command, CommandObject
 from aiogram.types import ErrorEvent, Message
 from aiohttp import ClientResponseError
@@ -76,7 +75,7 @@ async def set_commands(message: Message):
 )
 async def clear_cache(message: Message):
     try:
-        if os.path.exists(config.TEMP_DIR):
+        if await aiofiles.os.path.exists(config.TEMP_DIR):
             shutil.rmtree(config.TEMP_DIR)
         Cache.clear()
         await message.reply("Cache cleared successfully.")
@@ -104,8 +103,7 @@ async def on_error(event: ErrorEvent):
         await message.reply("Error: Timeout, please try again.")
     except Exception as error:
         logger.exception("Update {} caused {}: {}", update, type(error), error)
-        if not isinstance(error, TelegramAPIError):
-            await message.reply(f"Error: {format_error(error)}")
+        await message.reply(f"Error: {format_error(error)}")
 
     return True
 

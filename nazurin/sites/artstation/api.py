@@ -104,7 +104,7 @@ class Artstation:
             'https://cdnb.artstation.com/p/assets/images/images/042/908/363/medium/_z-ed_-da.jpg'
 
         """
-        baseurl = src.split("?")[0]
+        baseurl = src.split("?", maxsplit=1)[0]
         basename = os.path.basename(baseurl)
         url = baseurl.replace("/large/", "/4k/")
         thumbnail = baseurl.replace("/large/", "/medium/")
