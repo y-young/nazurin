@@ -472,7 +472,9 @@ class WebAPI(BaseAPI):
 
             ondemand_file_url = get_ondemand_file_url(response=home_page_response)
             if not ondemand_file_url:
-                raise NazurinError("Failed to locate ondemand file url from X home page")
+                raise NazurinError(
+                    "Failed to locate ondemand file url from X home page"
+                )
 
             if ondemand_file_url.startswith("/"):
                 ondemand_file_url = urljoin(str(BASE_URL), ondemand_file_url)
