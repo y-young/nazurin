@@ -6,10 +6,11 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from http import HTTPStatus
 from typing import TYPE_CHECKING, ClassVar
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 import bs4
 from x_client_transaction import ClientTransaction
+from x_client_transaction.utils import get_ondemand_file_url
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
@@ -445,21 +446,44 @@ class WebAPI(BaseAPI):
 
     @network_retry
     @Cache.lru(ttl=86400)
-    async def _get_home_page_source(self) -> bs4.BeautifulSoup:
+    async def _get_home_page_source(self) -> str:
         logger.info("Fetching Twitter home page source")
         async with self._raw_request(
             "GET", f"{BASE_URL}/home" if AUTH_TOKEN else f"{BASE_URL}/"
         ) as response:
             response.raise_for_status()
             source = await response.text()
-        return bs4.BeautifulSoup(source, "html.parser")
+        return source
 
+    @network_retry
+    async def _fetch_js_text(self, js_url: str) -> str:
+        async with self._raw_request("GET", js_url) as response:
+            response.raise_for_status()
+            return await response.text()
+
+    @network_retry
+    @Cache.lru(ttl=3600)
     async def _generate_transaction_id(self, url: str, method: str = "GET") -> str:
         path = urlparse(url).path
         method = method.upper()
         try:
-            home_page_source = await self._get_home_page_source()
-            tid_generator = ClientTransaction(home_page_source)
+            home_html = await self._get_home_page_source()
+            home_page_response = bs4.BeautifulSoup(home_html, "html.parser")
+
+            ondemand_file_url = get_ondemand_file_url(response=home_page_response)
+            if not ondemand_file_url:
+                raise NazurinError(
+                    "Failed to locate ondemand file url from X home page"
+                )
+
+            if ondemand_file_url.startswith("/"):
+                ondemand_file_url = urljoin(str(BASE_URL), ondemand_file_url)
+
+            ondemand_file_text = await self._fetch_js_text(ondemand_file_url)
+            tid_generator = ClientTransaction(
+                home_page_response=home_page_response,
+                ondemand_file_response=ondemand_file_text,
+            )
             return tid_generator.generate_transaction_id(method, path)
         except Exception as error:
             message = f"Failed to generate Twitter client transaction ID: {error}"
