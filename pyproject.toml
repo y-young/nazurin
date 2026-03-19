@@ -30,7 +30,7 @@ dependencies = [
     "mega-py",
     "minio~=7.2.15",
     "motor~=3.7.0",
-    "pillow~=11.1.0",
+    "pillow~=12.1.1",
     "pixivpy3~=3.7.2",
     "pybooru~=4.2.2",
     "pydantic~=2.10.6",
