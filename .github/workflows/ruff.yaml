@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - "nazurin/**"
+      - ".github/workflows/ruff.yaml"
   pull_request:
     types: [opened, reopened, synchronize, edited]
     branches: [master]
@@ -16,5 +17,5 @@ jobs:
   ruff:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: y-young/ruff-action@v2
+      - uses: actions/checkout@v6
+      - uses: astral-sh/ruff-action@v3
