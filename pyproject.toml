@@ -29,14 +29,15 @@ dependencies = [
     "loguru~=0.7.3",
     "mega-py",
     "minio~=7.2.15",
-    "motor~=3.7.0",
     "pillow~=12.1.1",
     "pixivpy3~=3.7.2",
     "pybooru~=4.2.2",
     "pydantic~=2.10.6",
     "pydrive2~=1.21.3",
+    "pymongo~=4.16",
     "tenacity~=9.0.0",
     "tinydb~=4.8.2",
+    "typing-extensions>=4.12.2",
     "xclienttransaction==1.0.2",
 ]
 
