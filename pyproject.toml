@@ -13,8 +13,8 @@ classifiers = [
 ]
 dependencies = [
     "aiofiles~=24.1.0",
-    "aiogram~=3.17.0",
-    "aiohttp~=3.11.12",
+    "aiogram~=3.26",
+    "aiohttp~=3.13",
     "aiohttp-cors~=0.7.0",
     "aiohttp-socks~=0.10.1",
     "aiojobs==1.3.0",
