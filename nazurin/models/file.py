@@ -1,6 +1,6 @@
 import os
 import pathlib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import aiofiles
 import aiofiles.os
@@ -21,6 +21,11 @@ class File:
     name: str
     url: str = None
     _destination: str = ""
+    local_path: str | os.PathLike | None = field(
+        default=None,
+        kw_only=True,
+        repr=False,
+    )
 
     def __post_init__(self):
         self.name = sanitize_filename(self.name)
@@ -30,6 +35,8 @@ class File:
         """
         Path to the file in temporary directory.
         """
+        if self.local_path is not None:
+            return os.fspath(self.local_path)
         return os.path.join(TEMP_DIR, self.name)
 
     @property
@@ -66,7 +73,7 @@ class File:
         if await self.exists():
             logger.info("File {} already exists", self.path)
             return await self.size()
-        await ensure_existence_async(TEMP_DIR)
+        await ensure_existence_async(os.path.dirname(self.path) or TEMP_DIR)
         logger.info("Downloading {} to {}...", self.url, self.path)
         await session.download(self.url, self.path)
         size = await self.size()
