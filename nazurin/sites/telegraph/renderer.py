@@ -191,17 +191,19 @@ class TelegraphRenderer:
             return rendered_children
 
         tag = TAG_ALIASES.get(tag, tag)
-        if tag in DIRECT_TAGS:
-            return f"<{tag}>{rendered_children}</{tag}>"
-        if tag in VOID_TAGS:
-            return f"<{tag}>"
-        if tag == "a":
-            return self._render_anchor(node, rendered_children)
-        if tag == "img":
-            return self._render_image(node)
-        if tag in {"iframe", "video"}:
-            return self._render_embed(node, tag, rendered_children)
-        return rendered_children
+        match tag:
+            case _ if tag in DIRECT_TAGS:
+                return f"<{tag}>{rendered_children}</{tag}>"
+            case _ if tag in VOID_TAGS:
+                return f"<{tag}/>"
+            case "a":
+                return self._render_anchor(node, rendered_children)
+            case "img":
+                return self._render_image(node)
+            case "iframe" | "video":
+                return self._render_embed(node, tag, rendered_children)
+            case _:
+                return rendered_children
 
     def _attrs(self, node: dict) -> dict:
         attrs = node.get("attrs")
