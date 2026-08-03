@@ -112,7 +112,6 @@ class TelegraphIllust(Illust):
         self.page = page
         self.source_url = source_url
         self.destination = destination
-        self.archive_name = build_archive_name(page)
         self.image_references = collect_image_references(
             page["content"],
             page_url,
@@ -151,11 +150,11 @@ class TelegraphIllust(Illust):
 
     def _create_workspace(self):
         try:
-            archive_dir = Path(TEMP_DIR, "Telegraph", self.archive_name)
-            archive_dir.mkdir(parents=True, exist_ok=True)
+            workspace_root = Path(TEMP_DIR, "Telegraph")
+            workspace_root.mkdir(parents=True, exist_ok=True)
             self._workspace = tempfile.mkdtemp(
                 prefix="work-",
-                dir=archive_dir,
+                dir=workspace_root,
             )
         except OSError as error:
             raise NazurinError("Failed to create Telegraph workspace") from error
@@ -258,11 +257,6 @@ class TelegraphIllust(Illust):
         workspace = Path(self._workspace) if self._workspace else None
         if workspace and await aiofiles.os.path.exists(workspace):
             await async_wrap(shutil.rmtree)(workspace, ignore_errors=True)
-            for directory in (workspace.parent, workspace.parent.parent):
-                try:
-                    await aiofiles.os.rmdir(directory)
-                except OSError:
-                    break
         self._workspace = None
         self.article_file.local_path = None
         self.page_file.local_path = None
