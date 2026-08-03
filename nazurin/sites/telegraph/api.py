@@ -1,4 +1,3 @@
-import hashlib
 from http import HTTPStatus
 from json import JSONDecodeError
 from pathlib import PurePath
@@ -11,7 +10,7 @@ from nazurin.utils.decorators import network_retry
 from nazurin.utils.exceptions import NazurinError
 
 from .config import DESTINATION
-from .models import PATH_HASH_LENGTH, TelegraphIllust, build_archive_name
+from .models import TelegraphIllust, build_archive_name, build_path_hash
 
 ASCII_CONTROL_END = 32
 ASCII_DELETE = 127
@@ -85,9 +84,7 @@ class Telegraph:
         values = {
             **page,
             "archive_name": build_archive_name(page),
-            "path_hash": hashlib.sha256(page["path"].encode()).hexdigest()[
-                :PATH_HASH_LENGTH
-            ],
+            "path_hash": build_path_hash(page["path"]),
         }
         try:
             destination = DESTINATION.format_map(values)

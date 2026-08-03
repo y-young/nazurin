@@ -54,10 +54,15 @@ PILLOW_EXTENSIONS = {
 PATH_HASH_LENGTH = 12
 
 
+def build_path_hash(page_path: str) -> str:
+    """Build a stable short hash for a Telegraph page path."""
+    return hashlib.sha256(page_path.encode()).hexdigest()[:PATH_HASH_LENGTH]
+
+
 def build_archive_name(page: dict) -> str:
     """Build a readable storage directory name using project filename rules."""
     title = sanitize_filename(page["title"]).strip(" .") or "Untitled"
-    path_hash = hashlib.sha256(page["path"].encode()).hexdigest()[:PATH_HASH_LENGTH]
+    path_hash = build_path_hash(page["path"])
     suffix = f" ({path_hash})"
     title = title[: FILENAME_MAX_LENGTH - len(suffix)].rstrip()
     return title + suffix
@@ -83,7 +88,6 @@ class TelegraphIllust(Illust):
         )
         metadata = {
             **page,
-            "canonical_path": page["path"],
             "content_sha256": hashlib.sha256(content_json.encode()).hexdigest(),
             "source_url": source_url,
         }
@@ -113,7 +117,6 @@ class TelegraphIllust(Illust):
             page["content"],
             page_url,
         )
-        self.asset_failures: list[dict[str, str | int]] = []
         self._workspace: str | None = None
         self._prepared = False
         self._prepare_lock = asyncio.Lock()
@@ -223,13 +226,6 @@ class TelegraphIllust(Illust):
         except (ClientError, asyncio.TimeoutError, NazurinError) as error:
             if await aiofiles.os.path.exists(image.path):
                 await aiofiles.os.remove(image.path)
-            self.asset_failures.append(
-                {
-                    "occurrence": reference.occurrence,
-                    "url": reference.url,
-                    "error": str(error),
-                },
-            )
             logger.warning(
                 "Failed to download Telegraph image {}: {}",
                 reference.url,
@@ -271,5 +267,4 @@ class TelegraphIllust(Illust):
         self.article_file.local_path = None
         self.page_file.local_path = None
         self.images = []
-        self.asset_failures = []
         self._prepared = False
