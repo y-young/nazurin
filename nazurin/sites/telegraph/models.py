@@ -12,7 +12,6 @@ from urllib.parse import urlsplit
 import aiofiles
 import aiofiles.os
 from aiohttp import ClientError
-from PIL import Image as PILImage
 
 from nazurin.config import MAX_PARALLEL_DOWNLOAD, TEMP_DIR
 from nazurin.models import Caption, File, Illust, Image
@@ -40,14 +39,6 @@ TRUSTED_IMAGE_SUFFIXES = {
     ".tif",
     ".tiff",
     ".webp",
-}
-PILLOW_EXTENSIONS = {
-    "BMP": ".bmp",
-    "GIF": ".gif",
-    "JPEG": ".jpg",
-    "PNG": ".png",
-    "TIFF": ".tiff",
-    "WEBP": ".webp",
 }
 PATH_HASH_LENGTH = 12
 
@@ -211,13 +202,6 @@ class TelegraphIllust(Illust):
         image.destination = str(PurePosixPath(self.destination, "assets"))
         try:
             await image.download(session)
-            detected_suffix = await async_wrap(self._detect_extension)(image.path)
-            final_name = f"{asset_index:03d}{detected_suffix}"
-            if final_name != image.name:
-                final_path = Path(self._workspace, "assets", final_name)
-                await aiofiles.os.replace(image.path, final_path)
-                image.name = final_name
-                image.local_path = final_path
             return image, reference.occurrence
         except (ClientError, asyncio.TimeoutError, NazurinError) as error:
             if await aiofiles.os.path.exists(image.path):
@@ -228,14 +212,6 @@ class TelegraphIllust(Illust):
                 error,
             )
             return None, reference.occurrence
-
-    @staticmethod
-    def _detect_extension(path: str) -> str:
-        with PILImage.open(path) as image:
-            extension = PILLOW_EXTENSIONS.get(image.format or "")
-        if not extension:
-            raise NazurinError("Unsupported Telegraph image format")
-        return extension
 
     @staticmethod
     async def _atomic_write(path: str, content: str):

@@ -187,8 +187,6 @@ class TelegraphRenderer:
         rendered_children = (
             self._render_nodes(children) if isinstance(children, list) else ""
         )
-        if not isinstance(tag, str):
-            return rendered_children
 
         tag = TAG_ALIASES.get(tag, tag)
         match tag:
