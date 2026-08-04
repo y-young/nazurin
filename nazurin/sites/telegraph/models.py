@@ -26,11 +26,9 @@ from nazurin.utils.helpers import (
 )
 
 from .renderer import (
-    SAFE_MEDIA_SCHEMES,
     ImageReference,
     TelegraphRenderer,
     collect_image_references,
-    safe_url,
 )
 
 TRUSTED_IMAGE_SUFFIXES = {
@@ -78,8 +76,7 @@ class TelegraphIllust(Illust):
         source_url: str,
         destination: str,
     ):
-        page_url = safe_url(page.get("url"), source_url, SAFE_MEDIA_SCHEMES)
-        page_url = page_url or source_url
+        page_url = page["url"]
         content_json = json.dumps(
             page["content"],
             ensure_ascii=False,

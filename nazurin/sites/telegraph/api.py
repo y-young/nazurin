@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from http import HTTPStatus
 from json import JSONDecodeError
 from pathlib import PurePath
-from urllib.parse import quote, unquote
 
 from aiohttp import ContentTypeError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from nazurin.utils import Request
 from nazurin.utils.decorators import network_retry
@@ -12,25 +14,34 @@ from nazurin.utils.exceptions import NazurinError
 from .config import DESTINATION
 from .models import TelegraphIllust, build_archive_name, build_path_hash
 
-ASCII_CONTROL_END = 32
-ASCII_DELETE = 127
+
+class TelegraphModel(BaseModel):
+    model_config = ConfigDict(extra="allow", strict=True)
 
 
-def validate_page_path(value: str) -> str:
-    """Validate and normalize a single-segment Telegraph page path."""
-    page_path = unquote(value).strip("/")
-    if (
-        not page_path
-        or page_path in {".", ".."}
-        or "/" in page_path
-        or "\\" in page_path
-        or any(
-            ord(char) < ASCII_CONTROL_END or ord(char) == ASCII_DELETE
-            for char in page_path
-        )
-    ):
-        raise NazurinError("Invalid Telegraph page path")
-    return page_path
+class TelegraphNodeElement(TelegraphModel):
+    tag: str
+    attrs: dict[str, str] | None = None
+    children: list[str | TelegraphNodeElement] | None = None
+
+
+class TelegraphPage(TelegraphModel):
+    path: str
+    url: str
+    title: str = Field(min_length=1)
+    description: str
+    author_name: str | None = None
+    author_url: str | None = None
+    image_url: str | None = None
+    content: list[str | TelegraphNodeElement]
+    views: int
+    can_edit: bool | None = None
+
+
+class TelegraphResponse(TelegraphModel):
+    ok: bool
+    result: TelegraphPage | None = None
+    error: str | None = None
 
 
 class Telegraph:
@@ -39,7 +50,7 @@ class Telegraph:
     @network_retry
     async def get_page(self, page_path: str) -> tuple[dict, dict]:
         """Fetch a Telegraph page and return the raw envelope and page data."""
-        api_url = f"{self.API_BASE}/getPage/{quote(page_path, safe='')}"
+        api_url = f"{self.API_BASE}/getPage/{page_path}"
         async with (
             Request() as request,
             request.get(
@@ -55,23 +66,17 @@ class Telegraph:
             except (ContentTypeError, JSONDecodeError, ValueError) as error:
                 raise NazurinError("Invalid Telegraph API response") from error
 
-        if not isinstance(envelope, dict) or not isinstance(envelope.get("ok"), bool):
-            raise NazurinError("Invalid Telegraph API response")
-        if not envelope["ok"]:
-            message = envelope.get("error") or "Unknown Telegraph API error"
+        try:
+            api_response = TelegraphResponse.model_validate(envelope)
+        except ValidationError as error:
+            raise NazurinError("Invalid Telegraph API response") from error
+        if not api_response.ok:
+            message = api_response.error or "Unknown Telegraph API error"
             raise NazurinError(f"Telegraph API error: {message}")
 
-        page = envelope.get("result")
-        if not isinstance(page, dict):
+        if api_response.result is None:
             raise NazurinError("Invalid Telegraph API response")
-        if not isinstance(page.get("path"), str):
-            raise NazurinError("Invalid Telegraph API response")
-        if not isinstance(page.get("title"), str) or not page["title"]:
-            raise NazurinError("Invalid Telegraph API response")
-        if not isinstance(page.get("content"), list):
-            raise NazurinError("Invalid Telegraph API response")
-
-        page = {**page, "path": validate_page_path(page["path"])}
+        page = api_response.result.model_dump(exclude_unset=True)
         return envelope, page
 
     async def fetch(self, page_path: str, source_url: str) -> TelegraphIllust:
