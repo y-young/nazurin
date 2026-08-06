@@ -12,6 +12,7 @@ from urllib.parse import urlsplit
 import aiofiles
 import aiofiles.os
 from aiohttp import ClientError
+from PIL import Image as PILImage
 
 from nazurin.config import MAX_PARALLEL_DOWNLOAD, TEMP_DIR
 from nazurin.models import Caption, File, Illust, Image
@@ -39,6 +40,14 @@ TRUSTED_IMAGE_SUFFIXES = {
     ".tif",
     ".tiff",
     ".webp",
+}
+PILLOW_FORMAT_SUFFIXES = {
+    "BMP": ".bmp",
+    "GIF": ".gif",
+    "JPEG": ".jpg",
+    "PNG": ".png",
+    "TIFF": ".tiff",
+    "WEBP": ".webp",
 }
 PATH_HASH_LENGTH = 12
 
@@ -194,14 +203,39 @@ class TelegraphIllust(Illust):
     ) -> tuple[Image | None, int]:
         assert self._workspace is not None
         assert reference.url is not None
-        suffix = Path(urlsplit(reference.url).path).suffix.lower()
-        suffix = suffix if suffix in TRUSTED_IMAGE_SUFFIXES else ".download"
+        url_suffix = Path(urlsplit(reference.url).path).suffix.lower()
+        needs_suffix_detection = url_suffix not in TRUSTED_IMAGE_SUFFIXES
+        suffix = ".download" if needs_suffix_detection else url_suffix
         name = f"{asset_index:03d}{suffix}"
         local_path = Path(self._workspace, "assets", name)
         image = Image(name, reference.url, local_path=local_path)
         image.destination = str(PurePosixPath(self.destination, "assets"))
         try:
             await image.download(session)
+            if needs_suffix_detection:
+                detected_suffix = await self._detect_image_suffix(image.path)
+                if detected_suffix:
+                    final_name = f"{asset_index:03d}{detected_suffix}"
+                    final_path = Path(self._workspace, "assets", final_name)
+                    try:
+                        await aiofiles.os.replace(image.path, final_path)
+                    except OSError as error:
+                        if not await aiofiles.os.path.exists(image.path):
+                            raise
+                        logger.warning(
+                            "Failed to rename Telegraph image {}: {}",
+                            reference.url,
+                            error,
+                        )
+                    else:
+                        image.name = final_name
+                        image.local_path = final_path
+                else:
+                    logger.warning(
+                        "Failed to detect Telegraph image format for {}, keeping {}",
+                        reference.url,
+                        image.name,
+                    )
             return image, reference.occurrence
         except (ClientError, asyncio.TimeoutError, NazurinError) as error:
             if await aiofiles.os.path.exists(image.path):
@@ -212,6 +246,15 @@ class TelegraphIllust(Illust):
                 error,
             )
             return None, reference.occurrence
+
+    @staticmethod
+    @async_wrap
+    def _detect_image_suffix(path: str | os.PathLike) -> str | None:
+        try:
+            with PILImage.open(path) as image:
+                return PILLOW_FORMAT_SUFFIXES.get(image.format or "")
+        except OSError:
+            return None
 
     @staticmethod
     async def _atomic_write(path: str, content: str):
