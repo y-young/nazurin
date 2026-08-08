@@ -1,4 +1,6 @@
 import os
+from mimetypes import guess_extension
+from urllib.parse import urlparse
 
 from nazurin.models import Caption, Illust, Image
 from nazurin.utils import Request
@@ -14,7 +16,7 @@ class Bluesky:
     async def resolve_handle(self, handle: str):
         """
         Get the DID from handle.
-        https://www.docs.bsky.app/docs/api/com-atproto-identity-resolve-handle
+        https://endpoints.bsky.app/#bluesky-app/tag/comatprotoidentity/GET/xrpc/com.atproto.identity.resolveHandle
         """
         api = "https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle"
         async with (
@@ -34,7 +36,7 @@ class Bluesky:
     async def get_post_thread(self, uri: str, depth: int, parent_height: int):
         """
         Get posts in a thread.
-        https://www.docs.bsky.app/docs/api/app-bsky-feed-get-post-thread
+        https://endpoints.bsky.app/#bluesky-app/tag/appbskyfeed/GET/xrpc/app.bsky.feed.getPostThread
         """
         api = "https://public.api.bsky.app/xrpc/app.bsky.feed.getPostThread"
         params = {"uri": uri, "depth": depth, "parentHeight": parent_height}
@@ -70,11 +72,17 @@ class Bluesky:
         embed_images = item["embed"]["images"]
         if not embed_images or len(embed_images) == 0:
             raise NazurinError("No image found")
+        image_mimetypes = Bluesky.build_mimetypes_map(item)
         imgs = []
         for index, pic in enumerate(embed_images):
             url = pic["fullsize"]
             thumbnail = pic["thumb"]
-            destination, filename = Bluesky.get_storage_dest(item, pic, index)
+            destination, filename = Bluesky.get_storage_dest(
+                item,
+                pic,
+                image_mimetypes,
+                index,
+            )
             imgs.append(
                 Image(
                     filename,
@@ -86,15 +94,41 @@ class Bluesky:
         return imgs
 
     @staticmethod
-    def get_storage_dest(item: dict, pic: dict, index: int = 0) -> tuple[str, str]:
+    def build_mimetypes_map(item: dict) -> dict[str, str]:
+        """Map record image blob IDs to MIME types."""
+        try:
+            return {
+                image["image"]["ref"]["$link"]: image["image"]["mimeType"]
+                for image in item["record"]["embed"]["images"]
+            }
+        except (KeyError, TypeError) as error:
+            raise NazurinError("Invalid image MIME type metadata") from error
+
+    @staticmethod
+    def get_storage_dest(
+        item: dict,
+        pic: dict,
+        image_mimetypes: dict[str, str],
+        index: int = 0,
+    ) -> tuple[str, str]:
         """
         Format destination and filename.
         """
 
         url = pic["fullsize"]
         created_at = fromisoformat(item["record"]["createdAt"])
-        basename = os.path.basename(url)
-        filename, extension = basename.split("@")
+        basename = os.path.basename(urlparse(url).path)
+        try:
+            mimetype = image_mimetypes[basename]
+        except KeyError as error:
+            raise NazurinError(
+                f"No image MIME type found for blob: {basename}",
+            ) from error
+        extension = guess_extension(mimetype)
+        if extension is None:
+            raise NazurinError(f"Unsupported image MIME type: {mimetype}")
+        extension = extension.lstrip(".")
+        filename = basename
         context = {
             "rkey": item["uri"].split("/")[-1],
             "uri": item["uri"],
