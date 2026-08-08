@@ -131,6 +131,7 @@ class TelegraphRenderer:
       padding-left: 1rem;
     }}
     pre {{ background: #f5f5f5; overflow-x: auto; padding: 1rem; }}
+    .author {{ color: #79828B; }}
     .source, .embed {{ color: #666; }}
   </style>
 </head>

@@ -207,7 +207,8 @@ class TelegraphIllust(Illust):
         needs_suffix_detection = url_suffix not in TRUSTED_IMAGE_SUFFIXES
         suffix = ".download" if needs_suffix_detection else url_suffix
         name = f"{asset_index:03d}{suffix}"
-        local_path = Path(self._workspace, "assets", name)
+        assets_folder = Path(self._workspace, "assets")
+        local_path = assets_folder / name
         image = Image(name, reference.url, local_path=local_path)
         image.destination = str(PurePosixPath(self.destination, "assets"))
         try:
@@ -216,7 +217,7 @@ class TelegraphIllust(Illust):
                 detected_suffix = await self._detect_image_suffix(image.path)
                 if detected_suffix:
                     final_name = f"{asset_index:03d}{detected_suffix}"
-                    final_path = Path(self._workspace, "assets", final_name)
+                    final_path = assets_folder / final_name
                     try:
                         await aiofiles.os.replace(image.path, final_path)
                     except OSError as error:
