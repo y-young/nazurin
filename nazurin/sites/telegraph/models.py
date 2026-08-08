@@ -7,6 +7,7 @@ import os
 import shutil
 import tempfile
 from pathlib import Path, PurePosixPath
+from typing import TYPE_CHECKING
 from urllib.parse import urlsplit
 
 import aiofiles
@@ -30,6 +31,9 @@ from .renderer import (
     TelegraphRenderer,
     collect_image_references,
 )
+
+if TYPE_CHECKING:
+    from .api import TelegraphPage
 
 TRUSTED_IMAGE_SUFFIXES = {
     ".bmp",
@@ -57,10 +61,10 @@ def build_path_hash(page_path: str) -> str:
     return hashlib.sha256(page_path.encode()).hexdigest()[:PATH_HASH_LENGTH]
 
 
-def build_archive_name(page: dict) -> str:
+def build_archive_name(page: TelegraphPage) -> str:
     """Build a readable storage directory name using project filename rules."""
-    title = sanitize_filename(page["title"]).strip(" .") or "Untitled"
-    path_hash = build_path_hash(page["path"])
+    title = sanitize_filename(page.title).strip(" .") or "Untitled"
+    path_hash = build_path_hash(page.path)
     suffix = f" ({path_hash})"
     title = title[: FILENAME_MAX_LENGTH - len(suffix)].rstrip()
     return title + suffix
@@ -72,26 +76,27 @@ class TelegraphIllust(Illust):
     def __init__(
         self,
         raw_response: dict,
-        page: dict,
+        page: TelegraphPage,
         source_url: str,
         destination: str,
     ):
-        page_url = page["url"]
+        raw_page = raw_response["result"]
+        page_url = page.url
         content_json = json.dumps(
-            page["content"],
+            raw_page.get("content", []),
             ensure_ascii=False,
             separators=(",", ":"),
             sort_keys=True,
         )
         metadata = {
-            **page,
+            **raw_page,
             "content_sha256": hashlib.sha256(content_json.encode()).hexdigest(),
             "source_url": source_url,
         }
         caption = Caption(
             {
-                "title": page["title"],
-                "author": page.get("author_name"),
+                "title": page.title,
+                "author": page.author_name,
                 "url": page_url,
             },
         )
@@ -100,7 +105,7 @@ class TelegraphIllust(Illust):
         self.page_file = File("page.json")
         self.page_file.destination = destination
         super().__init__(
-            id=page["path"],
+            id=page.path,
             caption=caption,
             metadata=metadata,
             files=[self.article_file, self.page_file],
@@ -110,7 +115,7 @@ class TelegraphIllust(Illust):
         self.source_url = source_url
         self.destination = destination
         self.image_references = collect_image_references(
-            page["content"],
+            page.content,
             page_url,
         )
         self._workspace: str | None = None

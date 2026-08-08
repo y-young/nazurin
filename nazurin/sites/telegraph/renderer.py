@@ -2,8 +2,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from html import escape
-from typing import Any
+from typing import TYPE_CHECKING
 from urllib.parse import urljoin, urlsplit
+
+if TYPE_CHECKING:
+    from .api import TelegraphNode, TelegraphNodeElement, TelegraphPage
 
 SAFE_LINK_SCHEMES = {"http", "https", "mailto"}
 SAFE_MEDIA_SCHEMES = {"http", "https"}
@@ -59,18 +62,20 @@ def safe_url(value: object, base_url: str, schemes: set[str]) -> str | None:
     return resolved
 
 
-def collect_image_references(nodes: list[Any], base_url: str) -> list[ImageReference]:
+def collect_image_references(
+    nodes: list[TelegraphNode],
+    base_url: str,
+) -> list[ImageReference]:
     """Collect image nodes in document order."""
     references: list[ImageReference] = []
     occurrence = 0
 
-    def visit(node: object):
+    def visit(node: TelegraphNode):
         nonlocal occurrence
-        if not isinstance(node, dict):
+        if isinstance(node, str):
             return
-        tag = node.get("tag")
-        attrs = node.get("attrs") if isinstance(node.get("attrs"), dict) else {}
-        if tag == "img":
+        attrs = node.attrs or {}
+        if node.tag == "img":
             occurrence += 1
             url = safe_url(attrs.get("src"), base_url, SAFE_MEDIA_SCHEMES)
             references.append(
@@ -79,10 +84,8 @@ def collect_image_references(nodes: list[Any], base_url: str) -> list[ImageRefer
                     url=url,
                 ),
             )
-        children = node.get("children")
-        if isinstance(children, list):
-            for child in children:
-                visit(child)
+        for child in node.children or []:
+            visit(child)
 
     for node in nodes:
         visit(node)
@@ -92,7 +95,7 @@ def collect_image_references(nodes: list[Any], base_url: str) -> list[ImageRefer
 class TelegraphRenderer:
     def __init__(
         self,
-        page: dict,
+        page: TelegraphPage,
         source_url: str,
         image_paths: dict[int, str] | None = None,
     ):
@@ -103,10 +106,10 @@ class TelegraphRenderer:
 
     def render(self) -> str:
         self._image_occurrence = 0
-        title = escape(self.page["title"], quote=False)
+        title = escape(self.page.title, quote=False)
         author = self._render_author()
         source = self._render_source()
-        content = self._render_nodes(self.page["content"])
+        content = self._render_nodes(self.page.content)
         return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -147,12 +150,12 @@ class TelegraphRenderer:
 """
 
     def _render_author(self) -> str:
-        author_name = self.page.get("author_name")
-        if not isinstance(author_name, str) or not author_name:
+        author_name = self.page.author_name
+        if not author_name:
             return ""
         name = escape(author_name, quote=False)
         author_url = safe_url(
-            self.page.get("author_url"),
+            self.page.author_url,
             self.source_url,
             SAFE_LINK_SCHEMES,
         )
@@ -174,20 +177,15 @@ class TelegraphRenderer:
             "Original page</a></p>"
         )
 
-    def _render_nodes(self, nodes: list[Any]) -> str:
+    def _render_nodes(self, nodes: list[TelegraphNode]) -> str:
         return "".join(self._render_node(node) for node in nodes)
 
-    def _render_node(self, node: object) -> str:  # noqa: PLR0911
+    def _render_node(self, node: TelegraphNode) -> str:  # noqa: PLR0911
         if isinstance(node, str):
             return escape(node, quote=False)
-        if not isinstance(node, dict):
-            return ""
 
-        tag = node.get("tag")
-        children = node.get("children")
-        rendered_children = (
-            self._render_nodes(children) if isinstance(children, list) else ""
-        )
+        tag = node.tag
+        rendered_children = self._render_nodes(node.children or [])
 
         tag = TAG_ALIASES.get(tag, tag)
         match tag:
@@ -204,11 +202,11 @@ class TelegraphRenderer:
             case _:
                 return rendered_children
 
-    def _attrs(self, node: dict) -> dict:
-        attrs = node.get("attrs")
-        return attrs if isinstance(attrs, dict) else {}
+    @staticmethod
+    def _attrs(node: TelegraphNodeElement) -> dict[str, str]:
+        return node.attrs or {}
 
-    def _render_anchor(self, node: dict, children: str) -> str:
+    def _render_anchor(self, node: TelegraphNodeElement, children: str) -> str:
         href = safe_url(
             self._attrs(node).get("href"),
             self.source_url,
@@ -220,7 +218,7 @@ class TelegraphRenderer:
         escaped_href = escape(href, quote=True)
         return f'<a href="{escaped_href}" rel="noopener noreferrer">{label}</a>'
 
-    def _render_image(self, node: dict) -> str:
+    def _render_image(self, node: TelegraphNodeElement) -> str:
         self._image_occurrence += 1
         local_path = self.image_paths.get(self._image_occurrence)
         if local_path:
@@ -238,7 +236,12 @@ class TelegraphRenderer:
             f'<a class="image-link" href="{href}" rel="noopener noreferrer">Image</a>'
         )
 
-    def _render_embed(self, node: dict, tag: str, children: str) -> str:
+    def _render_embed(
+        self,
+        node: TelegraphNodeElement,
+        tag: str,
+        children: str,
+    ) -> str:
         source = safe_url(
             self._attrs(node).get("src"),
             self.source_url,

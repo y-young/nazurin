@@ -3,6 +3,7 @@ from __future__ import annotations
 from http import HTTPStatus
 from json import JSONDecodeError
 from pathlib import PurePath
+from typing import TypeAlias, Union
 
 from aiohttp import ContentTypeError
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -19,10 +20,13 @@ class TelegraphModel(BaseModel):
     model_config = ConfigDict(extra="allow", strict=True)
 
 
+TelegraphNode: TypeAlias = Union[str, "TelegraphNodeElement"]
+
+
 class TelegraphNodeElement(TelegraphModel):
     tag: str
     attrs: dict[str, str] | None = None
-    children: list[str | TelegraphNodeElement] | None = None
+    children: list[TelegraphNode] | None = None
 
 
 class TelegraphPage(TelegraphModel):
@@ -33,7 +37,7 @@ class TelegraphPage(TelegraphModel):
     author_name: str | None = None
     author_url: str | None = None
     image_url: str | None = None
-    content: list[str | TelegraphNodeElement]
+    content: list[TelegraphNode] = Field(default_factory=list)
     views: int
     can_edit: bool | None = None
 
@@ -48,8 +52,8 @@ class Telegraph:
     API_BASE = "https://api.telegra.ph"
 
     @network_retry
-    async def get_page(self, page_path: str) -> tuple[dict, dict]:
-        """Fetch a Telegraph page and return the raw envelope and page data."""
+    async def get_page(self, page_path: str) -> tuple[dict, TelegraphPage]:
+        """Fetch a Telegraph page and return its raw envelope and validated page."""
         api_url = f"{self.API_BASE}/getPage/{page_path}"
         async with (
             Request() as request,
@@ -76,8 +80,7 @@ class Telegraph:
 
         if api_response.result is None:
             raise NazurinError("Invalid Telegraph API response")
-        page = api_response.result.model_dump(exclude_unset=True)
-        return envelope, page
+        return envelope, api_response.result
 
     async def fetch(self, page_path: str, source_url: str) -> TelegraphIllust:
         envelope, page = await self.get_page(page_path)
@@ -85,11 +88,11 @@ class Telegraph:
         return TelegraphIllust(envelope, page, source_url, destination)
 
     @staticmethod
-    def get_storage_destination(page: dict) -> str:
+    def get_storage_destination(page: TelegraphPage) -> str:
         values = {
-            **page,
+            **page.model_dump(exclude_unset=True),
             "archive_name": build_archive_name(page),
-            "path_hash": build_path_hash(page["path"]),
+            "path_hash": build_path_hash(page.path),
         }
         try:
             destination = DESTINATION.format_map(values)
