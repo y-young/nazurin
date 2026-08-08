@@ -1,5 +1,5 @@
 import re
-from urllib.parse import quote, unquote, urlsplit
+from urllib.parse import unquote, urlsplit
 
 from nazurin.models import Document
 from nazurin.sites import HandlerResult
@@ -8,19 +8,15 @@ from .api import Telegraph
 from .config import COLLECTION
 
 patterns = [
-    r"(?:^|,)(?P<url>(?i:https?://(?:telegra\.ph|graph\.org)/[\w%-]+))"
-    r"(?=,|$)",
+    r"(?P<url>(?i:https?://(?:telegra\.ph|graph\.org)/[\w%-]+))",
 ]
 
 
 def normalize_page_url(url: str) -> tuple[str, str]:
-    """Return a canonical page path and source URL."""
+    """Return the decoded page path and original source URL."""
     parsed = urlsplit(url)
-    host = parsed.hostname
-    assert host is not None
     page_path = unquote(parsed.path).strip("/")
-    source_url = f"https://{host}/{quote(page_path, safe='')}"
-    return page_path, source_url
+    return page_path, url
 
 
 async def handle(match: re.Match) -> HandlerResult:

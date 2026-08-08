@@ -21,8 +21,8 @@ class File:
     name: str
     url: str = None
     _destination: str = ""
-    local_path: str | os.PathLike | None = field(
-        default=None,
+    _local_dir: str = field(
+        default=TEMP_DIR,
         kw_only=True,
         repr=False,
     )
@@ -35,9 +35,16 @@ class File:
         """
         Path to the file in temporary directory.
         """
-        if self.local_path is not None:
-            return os.fspath(self.local_path)
-        return os.path.join(TEMP_DIR, self.name)
+        return os.path.join(self._local_dir, self.name)
+
+    @property
+    def local_dir(self) -> str:
+        """Local directory containing the file, without the file name."""
+        return self._local_dir
+
+    @local_dir.setter
+    def local_dir(self, value: str | os.PathLike):
+        self._local_dir = os.fspath(value)
 
     @property
     def destination(self) -> pathlib.Path:

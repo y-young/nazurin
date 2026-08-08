@@ -96,11 +96,9 @@ class TelegraphRenderer:
     def __init__(
         self,
         page: TelegraphPage,
-        source_url: str,
         image_paths: dict[int, str] | None = None,
     ):
         self.page = page
-        self.source_url = source_url
         self.image_paths = image_paths or {}
         self._image_occurrence = 0
 
@@ -156,7 +154,7 @@ class TelegraphRenderer:
         name = escape(author_name, quote=False)
         author_url = safe_url(
             self.page.author_url,
-            self.source_url,
+            self.page.url,
             SAFE_LINK_SCHEMES,
         )
         if author_url:
@@ -168,10 +166,7 @@ class TelegraphRenderer:
         return f'<p class="author">By {name}</p>'
 
     def _render_source(self) -> str:
-        source_url = safe_url(self.source_url, self.source_url, SAFE_MEDIA_SCHEMES)
-        if not source_url:
-            return ""
-        href = escape(source_url, quote=True)
+        href = escape(self.page.url, quote=True)
         return (
             f'<p class="source"><a href="{href}" rel="noopener noreferrer">'
             "Original page</a></p>"
@@ -209,7 +204,7 @@ class TelegraphRenderer:
     def _render_anchor(self, node: TelegraphNodeElement, children: str) -> str:
         href = safe_url(
             self._attrs(node).get("href"),
-            self.source_url,
+            self.page.url,
             SAFE_LINK_SCHEMES,
         )
         if not href:
@@ -226,7 +221,7 @@ class TelegraphRenderer:
 
         source = safe_url(
             self._attrs(node).get("src"),
-            self.source_url,
+            self.page.url,
             SAFE_MEDIA_SCHEMES,
         )
         if not source:
@@ -244,7 +239,7 @@ class TelegraphRenderer:
     ) -> str:
         source = safe_url(
             self._attrs(node).get("src"),
-            self.source_url,
+            self.page.url,
             SAFE_MEDIA_SCHEMES,
         )
         link = ""

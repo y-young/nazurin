@@ -112,7 +112,6 @@ class TelegraphIllust(Illust):
         )
         self.raw_response = raw_response
         self.page = page
-        self.source_url = source_url
         self.destination = destination
         self.image_references = collect_image_references(
             page.content,
@@ -160,15 +159,15 @@ class TelegraphIllust(Illust):
             )
         except OSError as error:
             raise NazurinError("Failed to create Telegraph workspace") from error
-        self.article_file.local_path = Path(self._workspace, "article.html")
-        self.page_file.local_path = Path(self._workspace, "page.json")
+        self.article_file.local_dir = self._workspace
+        self.page_file.local_dir = self._workspace
 
     async def _write_json(self):
         content = json.dumps(self.raw_response, ensure_ascii=False, indent=2) + "\n"
         await self._atomic_write(self.page_file.path, content)
 
     async def _write_article(self, image_paths: dict[int, str]):
-        renderer = TelegraphRenderer(self.page, self.source_url, image_paths)
+        renderer = TelegraphRenderer(self.page, image_paths)
         await self._atomic_write(self.article_file.path, renderer.render())
 
     async def _download_images(self) -> dict[int, str]:
@@ -213,8 +212,8 @@ class TelegraphIllust(Illust):
         suffix = ".download" if needs_suffix_detection else url_suffix
         name = f"{asset_index:03d}{suffix}"
         assets_folder = Path(self._workspace, "assets")
-        local_path = assets_folder / name
-        image = Image(name, reference.url, local_path=local_path)
+        image = Image(name, reference.url)
+        image.local_dir = assets_folder
         image.destination = str(PurePosixPath(self.destination, "assets"))
         try:
             await image.download(session)
@@ -235,7 +234,6 @@ class TelegraphIllust(Illust):
                         )
                     else:
                         image.name = final_name
-                        image.local_path = final_path
                 else:
                     logger.warning(
                         "Failed to detect Telegraph image format for {}, keeping {}",
@@ -280,7 +278,7 @@ class TelegraphIllust(Illust):
         if workspace and await aiofiles.os.path.exists(workspace):
             await async_wrap(shutil.rmtree)(workspace, ignore_errors=True)
         self._workspace = None
-        self.article_file.local_path = None
-        self.page_file.local_path = None
+        self.article_file.local_dir = TEMP_DIR
+        self.page_file.local_dir = TEMP_DIR
         self.images = []
         self._prepared = False
