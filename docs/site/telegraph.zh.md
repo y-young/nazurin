@@ -36,6 +36,7 @@ Telegraph/
 {
   "archive_name": "清理后的页面标题和稳定的 12 位 path hash",
   "title": "Telegraph 返回的页面标题",
+  "author_name": "作者名称",
   "path": "规范化后的 Telegraph page path",
   "path_hash": "page path 的 SHA-256 哈希前 12 位"
 }

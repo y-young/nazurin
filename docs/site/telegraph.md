@@ -35,6 +35,7 @@ For more information, refer to [Customizing Storage Path & File Name](./index.md
 {
   "archive_name": "Sanitized page title followed by a stable 12-character path hash",
   "title": "Page title returned by Telegraph",
+  "author_name": "Author name",
   "path": "Normalized Telegraph page path",
   "path_hash": "First 12 characters of the SHA-256 hash of the page path"
 }
