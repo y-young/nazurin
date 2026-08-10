@@ -123,6 +123,7 @@ class TelegraphRenderer:
       max-width: 46rem;
       padding: 0 1rem;
     }}
+    a {{ color: inherit; }}
     img, video {{ height: auto; max-width: 100%; }}
     figure {{ margin: 1.5rem 0; }}
     figcaption {{ color: #666; font-size: 0.9rem; }}
@@ -132,13 +133,14 @@ class TelegraphRenderer:
       padding-left: 1rem;
     }}
     pre {{ background: #f5f5f5; overflow-x: auto; padding: 1rem; }}
-    .author {{ color: #79828B; }}
+    .title {{ font-size: 32px; line-height: 34px; margin-block: 12px; }}
+    .author {{ color: #79828B; font-size: 15px; margin-block: 12px; }}
     .source, .embed {{ color: #666; }}
   </style>
 </head>
 <body>
   <article>
-    <h1>{title}</h1>
+    <h1 class="title">{title}</h1>
     {author}
     {content}
     {source}

@@ -12,7 +12,7 @@ from urllib.parse import urlsplit
 
 import aiofiles
 import aiofiles.os
-from aiohttp import ClientError
+from aiohttp import ClientError, ClientSession
 from PIL import Image as PILImage
 
 from nazurin.config import MAX_PARALLEL_DOWNLOAD, TEMP_DIR
@@ -201,7 +201,7 @@ class TelegraphIllust(Illust):
 
     async def _download_image(
         self,
-        session: Request,
+        session: ClientSession,
         asset_index: int,
         reference: ImageReference,
     ) -> tuple[Image | None, int]:
