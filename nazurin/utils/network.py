@@ -49,7 +49,7 @@ class Request(ClientSession, NazurinRequestSession):
         **kwargs,
     ):
         headers = headers or {}
-        headers.update({"User-Agent": UA})
+        headers.setdefault("User-Agent", UA)
         timeout = ClientTimeout(total=timeout)
 
         connector = None
