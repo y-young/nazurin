@@ -16,5 +16,6 @@
 |  DeviantArt  |        <https://www.deviantart.com/>        |      |    ✔     |
 |    Lofter    |          <https://www.lofter.com/>          |      |    ✔     |
 | Kemono.party |           <https://kemono.party/>           |      |    ✔     |
+|   Pawchive   | <https://pawchive.pw/>, <https://pawchive.st/> |      |    ✔     |
 |  Telegraph   | <https://telegra.ph/>, <https://graph.org/> |      |    ✔     |
 |   Bluesky    |             <https://bsky.app/>             |      |    ✔     |
