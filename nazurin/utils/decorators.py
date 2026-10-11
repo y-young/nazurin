@@ -85,6 +85,11 @@ class Cache:
         def decorator(func):
             if asyncio.iscoroutinefunction(func):
                 func = alru_cache(*args, **kwargs)(func)
+                if hasattr(func, "cache_invalidate") and not hasattr(
+                    func,
+                    "invalidate",
+                ):
+                    func.invalidate = func.cache_invalidate
             else:
                 func = functools.lru_cache(*args, **kwargs)(func)
             Cache.cached_functions.append(func)

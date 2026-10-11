@@ -125,6 +125,9 @@ class GoogleDrive:
                 # and Google Drive allows duplicate folder names,
                 # we need to invalidate the cache
                 # to avoid duplicate folders being created.
-                GoogleDrive.find_folder.invalidate(segment, current)
+                if hasattr(GoogleDrive.find_folder, "cache_invalidate"):
+                    GoogleDrive.find_folder.cache_invalidate(segment, current)
+                elif hasattr(GoogleDrive.find_folder, "invalidate"):
+                    GoogleDrive.find_folder.invalidate(segment, current)
             current = folder
         return current
