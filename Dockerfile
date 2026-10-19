@@ -1,4 +1,8 @@
 ARG PYTHON_VERSION=3.10
+ARG FFMPEG_VERSION=9.0.2-1
+
+# FFmpeg
+FROM mwader/static-ffmpeg:${FFMPEG_VERSION} AS ffmpeg
 
 # Builder
 FROM python:${PYTHON_VERSION}-alpine AS builder
@@ -18,15 +22,6 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-install-project --no-dev
 
-# Install FFmpeg
-ARG TARGETARCH
-ARG FFMPEG_VERSION=4.2.2
-
-RUN echo "Download from https://www.johnvansickle.com/ffmpeg/old-releases/ffmpeg-${FFMPEG_VERSION}-${TARGETARCH}-static.tar.xz" && \
-    wget https://www.johnvansickle.com/ffmpeg/old-releases/ffmpeg-${FFMPEG_VERSION}-${TARGETARCH}-static.tar.xz -O ffmpeg.tar.xz && \
-    tar Jxvf ./ffmpeg.tar.xz && \
-    cp ./ffmpeg-${FFMPEG_VERSION}-${TARGETARCH}-static/ffmpeg /usr/local/bin/
-
 # Runtime
 FROM python:${PYTHON_VERSION}-alpine
 
@@ -39,7 +34,8 @@ ENV PYTHONUNBUFFERED=1
 RUN apk add --no-cache curl
 
 # Install FFmpeg
-COPY --from=builder /usr/local/bin/ffmpeg /usr/local/bin/
+COPY --from=ffmpeg /ffmpeg /ffprobe /usr/local/bin/
+RUN ffmpeg -version && ffprobe -version
 
 # cURL Impersonate libraries
 COPY --from=builder /usr/local/bin/curl_* /usr/local/bin/
