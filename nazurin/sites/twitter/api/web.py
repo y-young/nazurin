@@ -208,7 +208,9 @@ class WebAPI(BaseAPI):
         # This API uses the same token as logged-in TweetDetail
         self.headers.update({Headers.AUTHORIZATION: AuthorizationToken.LOGGED_IN})
         await self._require_auth()
-        response = await self._json_request("GET", api, params=params)
+        response = await self._json_request(
+            "GET", api, params=params, require_tid=bool(AUTH_TOKEN)
+        )
         try:
             tweet_result = response["data"]["tweetResult"]
             if "result" not in tweet_result:
