@@ -185,7 +185,9 @@ class WebAPI(BaseAPI):
             "features": json.dumps(WebAPI.features),
         }
         await self._require_auth()
-        response = await self._json_request("GET", api, params=params)
+        response = await self._json_request(
+            "GET", api, params=params, require_tid=not AUTH_TOKEN
+        )
         try:
             return self._process_response(response, tweet_id)
         except KeyError as error:
@@ -428,12 +430,17 @@ class WebAPI(BaseAPI):
         Transform user object from API to a normalized schema.
         """
 
-        user = data["legacy"]
+        user = dict(data.get("legacy") or {})
+        core = data.get("core") or {}
+        for field in ("name", "screen_name", "created_at"):
+            if value := core.get(field):
+                user[field] = value
+
         user.update(
             {
                 "id_str": data["rest_id"],
                 "created_at": fromasctimeformat(user["created_at"]).isoformat(),
-                "is_blue_verified": data["is_blue_verified"],
+                "is_blue_verified": data.get("is_blue_verified", False),
             },
         )
         return user
