@@ -430,7 +430,7 @@ class WebAPI(BaseAPI):
         Transform user object from API to a normalized schema.
         """
 
-        user = dict(data.get("legacy") or {})
+        user = data.get("legacy") or {}
         core = data.get("core") or {}
         for field in ("name", "screen_name", "created_at"):
             if value := core.get(field):
@@ -440,7 +440,7 @@ class WebAPI(BaseAPI):
             {
                 "id_str": data["rest_id"],
                 "created_at": fromasctimeformat(user["created_at"]).isoformat(),
-                "is_blue_verified": data.get("is_blue_verified", False),
+                "is_blue_verified": data["is_blue_verified"],
             },
         )
         return user
