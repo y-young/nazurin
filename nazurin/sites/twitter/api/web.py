@@ -411,11 +411,14 @@ class WebAPI(BaseAPI):
         if data.get("__typename") == "TweetUnavailable":
             reason = WebAPI.error_message_by_reason(data.get("reason"))
             raise NazurinError(f"Tweet is unavailable, reason: {reason}.")
-        tweet = data["legacy"]
+
+        tweet = WebAPI.unwrap_field(data, "legacy")
+        user = WebAPI.normalize_user(tweet["core"]["user_results"]["result"])
+        del tweet["core"]
         tweet.update(
             {
                 "created_at": fromasctimeformat(tweet["created_at"]).isoformat(),
-                "user": WebAPI.normalize_user(data["core"]["user_results"]["result"]),
+                "user": user,
                 "text": tweet["full_text"],
             },
         )
@@ -423,25 +426,37 @@ class WebAPI(BaseAPI):
         return tweet
 
     @staticmethod
-    def normalize_user(data: dict):
+    def normalize_user(user: dict):
         """
         Transform user object from API to a normalized schema.
         """
 
-        user = data.get("legacy") or {}
-        core = data.get("core") or {}
-        for field in ("name", "screen_name", "created_at"):
-            if value := core.get(field):
-                user[field] = value
-
+        user = WebAPI.unwrap_field(user, "legacy")
+        user = WebAPI.unwrap_field(user, "core")
         user.update(
             {
-                "id_str": data["rest_id"],
+                "id_str": user["rest_id"],
                 "created_at": fromasctimeformat(user["created_at"]).isoformat(),
-                "is_blue_verified": data["is_blue_verified"],
             },
         )
         return user
+
+    @staticmethod
+    def unwrap_field(data: dict, field: str) -> dict:
+        """
+        Unwrap a field in the data dictionary if it exists.
+        """
+        if field not in data:
+            return data
+        values = data[field] or {}
+        del data[field]
+        if not isinstance(values, dict):
+            raise ValueError(
+                f"Expected a dictionary for field '{field}', "
+                f"got {type(values).__name__}"
+            )
+        data.update(values)
+        return data
 
     @staticmethod
     def error_message_by_reason(reason: str):
