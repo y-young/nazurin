@@ -56,7 +56,7 @@ class AuthorizationToken:
 class TweetDetailAPI:
     # From Fritter
     GUEST = "3XDB26fBve-MmjHaWTUZxA/TweetDetail"
-    LOGGED_IN = "_8aYOgEDz35BrBcBal1-_w/TweetDetail"
+    LOGGED_IN = "dQDdKtt882nl-Km98FJGSQ/TweetDetail"
 
 
 ERROR_MESSAGES = {
@@ -185,9 +185,7 @@ class WebAPI(BaseAPI):
             "features": json.dumps(WebAPI.features),
         }
         await self._require_auth()
-        response = await self._json_request(
-            "GET", api, params=params, require_tid=not AUTH_TOKEN
-        )
+        response = await self._json_request("GET", api, params=params)
         try:
             return self._process_response(response, tweet_id)
         except KeyError as error:
@@ -208,9 +206,7 @@ class WebAPI(BaseAPI):
         # This API uses the same token as logged-in TweetDetail
         self.headers.update({Headers.AUTHORIZATION: AuthorizationToken.LOGGED_IN})
         await self._require_auth()
-        response = await self._json_request(
-            "GET", api, params=params, require_tid=bool(AUTH_TOKEN)
-        )
+        response = await self._json_request("GET", api, params=params)
         try:
             tweet_result = response["data"]["tweetResult"]
             if "result" not in tweet_result:
@@ -456,10 +452,8 @@ class WebAPI(BaseAPI):
     @network_retry
     @Cache.lru(ttl=86400)
     async def _get_home_page_source(self) -> str:
-        logger.info("Fetching Twitter home page source")
-        async with self._raw_request(
-            "GET", f"{BASE_URL}/home" if AUTH_TOKEN else f"{BASE_URL}/"
-        ) as response:
+        logger.info("Fetching Twitter transaction ID page source")
+        async with self._raw_request("GET", f"{BASE_URL}/i/jf/") as response:
             response.raise_for_status()
             source = await response.text()
         return source
