@@ -378,22 +378,6 @@ class WebAPI(BaseAPI):
             logger.info("{}", response)
             raise NazurinError(error)
 
-        # Check if tweet is available
-        typename = tweet.get("__typename")
-        if typename == "TweetTombstone":
-            tombstone = tweet["tombstone"]["text"]
-            logger.error("Encountered tweet tombstone: {}", tombstone)
-            text = tombstone["text"]
-            if text.startswith("Age-restricted"):
-                raise NazurinError(
-                    "Age-restricted adult content. Please set Twitter auth token.",
-                )
-            raise NazurinError(text)
-
-        # When using auth token, and e.g. the user limited who can reply,
-        # the result is not a direct tweet type, the real tweet is nested.
-        if typename == "TweetWithVisibilityResults" or tweet.get("tweet"):
-            tweet = tweet["tweet"]
         tweet = WebAPI.normalize_tweet(tweet)
         # Return original tweet if it's a retweet
         retweet_original = tweet.get("retweeted_status_result")
@@ -407,8 +391,19 @@ class WebAPI(BaseAPI):
         """
         Transform tweet object from API to a normalized schema.
         """
+        # Check if tweet is available
+        typename = data.get("__typename")
+        if typename == "TweetTombstone":
+            logger.error("Encountered tweet tombstone: {}", data)
+            error = WebAPI.resolve_tombstone_error(data)
+            raise NazurinError(error)
 
-        if data.get("__typename") == "TweetUnavailable":
+        # When using auth token, and e.g. the user limited who can reply,
+        # the result is not a direct tweet type, the real tweet is nested.
+        if typename == "TweetWithVisibilityResults" or data.get("tweet"):
+            data = data["tweet"]
+
+        if typename == "TweetUnavailable":
             reason = WebAPI.error_message_by_reason(data.get("reason"))
             raise NazurinError(f"Tweet is unavailable, reason: {reason}.")
 
@@ -424,6 +419,22 @@ class WebAPI(BaseAPI):
         )
         del tweet["full_text"]
         return tweet
+
+    @staticmethod
+    def resolve_tombstone_error(data: dict) -> str:
+        """
+        Resolve the error message for a tweet tombstone.
+        """
+        if (
+            (tombstone := data.get("tombstone"))
+            and (text := tombstone.get("text"))
+            and (inner_text := text.get("text"))
+        ):
+            return f"Tweet is unavailable, reason: {inner_text}"
+        error = "Encountered tweet tombstone, this could be a sensitive tweet."
+        if not WebAPI.auth_token:
+            error += " Please set Twitter auth token."
+        return error
 
     @staticmethod
     def normalize_user(user: dict):
@@ -505,5 +516,5 @@ class WebAPI(BaseAPI):
             return tid_generator.generate_transaction_id(method, path)
         except Exception as error:
             message = f"Failed to generate Twitter client transaction ID: {error}"
-            logger.error(message)
+            logger.exception(message)
             raise NazurinError(message) from error
