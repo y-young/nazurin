@@ -14,8 +14,10 @@ patterns = [
     r"cdn\.donmai\.us/\w+/(?:[a-f0-9]{2}/){2}(?P<md5>[a-f0-9]{32})\.",
     # https://danbooru.donmai.us/data/sample/sample-12ab34cd56ef7890ab12cd34ef567890.jpg
     # https://safebooru.donmai.us/data/___original__drawn_by__12ab34cd56ef7890ab12cd34ef567890.png
-    r"(?:danbooru|safebooru)\.donmai\.us/data/(?:sample/)?(?:\S+)?"
-    r"(?P<md5>[a-f0-9]{32})\.",
+    (
+        r"(?:danbooru|safebooru)\.donmai\.us/data/(?:sample/)?(?:\S+)?"
+        r"(?P<md5>[a-f0-9]{32})\."
+    ),
 ]
 
 

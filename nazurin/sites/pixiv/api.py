@@ -370,4 +370,4 @@ class Pixiv:
                 raise NazurinError(
                     "Blocked by CloudFlare security check, please try again later.",
                 ) from None
-            raise error
+            raise

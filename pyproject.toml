@@ -89,7 +89,7 @@ extend-select = [
     "W",      # pycodestyle,
     "YTT",    # flake8-2020
 ]
-ignore = ["PERF203", "COM812", "RET504"]
+ignore = ["BLE001", "COM812", "FLY002", "PERF203", "RET504"]
 
 [tool.uv]
 constraint-dependencies = ["grpcio>=1.71.0"]
@@ -98,4 +98,4 @@ constraint-dependencies = ["grpcio>=1.71.0"]
 mega-py = { git = "https://github.com/y-young/mega.py", rev = "6015359" }
 
 [dependency-groups]
-dev = ["pre-commit~=4.1.0", "pytest~=8.3.3", "rich>=14.0.0", "ruff~=0.15.6"]
+dev = ["pre-commit~=4.1.0", "pytest~=8.3.3", "rich>=14.0.0", "ruff~=0.16.0"]

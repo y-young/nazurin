@@ -462,7 +462,7 @@ class WebAPI(BaseAPI):
         values = data[field] or {}
         del data[field]
         if not isinstance(values, dict):
-            raise ValueError(
+            raise TypeError(
                 f"Expected a dictionary for field '{field}', "
                 f"got {type(values).__name__}"
             )
