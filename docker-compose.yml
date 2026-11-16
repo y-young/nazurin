@@ -1,5 +1,3 @@
-version: "3.4"
-
 services:
   nazurin:
     # Alternatively, you may use "yyoung01/nazurin:latest"

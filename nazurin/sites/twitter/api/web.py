@@ -56,7 +56,7 @@ class AuthorizationToken:
 class TweetDetailAPI:
     # From Fritter
     GUEST = "3XDB26fBve-MmjHaWTUZxA/TweetDetail"
-    LOGGED_IN = "_8aYOgEDz35BrBcBal1-_w/TweetDetail"
+    LOGGED_IN = "dQDdKtt882nl-Km98FJGSQ/TweetDetail"
 
 
 ERROR_MESSAGES = {
@@ -378,22 +378,6 @@ class WebAPI(BaseAPI):
             logger.info("{}", response)
             raise NazurinError(error)
 
-        # Check if tweet is available
-        typename = tweet.get("__typename")
-        if typename == "TweetTombstone":
-            tombstone = tweet["tombstone"]["text"]
-            logger.error("Encountered tweet tombstone: {}", tombstone)
-            text = tombstone["text"]
-            if text.startswith("Age-restricted"):
-                raise NazurinError(
-                    "Age-restricted adult content. Please set Twitter auth token.",
-                )
-            raise NazurinError(text)
-
-        # When using auth token, and e.g. the user limited who can reply,
-        # the result is not a direct tweet type, the real tweet is nested.
-        if typename == "TweetWithVisibilityResults" or tweet.get("tweet"):
-            tweet = tweet["tweet"]
         tweet = WebAPI.normalize_tweet(tweet)
         # Return original tweet if it's a retweet
         retweet_original = tweet.get("retweeted_status_result")
@@ -407,15 +391,29 @@ class WebAPI(BaseAPI):
         """
         Transform tweet object from API to a normalized schema.
         """
+        # Check if tweet is available
+        typename = data.get("__typename")
+        if typename == "TweetTombstone":
+            logger.error("Encountered tweet tombstone: {}", data)
+            error = WebAPI.resolve_tombstone_error(data)
+            raise NazurinError(error)
 
-        if data.get("__typename") == "TweetUnavailable":
+        # When using auth token, and e.g. the user limited who can reply,
+        # the result is not a direct tweet type, the real tweet is nested.
+        if typename == "TweetWithVisibilityResults" or data.get("tweet"):
+            data = data["tweet"]
+
+        if typename == "TweetUnavailable":
             reason = WebAPI.error_message_by_reason(data.get("reason"))
             raise NazurinError(f"Tweet is unavailable, reason: {reason}.")
-        tweet = data["legacy"]
+
+        tweet = WebAPI.unwrap_field(data, "legacy")
+        user = WebAPI.normalize_user(tweet["core"]["user_results"]["result"])
+        del tweet["core"]
         tweet.update(
             {
                 "created_at": fromasctimeformat(tweet["created_at"]).isoformat(),
-                "user": WebAPI.normalize_user(data["core"]["user_results"]["result"]),
+                "user": user,
                 "text": tweet["full_text"],
             },
         )
@@ -423,20 +421,53 @@ class WebAPI(BaseAPI):
         return tweet
 
     @staticmethod
-    def normalize_user(data: dict):
+    def resolve_tombstone_error(data: dict) -> str:
+        """
+        Resolve the error message for a tweet tombstone.
+        """
+        if (
+            (tombstone := data.get("tombstone"))
+            and (text := tombstone.get("text"))
+            and (inner_text := text.get("text"))
+        ):
+            return f"Tweet is unavailable, reason: {inner_text}"
+        error = "Encountered tweet tombstone, this could be a sensitive tweet."
+        if not WebAPI.auth_token:
+            error += " Please set Twitter auth token."
+        return error
+
+    @staticmethod
+    def normalize_user(user: dict):
         """
         Transform user object from API to a normalized schema.
         """
 
-        user = data["legacy"]
+        user = WebAPI.unwrap_field(user, "legacy")
+        user = WebAPI.unwrap_field(user, "core")
         user.update(
             {
-                "id_str": data["rest_id"],
+                "id_str": user["rest_id"],
                 "created_at": fromasctimeformat(user["created_at"]).isoformat(),
-                "is_blue_verified": data["is_blue_verified"],
             },
         )
         return user
+
+    @staticmethod
+    def unwrap_field(data: dict, field: str) -> dict:
+        """
+        Unwrap a field in the data dictionary if it exists.
+        """
+        if field not in data:
+            return data
+        values = data[field] or {}
+        del data[field]
+        if not isinstance(values, dict):
+            raise ValueError(
+                f"Expected a dictionary for field '{field}', "
+                f"got {type(values).__name__}"
+            )
+        data.update(values)
+        return data
 
     @staticmethod
     def error_message_by_reason(reason: str):
@@ -447,10 +478,8 @@ class WebAPI(BaseAPI):
     @network_retry
     @Cache.lru(ttl=86400)
     async def _get_home_page_source(self) -> str:
-        logger.info("Fetching Twitter home page source")
-        async with self._raw_request(
-            "GET", f"{BASE_URL}/home" if AUTH_TOKEN else f"{BASE_URL}/"
-        ) as response:
+        logger.info("Fetching Twitter transaction ID page source")
+        async with self._raw_request("GET", f"{BASE_URL}/i/jf/") as response:
             response.raise_for_status()
             source = await response.text()
         return source
@@ -487,5 +516,5 @@ class WebAPI(BaseAPI):
             return tid_generator.generate_transaction_id(method, path)
         except Exception as error:
             message = f"Failed to generate Twitter client transaction ID: {error}"
-            logger.error(message)
+            logger.exception(message)
             raise NazurinError(message) from error

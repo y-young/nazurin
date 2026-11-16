@@ -2,6 +2,18 @@
 
 <https://danbooru.donmai.us/>
 
+## User-Agent
+
+### DANBOORU_USER_ID
+
+:material-lightbulb-on: 可选整数，默认不设置
+
+你的 Danbooru 用户 ID，会添加到 API 请求和文件下载的 User-Agent 中。
+可在个人资料页面的 URL 中找到：例如 `https://danbooru.donmai.us/users/12345` 中的 ID 为 `12345`。
+
+如果 IP 地址信誉较差，且 User-Agent 中未包含用户 ID，可能会被 Cloudflare 封禁。
+有关 User-Agent 的说明，请参阅 [Danbooru API Wiki](https://danbooru.donmai.us/wiki_pages/help:api)。
+
 ## 自定义存储路径和文件名
 
 更多信息请查阅 [自定义存储路径和文件名](./index.zh.md/#customizing-storage-path--file-name)。

@@ -1,6 +1,7 @@
 import os
 import re
 from datetime import datetime
+from http import HTTPStatus
 from os import path
 
 from pybooru import Danbooru as DanbooruBase
@@ -12,7 +13,7 @@ from nazurin.utils.decorators import async_wrap
 from nazurin.utils.exceptions import NazurinError
 from nazurin.utils.helpers import is_image
 
-from .config import DESTINATION, FILENAME
+from .config import DESTINATION, FILENAME, UA, USER_ID_HINT
 
 MAX_CHARACTER_COUNT = 5
 
@@ -22,6 +23,7 @@ class Danbooru:
         """Set Danbooru site."""
         self.site = site
         self.api = DanbooruBase(site)
+        self.api.client.headers.update({"User-Agent": UA})
         self.post_show = async_wrap(self.api.post_show)
         self.post_list = async_wrap(self.api.post_list)
 
@@ -37,9 +39,11 @@ class Danbooru:
             else:
                 post = await self.post_list(md5=md5)
         except PybooruHTTPError as err:
-            # pylint: disable=protected-access
-            if "Not Found" in err._msg:
-                raise NazurinError("Post not found") from None
+            msg, http_code, _ = err.args
+            message = f"Failed to fetch post ({http_code}): {msg}"
+            if http_code == HTTPStatus.FORBIDDEN:
+                message += f"\n{USER_ID_HINT}"
+            raise NazurinError(message) from err
         if "file_url" not in post:
             raise NazurinError(
                 "You may need a gold account to view this post\nSource: "
@@ -145,10 +149,10 @@ class Danbooru:
         return title, filename + extension
 
     @staticmethod
-    def _format_characters(characters: str) -> str:
-        if not characters:
+    def _format_characters(characters_str: str) -> str:
+        if not characters_str:
             return ""
-        characters = characters.split(" ")
+        characters = characters_str.split(" ")
         characters = list(map(Danbooru._normalize, characters))
         size = len(characters)
         if size <= MAX_CHARACTER_COUNT:
@@ -159,10 +163,10 @@ class Danbooru:
         return result
 
     @staticmethod
-    def _format_copyrights(copyrights: str) -> str:
-        if not copyrights:
+    def _format_copyrights(copyrights_str: str) -> str:
+        if not copyrights_str:
             return ""
-        copyrights = copyrights.split(" ")
+        copyrights = copyrights_str.split(" ")
         copyrights = list(map(Danbooru._normalize, copyrights))
         size = len(copyrights)
         if size == 1:

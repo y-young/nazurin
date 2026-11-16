@@ -2,6 +2,19 @@
 
 <https://danbooru.donmai.us/>
 
+## User-Agent
+
+### DANBOORU_USER_ID
+
+:material-lightbulb-on: Optional integer, unset by default
+
+Your Danbooru user ID, included in the User-Agent for API requests and file downloads.
+Find it in your profile URL: for `https://danbooru.donmai.us/users/12345`, the ID is `12345`.
+
+An IP address with a bad reputation, combined with a missing user ID in the User-Agent,
+may result in a Cloudflare ban. See the [Danbooru API wiki](https://danbooru.donmai.us/wiki_pages/help:api)
+for User-Agent guidance.
+
 ## Customizing Storage Path & File Name
 
 For more information, refer to [Customizing Storage Path & File Name](./index.md/#customizing-storage-path--file-name).

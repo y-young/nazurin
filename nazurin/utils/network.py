@@ -44,13 +44,12 @@ class Request(ClientSession, NazurinRequestSession):
     def __init__(
         self,
         cookies: dict | None = None,
-        headers: dict | None = None,
+        headers: dict[str, str] | None = None,
         timeout: int = TIMEOUT,
         **kwargs,
     ):
         headers = headers or {}
-        headers.update({"User-Agent": UA})
-        timeout = ClientTimeout(total=timeout)
+        headers.setdefault("User-Agent", UA)
 
         connector = None
         if PROXY:
@@ -60,7 +59,7 @@ class Request(ClientSession, NazurinRequestSession):
             cookies=cookies,
             headers=headers,
             trust_env=True,
-            timeout=timeout,
+            timeout=ClientTimeout(total=timeout),
             **kwargs,
         )
 
