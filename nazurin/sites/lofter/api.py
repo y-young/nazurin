@@ -73,8 +73,8 @@ class Lofter:
                     url,
                     destination,
                     thumbnail=photo["orign"],
-                    width=photo["rw"],
-                    height=photo["rh"],
+                    width=photo.get("rw", photo.get("ow", 0)),
+                    height=photo.get("rh", photo.get("oh", 0)),
                 ),
             )
         return imgs
