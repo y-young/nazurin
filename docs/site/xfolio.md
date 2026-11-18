@@ -10,7 +10,7 @@
 
 Value of the `xfolio_session` cookie from a logged-in browser session (valid for 30 days on a rolling basis).
 
-- **Without `XFOLIO_SESSION`**: Works out-of-the-box for public portfolios using the public display images (`assets.xfolio.jp`, WebP up to 1200px height).
+- **Without `XFOLIO_SESSION`**: Works for public portfolios using the public display images (`assets.xfolio.jp`, WebP up to 1200px height).
 - **With `XFOLIO_SESSION`**:
   - Unlocks full-scale original images (`user_asset.php` via `fullscale_image`, automatically detecting original PNG/JPEG/WebP format) with automatic fallback to `assets.xfolio.jp` when full-scale viewing is disabled by the creator.
   - Accesses portfolios that have bot protection (`reCAPTCHA`) enabled for logged-out visitors.
@@ -71,7 +71,7 @@ _Only common used ones are listed._
   "likes_num": "Number of likes",
   "favorites_num": "Number of favorites",
   "filename": "Original file name, without extension",
-  "image_id": "Full-scale image ID (if available when logged in)",
+  "image_id": "Full-scale image ID (if available when logged in and creator does not disable)",
   "index": "Image index",
   "extension": "Extension, with leading dot"
 }
