@@ -10,9 +10,9 @@
 
 浏览器登录后 Cookie 中的 `xfolio_session` 值（Xfolio 服务端默认提供 30 天滚动有效期）。
 
-- **未配置 `XFOLIO_SESSION` 时**：零配置直接抓取公开作品集的展示大图（`assets.xfolio.jp`，最高 1200px 的 WebP）。
+- **未配置 `XFOLIO_SESSION` 时**：直接抓取公开作品集的展示大图（`assets.xfolio.jp`，最高 1200px 的 WebP）。
 - **配置 `XFOLIO_SESSION` 时**：
-  - 自动优先获取原寸大未压缩原图（通过 `fullscale_image` 解析 `user_asset.php` 并自动识别 PNG/JPEG/WebP 真实后缀），若创作者未开启全尺寸查看则自动回退至 `assets.xfolio.jp` 源。
+  - 优先获取未压缩原图（通过 `fullscale_image` 解析 `user_asset.php` 并自动识别 PNG/JPEG/WebP 真实后缀），若创作者未开启全尺寸查看则自动回退至 `assets.xfolio.jp` 源。
   - 可直接访问开启了「Bot対策機能（reCAPTCHA）」的作品集。
   - 收藏作品时支持自动点赞与自动加入站内收藏夹。
 
@@ -71,7 +71,7 @@ _此处只列出常用项。_
   "likes_num": "点赞数",
   "favorites_num": "收藏数",
   "filename": "原始文件名称，不含扩展名",
-  "image_id": "全尺寸原图 ID（登录且开启全尺寸查看时可用）",
+  "image_id": "全尺寸原图 ID（登录且作者开启全尺寸查看时可用）",
   "index": "图片索引",
   "extension": "扩展名，含前导点"
 }
